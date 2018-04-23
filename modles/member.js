@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 const Base = require('./base');
 

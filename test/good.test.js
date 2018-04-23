@@ -16,7 +16,12 @@ describe("#药品数据模块测试", function() {
     })
 
     it("##016.01 添加|修改药品、应该返回成功，Code=0", function(done) {
-        let goodData = {};
+        let goodData = {
+            Name:"",
+            NamePinYin:"",
+            OfficalName:"",
+
+        };
 
         agent.post('/api/good/save').send({goodData}).expect(200).end(function(err, res) {
             if (err) {
