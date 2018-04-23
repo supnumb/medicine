@@ -8,6 +8,7 @@ describe("#会员模块测试", function() {
     before(function(done) {
         agent.post('/api/employee/signin').send({login_name: "13552085563", password: "sup340"}).expect(200).end(function(err, res) {
             if (err) {
+
                 console.log(err);
             }
             res.text.should.containEql("登录成功");
