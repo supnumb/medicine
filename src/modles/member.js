@@ -39,7 +39,7 @@ Member.prototype.showMemberList = function(callback) {
             return callback(err, null);
         }
 
-        callback(null, {data: rows});
+        callback(null, { data: rows });
     });
 };
 
