@@ -17,10 +17,25 @@ describe("#药品数据模块测试", function() {
 
     it("##016.01 添加|修改药品、应该返回成功，Code=0", function(done) {
         let goodData = {
-            Name:"",
-            NamePinYin:"",
-            OfficalName:"",
-
+            Name: "",
+            NamePinYin: "",
+            OfficalName: "",
+            Dimension: "",
+            FormOfDrug: "",
+            Unit: "",
+            DefaultCostPrice: "",
+            DefaultPrice: "",
+            LimitPrice: "",
+            BidPrice: "",
+            Manufacturer: "",
+            Competion: "",
+            Medicare: "",
+            PeriodTreatment: "",
+            Translation: "",
+            Usage: "",
+            Remark: "",
+            IsForeign: "",
+            ApprovalNumber: ""
         };
 
         agent.post('/api/good/save').send({goodData}).expect(200).end(function(err, res) {
@@ -80,21 +95,19 @@ describe("#药品数据模块测试", function() {
         });
     })
 
+    it("##016.03 得到指定商品的详细信息 应该返回成功，Code=0", function(done) {
+        let goodid = -1;
+
+        agent.get('/api/good/${goodid}').expect(200).end(function(err, res) {
+            if (err) {
+                return done(err);
+            }
+
+            console.log(res.text);
+            res.text.should.containEql("0");
+            done();
+        });
 
 
-    // it("##016.03 查询药品（按名称、通用名称）应该返回成功，Code=0", function(done) {
-    //     let goodid = -1;
-    //
-    //     agent.post('/api/good/delete').send {
-    //         goodid
-    //     }.expect(200).end(function(err, res) {
-    //         if (err) {
-    //             return done(err);
-    //         }
-    //
-    //         console.log(res.text);
-    //         res.text.should.containEql("0");
-    //         done();
-    //     });
-    // })
+    })
 })

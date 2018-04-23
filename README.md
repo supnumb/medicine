@@ -19,6 +19,33 @@ passuser01
 3、药品录入页面：收集字段  
 4、几个统计表的表头：
 
+## 符合真实场景的模拟数据
+
+
+> let goodData = {  
+>     Name: "",  
+>     NamePinYin: "",  
+>     OfficalName: "",  
+>     Dimension: "",  
+>     FormOfDrug: "",  
+>     Unit: "",  
+>     DefaultCostPrice: "",  
+>     DefaultPrice: "",  
+>     LimitPrice: "",  
+>     BidPrice: "",  
+>     Manufacturer: "",  
+>     Competion: "",  
+>     Medicare: "",  
+>     PeriodTreatment: "",  
+>     Translation: "",  
+>     Usage: "",  
+>     Remark: "",  
+>     IsForeign: "",  
+>     ApprovalNumber: ""  
+> };
+
+
+
 ## 业务逻辑流程整理
 
 1、
