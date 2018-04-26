@@ -1,2 +1,11 @@
+const Good = require('./good');
+const Member = require('./member');
+const Intention = require('./intention');
+const Visit = require('./visit');
 
-export {default as Good} from './good';
+module.exports = {
+    Good,
+    Member,
+    Intention,
+    Visit
+}

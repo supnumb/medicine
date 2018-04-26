@@ -41,6 +41,8 @@ Visit.prototype.Search = function(MemberID, callback) {
 
 /**
  * 回访记录列表
+ * @param  {Number} page 第几页
+ * @param  {Number} limit 每页显示几条
  */
 Visit.prototype.VisitList = function(page, limit, callback) {
 

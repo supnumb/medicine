@@ -19,3 +19,12 @@
 3、models 下增加一个index.js暴露对外的对象； controller层通过引用  require('../modles');引用暴露对象；（代码好看）
 4、Member.prototype.MemberList  参数注释写完整；要确保生成出来的接口文档有参考价值；
 5、exports.updateGood 代码可以很大的简化成JSON对象；先解构再组装，浪费时间且进度慢；（这个是严重问题）
+
+
+### 问题修改反馈
+
+1、已修改全部models
+2、待确定
+3、已修改
+4、已修改全部models
+5、待确定

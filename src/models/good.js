@@ -22,7 +22,7 @@ function Good() {
         _remove: "update Goods set Status=1 where ID=:ID;",
 
         //药品修改
-        _upd: "update Goods set Name=:Name,PinYin=:PinYin,OfficalName=:OfficalName,Dimension=:Dimension,FormOfDrug=:FormOfDrug,Unit=:Unit,DefaultCostPrice=:DefaultCostPrice,DefaultPrice=:DefaultPrice,LimitPrice=:LimitPrice,BidPrice=:BidPrice,Manufacturer=:Manufacturer,Medicare=:Medicare,PeriodTreatment=:PeriodTreatment,Translation=:Translation,Usage=:Usage,Remark=:Remark,IsForeign=:IsForeign,ApprovalNumber=:ApprovalNumber where ID=:ID;",
+        _update: "update Goods set Name=:Name,PinYin=:PinYin,OfficalName=:OfficalName,Dimension=:Dimension,FormOfDrug=:FormOfDrug,Unit=:Unit,DefaultCostPrice=:DefaultCostPrice,DefaultPrice=:DefaultPrice,LimitPrice=:LimitPrice,BidPrice=:BidPrice,Manufacturer=:Manufacturer,Medicare=:Medicare,PeriodTreatment=:PeriodTreatment,Translation=:Translation,Usage=:Usage,Remark=:Remark,IsForeign=:IsForeign,ApprovalNumber=:ApprovalNumber where ID=:ID;",
 
 
 
@@ -54,6 +54,8 @@ Good.prototype.Search = function(KeyWord, callback) {
 
 /**
  * 药品列表
+ * @param  {Number} page 第几页
+ * @param  {Number} limit 每页显示几条
  */
 Good.prototype.GoodList = function(page, limit, callback) {
 
@@ -88,46 +90,30 @@ Good.prototype.GoodInfo = function(ID, callback) {
 
 /**
  * 药品添加
- * @param  {String} Name 名称
- * @param  {String} PinYin 拼音
- * @param  {String} OfficalName 学名
- * @param  {String} Dimension 规格尺寸
- * @param  {String} FormOfDrug 剂型
- * @param  {String} Unit 单位
- * @param  {String} DefaultCostPrice 默认进价
- * @param  {String} DefaultPrice 默认零售价
- * @param  {Tinyint} LimitPrice 权限价
- * @param  {String} Competion
- * @param  {String} Medicare 医保情况
- * @param  {String} PeriodTreatment 疗程
- * @param  {String} Translation 适应症
- * @param  {String} Usage 用法用量
- * @param  {String} Remark 备注
- * @param  {String} IsForeign 是否进口
- * @param  {String} ApprovalNumber 批准文号
+ * @param  {Object} obj 药品信息
  */
-Good.prototype.addGood = function(Name, PinYin, OfficalName, Dimension, FormOfDrug, Unit, DefaultCostPrice, DefaultPrice, LimitPrice, BidPrice, Manufacturer, Medicare, PeriodTreatment, Translation, Usage, Remark, IsForeign, ApprovalNumber, CreateTime, callback) {
+Good.prototype.addGood = function(obj, callback) {
 
     this._add({
-        Name,
-        PinYin,
-        OfficalName,
-        Dimension,
-        FormOfDrug,
-        Unit,
-        DefaultCostPrice,
-        DefaultPrice,
-        LimitPrice,
-        BidPrice,
-        Manufacturer,
-        Medicare,
-        PeriodTreatment,
-        Translation,
-        Usage,
-        Remark,
-        IsForeign,
-        ApprovalNumber,
-        CreateTime
+        Name: obj.name,
+        PinYin: obj.pinYin,
+        OfficalName: obj.officalName,
+        Dimension: obj.dimension,
+        FormOfDrug: obj.formOfDrug,
+        Unit: obj.unit,
+        DefaultCostPrice: obj.defaultCostPrice,
+        DefaultPrice: obj.defaultCostPrice,
+        LimitPrice: obj.limitPrice,
+        BidPrice: obj.bidPrice,
+        Manufacturer: obj.manufacturer,
+        Medicare: obk.medicare,
+        PeriodTreatment: obj.periodTreatment,
+        Translation: obj.translation,
+        Usage: obj.usage,
+        Remark: obj.remark,
+        IsForeign: obj.isForeign,
+        ApprovalNumber: obj.approvalNumber,
+        CreateTime: obj.createTime
     }, function(err, rows) {
         if (err) {
             return callback(err, null);
@@ -156,47 +142,31 @@ Good.prototype.removeGood = function(ID, callback) {
 
 /**
  * 药品修改
- * @param  {Int} ID 药品ID
- * @param  {String} Name 名称
- * @param  {String} PinYin 拼音
- * @param  {String} OfficalName 学名
- * @param  {String} Dimension 规格尺寸
- * @param  {String} FormOfDrug 剂型
- * @param  {String} Unit 单位
- * @param  {String} DefaultCostPrice 默认进价
- * @param  {String} DefaultPrice 默认零售价
- * @param  {Tinyint} LimitPrice 权限价
- * @param  {String} Competion
- * @param  {String} Medicare 医保情况
- * @param  {String} PeriodTreatment 疗程
- * @param  {String} Translation 适应症
- * @param  {String} Usage 用法用量
- * @param  {String} Remark 备注
- * @param  {String} IsForeign 是否进口
- * @param  {String} ApprovalNumber 批准文号
+ * @param  {Object} obj 药品信息
  */
-Good.prototype.updGood = function(ID, Name, PinYin, OfficalName, Dimension, FormOfDrug, Unit, DefaultCostPrice, DefaultPrice, LimitPrice, BidPrice, Manufacturer, Medicare, PeriodTreatment, Translation, Usage, Remark, IsForeign, ApprovalNumber, callback) {
+Good.prototype.updGood = function(obj, callback) {
 
-    this._upd({
-        ID: ID,
-        Name,
-        PinYin,
-        OfficalName,
-        Dimension,
-        FormOfDrug,
-        Unit,
-        DefaultCostPrice,
-        DefaultPrice,
-        LimitPrice,
-        BidPrice,
-        Manufacturer,
-        Medicare,
-        PeriodTreatment,
-        Translation,
-        Usage,
-        Remark,
-        IsForeign,
-        ApprovalNumber
+    this._update({
+        ID: obj.id,
+        Name: obj.name,
+        PinYin: obj.pinyin,
+        OfficalName: obj.officalName,
+        Dimension: obj.dimension,
+        FormOfDrug: obj.formOfDrug,
+        Unit: obj.unit,
+        DefaultCostPrice: obj.defaultCostPrice,
+        DefaultPrice: obj.defaultCostPrice,
+        LimitPrice: obj.limitPrice,
+        BidPrice: obj.bidPrice,
+        Manufacturer: obj.manufacturer,
+        Medicare: obk.medicare,
+        PeriodTreatment: obj.periodTreatment,
+        Translation: obj.translation,
+        Usage: obj.usage,
+        Remark: obj.remark,
+        IsForeign: obj.isForeign,
+        ApprovalNumber: obj.approvalNumber,
+        CreateTime: obj.createTime
     }, function(err, rows) {
         if (err) {
             return callback(err, null);

@@ -25,7 +25,7 @@ function Member() {
         _remove: "update Members set Status=1 where ID=:ID;",
 
         //会员修改
-        _upd: "update Members set Name=:Name,PinYin=:PinYin,Telephone=:Telephone,City=:City,Gender=:Gender,Address=:Address,Remark=:Remark,MobilPhone=:MobilPhone,WeiXinCode=:WeiXinCode,IsWeixinFriend=:IsWeixinFriend,FriendName=:FriendName,BirthYear=:BirthYear,Diseases=:Diseases where ID=:ID;",
+        _update: "update Members set Name=:Name,PinYin=:PinYin,Telephone=:Telephone,City=:City,Gender=:Gender,Address=:Address,Remark=:Remark,MobilPhone=:MobilPhone,WeiXinCode=:WeiXinCode,IsWeixinFriend=:IsWeixinFriend,FriendName=:FriendName,BirthYear=:BirthYear,Diseases=:Diseases where ID=:ID;",
 
 
 
@@ -77,6 +77,8 @@ Member.prototype.Search = function(KeyWord, callback) {
 
 /**
  * 会员列表
+ * @param  {Number} page 第几页
+ * @param  {Number} limit 每页显示几条
  */
 Member.prototype.MemberList = function(page, limit, callback) {
 
@@ -126,22 +128,24 @@ Member.prototype.MemberInfo = function(ID, callback) {
  * @param  {String} BirthYear 出生年代
  * @param  {String} Diseases 疾病
  */
-Member.prototype.addMember = function(Name, PinYin, Telephone, City, Gender, Address, Remark, MobilPhone, WeiXinCode, IsWeixinFriend, FriendName, BirthYear, Diseases, callback) {
+Member.prototype.addMember = function(obj, callback) {
+
+    const { Name, PinYin, Telephone, City, Gender, Address, Remark, MobilPhone, WeiXinCode, IsWeixinFriend, FriendName, BirthYear, Diseases } = obj
 
     this._add({
-        Name: Name,
-        PinYin: PinYin,
-        Telephone: Telephone,
-        City: City,
-        Gender: Gender,
-        Address: Address,
-        Remark: Remark,
-        MobilPhone: MobilPhone,
-        WeiXinCode: WeiXinCode,
-        IsWeixinFriend: IsWeixinFriend,
-        FriendName: FriendName,
-        BirthYear: BirthYear,
-        Diseases: Diseases
+        Name,
+        PinYin,
+        Telephone,
+        City,
+        Gender,
+        Address,
+        Remark,
+        MobilPhone,
+        WeiXinCode,
+        IsWeixinFriend,
+        FriendName,
+        BirthYear,
+        Diseases
     }, function(err, rows) {
         if (err) {
             return callback(err, null);
@@ -188,21 +192,21 @@ Member.prototype.removeMember = function(ID, callback) {
  */
 Member.prototype.updMember = function(ID, Name, PinYin, Telephone, City, Gender, Address, Remark, MobilPhone, WeiXinCode, IsWeixinFriend, FriendName, BirthYear, Diseases, callback) {
 
-    this._upd({
-        ID: ID,
-        Name: Name,
-        PinYin: PinYin,
-        Telephone: Telephone,
-        City: City,
-        Gender: Gender,
-        Address: Address,
-        Remark: Remark,
-        MobilPhone: MobilPhone,
-        WeiXinCode: WeiXinCode,
-        IsWeixinFriend: IsWeixinFriend,
-        FriendName: FriendName,
-        BirthYear: BirthYear,
-        Diseases: Diseases
+    this._update({
+        ID,
+        Name,
+        PinYin,
+        Telephone,
+        City,
+        Gender,
+        Address,
+        Remark,
+        MobilPhone,
+        WeiXinCode,
+        IsWeixinFriend,
+        FriendName,
+        BirthYear,
+        Diseases
     }, function(err, rows) {
         if (err) {
             return callback(err, null);

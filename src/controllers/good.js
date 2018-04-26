@@ -12,18 +12,37 @@
 const moment = require('moment');
 const eventproxy = require('eventproxy');
 
-const goodModel = require('../models/good');
+const { Good } = require('../models/index');
 
 
 /**
  * 添加药品
  * @param  {Object}   req  http 请求对象
  * @param  {Object}   res  http 响应对象
+ * @param  {String}   req.body.name 名称
+ * @param  {String}   req.body.pinYin 拼音
+ * @param  {String}   req.body.officalName 学名
+ * @param  {String}   req.body.dimension 规格尺寸
+ * @param  {String}   req.body.formOfDrug 剂型
+ * @param  {String}   req.body.unit 单位
+ * @param  {String}   req.body.defaultCostPrice 默认进价
+ * @param  {String}   req.body.defaultPrice 默认零售价
+ * @param  {Tinyint}  req.body.limitPrice 权限价
+ * @param  {String}   req.body.competion
+ * @param  {String}   req.body.medicare 医保情况
+ * @param  {String}   req.body.periodTreatment 疗程
+ * @param  {String}   req.body.translation 适应症
+ * @param  {String}   req.body.usage 用法用量
+ * @param  {String}   req.body.remark 备注
+ * @param  {String}   req.body.isForeign 是否进口
+ * @param  {String}   req.body.approvalNumber 批准文号
  * @param  {Function} next 管道操作，传递到下一步
  */
-exports.addMember = (req, res, next) => {
+exports.addGood = (req, res, next) => {
 
-    let { name, pinYin, officalName, dimension, formOfDrug, unit, defaultCostPrice, defaultPrice, limitPrice, bidPrice, manufacturer, medicare, periodTreatment, translation, usage, remark, isForeign, approvalNumber } = req.body;
+    let employData = JSON.parse(JSON.stringify(req.body));
+
+    let { name, pinYin, officalName, dimension, formOfDrug, unit, defaultCostPrice, defaultPrice, limitPrice, bidPrice, manufacturer, medicare, periodTreatment, translation, usage, remark, isForeign, approvalNumber } = employData;
 
     let createTime = new moment(new Date()).format("YYYY-MM-DD");
 
@@ -39,7 +58,9 @@ exports.addMember = (req, res, next) => {
         return res.send({ code: 2, message: "参数不完整" });
     };
 
-    goodModel.addGood(name, pinYin, officalName, dimension, formOfDrug, unit, defaultCostPrice, defaultPrice, limitPrice, bidPrice, manufacturer, medicare, periodTreatment, translation, usage, remark, isForeign, approvalNumber, createTime, function(err, mem) {
+    employData.createTime = createTime;
+
+    Good.addGood(employData, function(err, mem) {
 
         if (err) {
             ep.emit('error', "数据库操作错误");
@@ -72,7 +93,7 @@ exports.deleteGood = (req, res, next) => {
         return res.send({ code: 2, message: "药品Id参数不完整" });
     };
 
-    goodModel.removeGood(id, function(err, mem) {
+    Good.removeGood(id, function(err, mem) {
 
         if (err) {
             ep.emit('error', "数据库操作错误");
@@ -87,11 +108,31 @@ exports.deleteGood = (req, res, next) => {
  * 修改药品
  * @param  {Object}   req  http 请求对象
  * @param  {Object}   res  http 响应对象
+ * @param  {String}   req.body.id 药品id
+ * @param  {String}   req.body.name 名称
+ * @param  {String}   req.body.pinYin 拼音
+ * @param  {String}   req.body.officalName 学名
+ * @param  {String}   req.body.dimension 规格尺寸
+ * @param  {String}   req.body.formOfDrug 剂型
+ * @param  {String}   req.body.unit 单位
+ * @param  {String}   req.body.defaultCostPrice 默认进价
+ * @param  {String}   req.body.defaultPrice 默认零售价
+ * @param  {Tinyint}  req.body.limitPrice 权限价
+ * @param  {String}   req.body.competion
+ * @param  {String}   req.body.medicare 医保情况
+ * @param  {String}   req.body.periodTreatment 疗程
+ * @param  {String}   req.body.translation 适应症
+ * @param  {String}   req.body.usage 用法用量
+ * @param  {String}   req.body.remark 备注
+ * @param  {String}   req.body.isForeign 是否进口
+ * @param  {String}   req.body.approvalNumber 批准文号
  * @param  {Function} next 管道操作，传递到下一步
  */
 exports.updateGood = (req, res, next) => {
 
-    let { id, name, pinYin, officalName, dimension, formOfDrug, unit, defaultCostPrice, defaultPrice, limitPrice, bidPrice, manufacturer, medicare, periodTreatment, translation, usage, remark, isForeign, approvalNumber } = req.body;
+    let employData = JSON.parse(JSON.stringify(req.body));
+
+    let { id, name, pinYin, officalName, dimension, formOfDrug, unit, defaultCostPrice, defaultPrice, limitPrice, bidPrice, manufacturer, medicare, periodTreatment, translation, usage, remark, isForeign, approvalNumber } = employData;
 
     let ep = new eventproxy();
 
@@ -106,7 +147,7 @@ exports.updateGood = (req, res, next) => {
         return res.send({ code: 2, message: "参数不完整" });
     };
 
-    Member.updMember(id, name, pinYin, officalName, dimension, formOfDrug, unit, defaultCostPrice, defaultPrice, limitPrice, bidPrice, manufacturer, medicare, periodTreatment, translation, usage, remark, isForeign, approvalNumber, function(err, mem) {
+    Member.updMember(employData, function(err, mem) {
 
         if (err) {
             ep.emit('error', "数据库操作错误");
@@ -138,7 +179,7 @@ exports.goodList = (req, res, next) => {
         page = (page - 1) * limit;
     }
 
-    goodModel.GoodList(page, limit, function(err, mem) {
+    Good.GoodList(page, limit, function(err, mem) {
 
         if (err) {
             ep.emit('error', "数据库操作错误");
@@ -166,7 +207,7 @@ exports.search = (req, res, next) => {
         return res.status(403).send({ code: -1, message: "系统错误", data: error });
     });
 
-    goodModel.Search(keyWord, function(err, mem) {
+    Good.Search(keyWord, function(err, mem) {
 
         if (err) {
             ep.emit('error', "数据库操作错误");

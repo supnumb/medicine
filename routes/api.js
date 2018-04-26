@@ -38,10 +38,10 @@ router.post('/member/list', member.memberList);
 
 
 //药品添加
-router.post('/good/add', good.addMember);
+router.post('/good/add', good.addGood);
 
 //药品修改
-router.post('/good/upd', good.updateGood);
+router.post('/good/update', good.updateGood);
 
 //药品删除
 router.post('/good/remove', good.deleteGood);

@@ -23,9 +23,7 @@ const async = require('async');
 const moment = require('moment');
 const eventproxy = require('eventproxy');
 
-const Member = require('../models/member');
-const Visit = require('../models/visit');
-const Intention = require('../models/intention');
+const { Member, Visit, Intention } = require('../models/index');
 
 /**
  * 管理员登录功能
