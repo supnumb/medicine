@@ -144,7 +144,7 @@ Good.prototype.removeGood = function(ID, callback) {
  * 药品修改
  * @param  {Object} obj 药品信息
  */
-Good.prototype.updGood = function(obj, callback) {
+Good.prototype.updateGood = function(obj, callback) {
 
     this._update({
         ID: obj.id,

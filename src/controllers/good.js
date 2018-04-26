@@ -147,7 +147,7 @@ exports.updateGood = (req, res, next) => {
         return res.send({ code: 2, message: "参数不完整" });
     };
 
-    Member.updMember(employData, function(err, mem) {
+    Good.updateGood(employData, function(err, mem) {
 
         if (err) {
             ep.emit('error', "数据库操作错误");
