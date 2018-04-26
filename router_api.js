@@ -6,5 +6,4 @@ const Auth = require('./src/middle_wares/auth');
 router.post('/member/signup', API.Member.signup);
 router.post('/member/signin', API.Member.signin);
 
-
 module.exports = router;

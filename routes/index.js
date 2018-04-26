@@ -15,5 +15,9 @@ router.get('/orderAdd', function(req, res, next) {
     res.render('orderAdd');
 });
 
+router.get('/back_index', function(req, res, next) {
+    res.render('back');
+});
+
 
 module.exports = router;
