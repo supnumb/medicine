@@ -6,14 +6,17 @@ const Base = require('./base');
 function Member() {
     var _action = {
 
+        //根据电话号码查找
+        _getByTel: "select * from Members where MobilPhone=:MobilPhone;",
+
         //会员查询(like 字段转义)
         _search: "select Name,Gender,MobilPhone,City from Members where Flag=:Flag and concat(MobilPhone,Name) like :KeyWord;",
 
         //会员列表
-        _memberList: "select m.Name,m.MobilPhone,ifnull(i.Goods,'') Goods from Members m left join Intentions i on m.ID=i.MemberID where m.Flag=:Flag;",
+        _memberList: "select m.Name,m.MobilPhone,ifnull(i.Goods,'') Goods,count(v.ID) as visitCount,count(o.ID) as orderCount from Members m left join Intentions i on m.ID=i.MemberID left join Visits v on m.ID=v.MemberID left join Orders o on m.ID=o.MemberID where m.Flag=:Flag order by ID desc limit :page,:limit;",
 
         //会员详情
-        _MemberInfo: "select * from Members where ID=:ID;",
+        _memberInfo: "select * from Members where ID=:ID;",
 
         //会员添加
         _add: "insert into Members (Name,PinYin,Telephone,City,Gender,Address,Remark,MobilPhone,WeiXinCode,IsWeixinFriend,FriendName,BirthYear,Diseases) values (:Name,:PinYin,:Telephone,:City,:Gender,:Address,:Remark,:MobilPhone,:WeiXinCode,:IsWeixinFriend,:FriendName,:BirthYear,:Diseases);",
@@ -36,6 +39,25 @@ function Member() {
 };
 
 /**
+ * 根据电话号码查找
+ * @param  {String} MobilPhone 电话号码
+ */
+Member.prototype.Check = function(MobilPhone, callback) {
+
+    this._getByTel({
+        MobilPhone: MobilPhone
+    }, function(err, rows) {
+        if (err) {
+            return callback(err, null);
+        }
+
+        callback(null, rows[0]);
+    });
+};
+
+
+
+/**
  * 会员查询
  * @param  {String} KeyWord (MobilPhone,Name)
  */
@@ -56,10 +78,12 @@ Member.prototype.Search = function(KeyWord, callback) {
 /**
  * 会员列表
  */
-Member.prototype.showMemberList = function(callback) {
+Member.prototype.MemberList = function(page, limit, callback) {
 
     this._memberList({
-        Flag: 0
+        Flag: 0,
+        page,
+        limit
     }, function(err, rows) {
         if (err) {
             return callback(err, null);
@@ -73,7 +97,7 @@ Member.prototype.showMemberList = function(callback) {
  * 会员详情
  * @param  {Int} ID 会员ID
  */
-Member.prototype.showMemberInfo = function(ID, callback) {
+Member.prototype.MemberInfo = function(ID, callback) {
 
     this._memberInfo({
         ID: ID
