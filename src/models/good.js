@@ -206,5 +206,4 @@ Good.prototype.updGood = function(ID, Name, PinYin, OfficalName, Dimension, Form
     });
 };
 
-
 module.exports = new Good();
