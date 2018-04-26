@@ -21,6 +21,8 @@
     <!-- Custom styles for this template -->
     <link href="/stylesheets/dashboard.css" rel="stylesheet">
 
+    <link href="/stylesheets/style.css" rel="stylesheet">
+
     <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
     <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
     <script src="../../assets/js/ie-emulation-modes-warning.js"></script>
@@ -52,12 +54,13 @@
         <div class="row">
             <div class="col-sm-3 col-md-2 sidebar">
                 <ul class="nav nav-sidebar">
+                    <li><a href="/orderList">销售订单</a></li>
                     <li class="active"><a href="/">会员列表<span class="sr-only">(current)</span></a></li>
                     <li><a href="/memberAdd">会员添加</a></li>
                     <li><a href="/orderAdd">订单添加</a></li>
                 </ul>
             </div>
-            <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+            <div class="col-sm-9 col-sm-offset-3 col-md-7 col-md-offset-2 main">
 
                 <h3 class="sub-header">会员列表</h3>
 
@@ -168,6 +171,8 @@
                     </table>
                 </div>
             </div>
+            <!-- <div id="greenDiv" style="position:absolute;width:40%;height:100%;top:0px;left:100%;background-color:red;">
+            </div> -->
         </div>
     </div>
 
@@ -183,6 +188,25 @@
     <script src="/assets/js/vendor/holder.min.js "></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script src="/assets/js/ie10-viewport-bug-workaround.js "></script>
+
+    <!-- <script>
+        var isShow = true;
+        $(".container-fluid").click(function() {
+            if (isShow) {
+                $("#greenDiv").animate({
+                    left: '60%'
+                }, 'slow');
+                isShow = false;
+            } else {
+                $("#greenDiv").animate({
+                    left: '100%'
+                }, 'slow');
+                isShow = true;
+
+            }
+
+        });
+    </script> -->
 </body>
 
 </html>

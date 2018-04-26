@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="">
+
+    <title>后台管理系统</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <link href="/assets/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="/stylesheets/dashboard.css" rel="stylesheet">
+
+    <link href="/stylesheets/style.css" rel="stylesheet">
+
+    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
+    <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+    <script src="../../assets/js/ie-emulation-modes-warning.js"></script>
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+                <a class="navbar-brand" href="#">后台管理系统</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-3 col-md-2 sidebar">
+                <ul class="nav nav-sidebar">
+                    <li class="active"><a href="/orderList">销售订单</a></li>
+                    <li><a href="/">会员列表<span class="sr-only">(current)</span></a></li>
+                    <li><a href="/memberAdd">会员添加</a></li>
+                    <li><a href="/orderAdd">订单添加</a></li>
+                </ul>
+            </div>
+            <div class="col-sm-9 col-sm-offset-3 col-md-8 col-md-offset-2 main">
+
+                <h3 class="sub-header">销售订单</h3>
+
+                <form class="form-inline" style="margin:20px 0px 40px;">
+                    <div class=" form-group" style="margin-right:10px;">
+                        <label class="control-label" for="exampleInputEmail3 ">开始：</label>
+                        <input type="text" class="form-control " id="exampleInputEmail3 " placeholder="">
+                    </div>
+                    <div class="form-group" style="margin-right:10px;">
+                        <label class="control-label" for="exampleInputPassword3 ">结束：</label>
+                        <input type="text " class="form-control " id="exampleInputPassword3 " placeholder="">
+                    </div>
+                    <div class="form-group" style="margin-right:10px;">
+                        <label class="control-label" for="exampleInputPassword3 ">关键字：</label>
+                        <input type="text " class="form-control " id="exampleInputPassword3 " placeholder="">
+                    </div>
+                    <button type="button" class="btn btn-info">查询</button>
+                </form>
+                <div class="table-responsive ">
+
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>姓名</th>
+                                <th>电话</th>
+                                <th>意向单</th>
+                                <th>成交单</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Lorem</td>
+                                <td>13599999999</td>
+                                <td>感冒药、止痛药</td>
+                                <td>1</td>
+                                <td><button type="button" class='btn btn-sm upd_btn'><span class="glyphicon glyphicon-pencil" aria-hidden="true">修改</span></button></span>
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>amet</td>
+                                <td>13599999999</td>
+                                <td>退烧药</td>
+                                <td>0</td>
+                                <td><button type="button" class='btn btn-sm upd_btn'><span class="glyphicon glyphicon-pencil" aria-hidden="true">修改</span></button></span>
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Integer</td>
+                                <td>13599999999</td>
+                                <td>创可贴</td>
+                                <td>3</td>
+                                <td><button type="button" class='btn btn-sm upd_btn'><span class="glyphicon glyphicon-pencil" aria-hidden="true">修改</span></button></span>
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>libero</td>
+                                <td>13599999999</td>
+                                <td>创可贴</td>
+                                <td>0</td>
+                                <td><button type="button" class='btn btn-sm upd_btn'><span class="glyphicon glyphicon-pencil" aria-hidden="true">修改</span></button></span>
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>dapibus</td>
+                                <td>13599999999</td>
+                                <td>创可贴</td>
+                                <td>0</td>
+                                <td><button type="button" class='btn btn-sm upd_btn'><span class="glyphicon glyphicon-pencil" aria-hidden="true">修改</span></button></span>
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Nulla</td>
+                                <td>13599999999</td>
+                                <td>创可贴</td>
+                                <td>0</td>
+                                <td><button type="button" class='btn btn-sm upd_btn'><span class="glyphicon glyphicon-pencil" aria-hidden="true">修改</span></button></span>
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>nibh</td>
+                                <td>13599999999</td>
+                                <td>创可贴</td>
+                                <td>0</td>
+                                <td><button type="button" class='btn btn-sm upd_btn'><span class="glyphicon glyphicon-pencil" aria-hidden="true">修改</span></button></span>
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>sagittis</td>
+                                <td>13599999999</td>
+                                <td>创可贴</td>
+                                <td>0</td>
+                                <td><button type="button" class='btn btn-sm upd_btn'><span class="glyphicon glyphicon-pencil" aria-hidden="true">修改</span></button></span>
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Fusce</td>
+                                <td>13599999999</td>
+                                <td>创可贴</td>
+                                <td>0</td>
+                                <td><button type="button" class='btn btn-sm upd_btn'><span class="glyphicon glyphicon-pencil" aria-hidden="true">修改</span></button></span>
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>augue</td>
+                                <td>13599999999</td>
+                                <td>创可贴</td>
+                                <td>0</td>
+                                <td><button type="button" class='btn btn-sm upd_btn'><span class="glyphicon glyphicon-pencil" aria-hidden="true">修改</span></button></span>
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>massa</td>
+                                <td>13599999999</td>
+                                <td>创可贴</td>
+                                <td>0</td>
+                                <td><button type="button" class='btn btn-sm upd_btn'><span class="glyphicon glyphicon-pencil" aria-hidden="true">修改</span></button></span>
+                                    </span>
+                                </td>
+                            </tr>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div id="greenDiv" style="position:absolute;z-index:1000;width:50%;height:100%;top:0px;left:83%;background-color:#fff;border:1px solid #ddd">
+
+                <form class="form-horizontal" style="margin-top:75px;padding:0px 30px;">
+                    <div style="height:50px;padding-left:4px;">
+                        <h4>销售订单修改</h4>
+                    </div>
+                    <div class="form_div">
+                        <div class="form-group ">
+                            <div class="col-sm-10 ">
+                                <select class="form-control ">
+                                                        <option>张三</option>
+                                                        <option>李四</option>
+                                                        <option>王五</option>
+                                                      </select>
+                            </div>
+                            <label for="inputEmail3 " class="col-sm-2 control-label ">会员</label>
+
+                        </div>
+
+                        <div class="form-group ">
+                            <label for="inputEmail3 " class="col-sm-2 control-label ">所需商品</label>
+                            <div class="col-sm-4 ">
+                                <select class="form-control ">
+                                                <option>创可贴</option>
+                                                <option>感冒药</option>
+                                                <option>退烧药</option>
+                     
+                                    </select>
+                            </div>
+                            <div class="col-sm-3 ">
+                                <input type="text " class="col-sm-2 form-control " id="inputEmail3 " placeholder="数量 ">
+                            </div>
+                        </div>
+
+                        <div class="form-group ">
+                            <label for="inputEmail3 " class="col-sm-2 control-label ">所需商品</label>
+                            <div class="col-sm-4 ">
+                                <select class="form-control ">
+                                                <option>感冒药</option>
+                                                <option>退烧药</option>
+                                                <option>创可贴</option>
+                                    </select>
+                            </div>
+                            <div class="col-sm-3 ">
+                                <input type="text " class="col-sm-2 form-control " id="inputEmail3 " placeholder="数量 ">
+                            </div>
+                        </div>
+
+                        <div class="form-group ">
+                            <label for="inputEmail3 " class="col-sm-2 control-label ">所需商品</label>
+                            <div class="col-sm-4 ">
+                                <select class="form-control ">
+                                                <option>退烧药</option>
+                                                <option>感冒药</option>
+                                                <option>创可贴</option>
+                                    </select>
+                            </div>
+                            <div class="col-sm-3 ">
+                                <input type="text " class="col-sm-2 form-control " id="inputEmail3 " placeholder="数量 ">
+                            </div>
+                        </div>
+
+                        <div class="form-group ">
+                            <label for="inputEmail3 " class="col-sm-2 control-label ">联系地址</label>
+                            <div class="col-sm-10 ">
+                                <input type="text " class="form-control " id="inputEmail3 " placeholder="联系地址 ">
+                            </div>
+                        </div>
+                        <div class="form-group ">
+                            <label for="inputEmail3 " class="col-sm-2 control-label ">联系人</label>
+                            <div class="col-sm-10 ">
+                                <input type="text " class="col-sm-2 form-control " id="inputEmail3 " placeholder="联系人 ">
+                            </div>
+                        </div>
+                        <div class="form-group ">
+                            <label for="inputEmail3 " class="col-sm-2 control-label ">联系方式</label>
+                            <div class="col-sm-10 ">
+                                <input type="text " class="col-sm-2 form-control " id="inputEmail3 " placeholder="联系方式 ">
+                            </div>
+                        </div>
+                        <div class="form-group ">
+                            <label for="inputPassword3 " class="col-sm-2 control-label ">支付方式</label>
+                            <div class="col-sm-10 ">
+                                <select class="form-control ">
+                                                <option>微信支付</option>
+                                                <option>现金支付</option>
+                                                <option>货到付款</option>
+                                    </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group ">
+                            <label for="inputEmail3 " class="col-sm-2 control-label ">备注</label>
+                            <div class="col-sm-10 ">
+                                <textarea class="form-control " rows="4 "></textarea>
+                            </div>
+                        </div>
+
+
+                        <div class="form-group ">
+                            <div class="col-sm-offset-2 col-sm-5">
+                                <a class="btn btn-default" style="margin-right:10px; " id="cancel_btn">取消</a>
+                                <a class="btn btn-info" id="save_btn">保存</a>
+                            </div>
+                        </div>
+
+                    </div>
+                </form>
+
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js "></script>
+    <script>
+        window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js "><\/script>')
+    </script>
+    <script src="/dist/js/bootstrap.min.js "></script>
+    <!-- Just to make our placeholder images work. Don't actually copy the next line! -->
+    <script src="/assets/js/vendor/holder.min.js "></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="/assets/js/ie10-viewport-bug-workaround.js "></script>
+
+    <script>
+        isShow = true;
+        $(".upd_btn ").click(function() {
+            $("#greenDiv .form_div ").css("display ", "block ");
+            $("#greenDiv ").animate({
+                left: '50%'
+            }, 'slow');
+        });
+
+        $("#save_btn ").click(function() {
+            $("#greenDiv ").animate({
+                left: '83%'
+            }, 'slow');
+        });
+
+        $("#cancel_btn ").click(function() {
+            $("#greenDiv ").animate({
+                left: '83%'
+            }, 'slow');
+        });
+    </script>
+</body>
+
+</html>
