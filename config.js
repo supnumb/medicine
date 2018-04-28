@@ -4,6 +4,7 @@ var config = {
         host: 'www.loclive.cn',
         connectionLimit: 50,
         user: "chenxy",
+        port: "3360",
         password: "60v&iA",
         database: "Medicine"
     },

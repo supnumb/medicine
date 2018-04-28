@@ -23,7 +23,6 @@ describe("#会员模块测试", function() {
     before(function(done) {
         agent.post('/api/employee/signin').send({login_name: "13552085563", password: "sup340"}).expect(200).end(function(err, res) {
             if (err) {
-
                 console.log(err);
             }
             res.text.should.containEql("登录成功");
@@ -32,7 +31,6 @@ describe("#会员模块测试", function() {
     })
 
     it("##005.01 会员添加", function(doen) {
-
         agent.post('/api/member/add').send({body: memberData}).expect(200).end(function(err, res) {
             if (err) {
                 return done(err);

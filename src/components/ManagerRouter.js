@@ -1,13 +1,42 @@
 import React from 'react';
 import {Route, BrowserRouter as Router, Switch, NavLink} from 'react-router-dom';
+import {
+    GoodList,
+    OrderList,
+    ReceiptList,
+    StatsList,
+    MemberList,
+    VendorList,
+    SiteIndex,
+    Container,
+    MainMenu
+} from './index';
 
-import {GoodList,SiteIndex} from './index';
-
-console.log({Router})
+console.log(OrderList);
 
 const routes = [
     {
-        path: "/goods/index",
+        path: "/orders/",
+        extra: true,
+        component: OrderList
+    }, {
+        path: "/receipts/",
+        extra: true,
+        component: ReceiptList
+    }, {
+        path: "/stats/",
+        extra: true,
+        component: StatsList
+    }, {
+        path: "/members/",
+        extra: true,
+        component: MemberList
+    }, {
+        path: "/vendors/",
+        extra: true,
+        component: VendorList
+    }, {
+        path: "/goods/",
         extra: true,
         component: GoodList
     }, {
@@ -48,16 +77,25 @@ class ManagerRouter extends React.Component {
     render() {
         let {employee} = this.state;
 
-
-        {/* <Switch>
-            {
-                routes.map((route, i) => {
-                    return (<Container key={i} Employee={employee} {...route}/>)
-                })
-            }
-        </Switch> */}
-        return ("<Router></Router>");
-        // return (<Router></Router>);
+        return (<Router>
+            <div>
+                <div className="navbar navbar-inverse navbar-fixed-top"></div>
+                <div className="container-fluid">
+                    <div className="row">
+                        {/* 左侧菜单 */}
+                        <div className="col-md-1 sidebar"><MainMenu/></div>
+                        {/* 右侧内容 */}
+                        <Switch>
+                            {
+                                routes.map((route, i) => {
+                                    return (<Container key={i} Employee={employee} {...route}/>)
+                                })
+                            }
+                        </Switch>
+                    </div>
+                </div>
+            </div>
+        </Router>);
     }
 }
 
