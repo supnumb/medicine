@@ -2,6 +2,7 @@
  * 会员&员工表
  */
 const Base = require('./base');
+const moment = require('moment');
 
 function Member() {
     var _action = {
@@ -13,19 +14,19 @@ function Member() {
         _search: "select Name,Gender,MobilPhone,City from Members where Flag=:Flag and concat(MobilPhone,Name) like :KeyWord;",
 
         //会员列表
-        _memberList: "select m.Name,m.MobilPhone,m.City,m.Gender,m.Address,m.Remark,ifnull(i.Goods,'') Goods,count(v.ID) as VisitQuantity,count(o.ID) as OrderQuantity from Members m left join Intentions i on m.ID=i.MemberID left join Visits v on m.ID=v.MemberID left join Orders o on m.ID=o.MemberID where m.Flag=:Flag and m.Status=1 group by m.ID order by m.ID desc limit :page,:limit;",
+        _memberList: "select m.*,count(i.ID) as IntentionQuantity,count(v.ID) as VisitQuantity,count(o.ID) as OrderQuantity from Members m left join Intentions i on m.ID=i.MemberID left join Visits v on m.ID=v.MemberID left join Orders o on m.ID=o.MemberID where m.Flag=:Flag and m.Status=1 group by m.ID order by m.ID desc limit :page,:limit;",
 
         //会员详情
         _memberInfo: "select * from Members where ID=:ID;",
 
         //会员添加
-        _add: "insert into Members (Name,PinYin,Telephone,City,Gender,Address,Remark,MobilPhone,BirthYear,Diseases,RelationWithPatient) values (:Name,:PinYin,:Telephone,:City,:Gender,:Address,:Remark,:MobilPhone,:BirthYear,:Diseases,:RelationWithPatient);",
+        _add: "insert into Members (Name,PinYin,Telephone,City,Gender,Address,Remark,MobilPhone,WeiXinCode,IsWeixinFriend,FriendName,BirthYear,Diseases,RelationWithPatient,CreateTime) values (:Name,:PinYin,:Telephone,:City,:Gender,:Address,:Remark,:MobilPhone,WeiXinCode,IsWeixinFriend,FriendName,:BirthYear,:Diseases,:RelationWithPatient,now());",
 
         //会员删除
         _remove: "update Members set Status=0 where ID=:ID;",
 
         //会员修改
-        _update: "update Members set Name=:Name,PinYin=:PinYin,Telephone=:Telephone,City=:City,Gender=:Gender,Address=:Address,Remark=:Remark,MobilPhone=:MobilPhone,BirthYear=:BirthYear,Diseases=:Diseases where ID=:ID;",
+        _update: "update Members set Name=:Name,PinYin=:PinYin,Telephone=:Telephone,City=:City,Gender=:Gender,Address=:Address,Remark=:Remark,MobilPhone=:MobilPhone,WeiXinCode=:WeiXinCode,IsWeixinFriend=:IsWeixinFriend,FriendName=:FriendName,BirthYear=:BirthYear,Diseases=:Diseases,RelationWithPatient=:RelationWithPatient where ID=:ID;",
 
 
 
@@ -98,6 +99,15 @@ Member.prototype.MemberList = function(page, limit, callback) {
             } else {
                 rows[index].Gender = "女";
             }
+
+            if (element.IsWeixinFriend == 1) {
+                rows[index].IsWeixinFriend = "是";
+            } else {
+                rows[index].IsWeixinFriend = "否";
+            }
+
+            rows[index].CreateTime = moment(rows[index].CreateTime).format('YYYY-MM-DD HH:mm:ss');
+            rows[index].UpdateTime = moment(rows[index].UpdateTime).format('YYYY-MM-DD HH:mm:ss');
 
         });
 
