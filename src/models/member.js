@@ -13,7 +13,7 @@ function Member() {
         _search: "select Name,Gender,MobilPhone,City from Members where Flag=:Flag and concat(MobilPhone,Name) like :KeyWord;",
 
         //会员列表
-        _memberList: "select m.Name,m.MobilPhone,ifnull(i.Goods,'') Goods,count(v.ID) as visitCount,count(o.ID) as orderCount from Members m left join Intentions i on m.ID=i.MemberID left join Visits v on m.ID=v.MemberID left join Orders o on m.ID=o.MemberID where m.Flag=:Flag order by m.ID desc limit :page,:limit;",
+        _memberList: "select m.Name,m.MobilPhone,ifnull(i.Goods,'') Goods,count(v.ID) as visitCount,count(o.ID) as orderCount from Members m left join Intentions i on m.ID=i.MemberID left join Visits v on m.ID=v.MemberID left join Orders o on m.ID=o.MemberID where m.Flag=:Flag and m.Status=1 group by m.ID order by m.ID desc limit :page,:limit;",
 
         //会员详情
         _memberInfo: "select * from Members where ID=:ID;",
