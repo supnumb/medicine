@@ -70,7 +70,7 @@ Member.prototype.Search = function(KeyWord, callback) {
             return callback(err, null);
         }
 
-        callback(null, { data: rows });
+        callback(null, rows);
     });
 };
 
@@ -94,14 +94,14 @@ Member.prototype.MemberList = function(page, limit, callback) {
         rows.forEach(function(element, index) {
 
             if (element.Gender == 1) {
-
+                rows[index].Gender = "男";
             } else {
-
+                rows[index].Gender = "女";
             }
 
         });
 
-        callback(null, { data: rows });
+        callback(null, rows);
     });
 };
 
@@ -119,7 +119,7 @@ Member.prototype.MemberInfo = function(ID, callback) {
             return callback(err, null);
         }
 
-        callback(null, { data: rows[0] });
+        callback(null, rows[0]);
     });
 };
 
@@ -135,7 +135,7 @@ Member.prototype.addMember = function(obj, callback) {
             return callback(err, null);
         }
 
-        callback(null, { data: rows });
+        callback(null, rows);
     });
 };
 
@@ -153,7 +153,7 @@ Member.prototype.removeMember = function(ID, callback) {
             return callback(err, null);
         }
 
-        callback(null, { data: rows });
+        callback(null, rows);
     });
 };
 
@@ -169,7 +169,7 @@ Member.prototype.updMember = function(obj, callback) {
             return callback(err, null);
         }
 
-        callback(null, { data: rows });
+        callback(null, rows);
     });
 };
 
