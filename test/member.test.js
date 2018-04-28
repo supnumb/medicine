@@ -14,6 +14,9 @@ let memberData = {
     "Address": "",
     "Remark": "注释",
     "MobilPhone": "13511111111",
+    "WeiXinCode": "111111",
+    "IsWeixinFriend": 1,
+    "FriendName": "张三",
     "BirthYear": "70",
     "Diseases": "高血压",
     "RelationWithPatient": "妈妈"
@@ -43,7 +46,7 @@ describe("#会员模块测试", function() {
         });
     })
 
-    it.only("##005.02 删除存在的会员，应该返回成功", function(done) {
+    it("##005.02 删除存在的会员，应该返回成功", function(done) {
         let memberid = 2;
         agent.post('/api/member/delete').send({ memberid }).expect(200).end(function(err, res) {
             if (err) {
@@ -70,8 +73,8 @@ describe("#会员模块测试", function() {
     })
 
     it("##005.04 修改不存在的会员，应该返回Code=2", function(done) {
-        let memberData = {};
-        agent.post('/api/member/update').send({ body: memberData }).expect(200).end(function(err, res) {
+        memberData.ID = 100;
+        agent.post('/api/member/update').send(memberData).expect(200).end(function(err, res) {
             if (err) {
                 return done(err);
             }

@@ -106,7 +106,7 @@ exports.search = (req, res, next) => {
             ep.emit('error', "数据库操作错误");
         };
 
-        return res.status(200).send({ code: 0, data: mem });
+        return res.status(200).send({ code: 0, message: "success", data: mem });
 
     });
 }
@@ -186,7 +186,7 @@ exports.memberInfo = (req, res, next) => {
 
         const data = result[0];
 
-        return res.status(200).send({ code: 0, data: result[0], visitData: result[1], intentionData: result[2] });
+        return res.status(200).send({ code: 0, message: "success", data: result[0], visitData: result[1], intentionData: result[2] });
 
     });
 
@@ -220,7 +220,7 @@ exports.visitList = (req, res, next) => {
             ep.emit('error', "数据库操作错误");
         };
 
-        return res.status(200).send({ code: 0, data: mem });
+        return res.status(200).send({ code: 0, message: "success", data: mem });
 
     });
 }
@@ -252,7 +252,7 @@ exports.intentionList = (req, res, next) => {
             ep.emit('error', "数据库操作错误");
         };
 
-        return res.status(200).send({ code: 0, data: mem });
+        return res.status(200).send({ code: 0, message: "success", data: mem });
 
     });
 }
@@ -289,7 +289,7 @@ exports.intentionAdd = (req, res, next) => {
             ep.emit('error', "数据库操作错误");
         };
 
-        return res.status(200).send({ code: 0, data: mem });
+        return res.status(200).send({ code: 0, message: "success", data: mem });
 
     });
 }
@@ -304,7 +304,7 @@ exports.intentionAdd = (req, res, next) => {
  * @param  {String}   req.body.PinYin 姓名拼音
  * @param  {String}   req.body.Telephone 座机
  * @param  {String}   req.body.City 城市
- * @param  {Nember}   req.body.Gender 行别
+ * @param  {Nember}   req.body.Gender 行别  1是男，2是女
  * @param  {String}   req.body.Address 地址
  * @param  {String}   req.body.Remark 备注
  * @param  {String}   req.body.MobilPhone 移动电话
@@ -317,7 +317,7 @@ exports.intentionAdd = (req, res, next) => {
  */
 exports.addMember = (req, res, next) => {
 
-    let memberData = JSON.parse(JSON.stringify(req.body));
+    const { Name, PinYin = '', Telephone, City, Gender, Address = '', Remark = '', MobilPhone, WeiXinCode = '', IsWeixinFriend = '', FriendName = '', BirthYear = '', Diseases = '', RelationWithPatient = '' } = req.body;
 
     let ep = new eventproxy();
 
@@ -326,14 +326,12 @@ exports.addMember = (req, res, next) => {
         return res.status(403).send({ code: -1, message: "系统错误", data: error });
     });
 
-    const { Name, Telephone, City, Gender, MobilPhone } = memberData;
-
     if (!Name || !Telephone || !City || !Gender || !MobilPhone) {
         res.status(422);
         return res.send({ code: 2, message: "参数不完整" });
     };
 
-    memberData.CreateTime = new moment(new Date()).format("YYYY-MM-DD");
+    let memberData = { Name, PinYin, Telephone, City, Gender, Address, Remark, MobilPhone, WeiXinCode, IsWeixinFriend, FriendName, BirthYear, Diseases, RelationWithPatient };
 
     Member.addMember(memberData, function(err, mem) {
 
@@ -341,7 +339,7 @@ exports.addMember = (req, res, next) => {
             ep.emit('error', "数据库操作错误");
         };
 
-        return res.status(200).send({ code: 0, data: mem });
+        return res.status(200).send({ code: 0, message: "success", data: mem });
 
     });
 }
@@ -374,7 +372,7 @@ exports.deleteMember = (req, res, next) => {
             ep.emit('error', "数据库操作错误");
         };
 
-        return res.status(200).send({ code: 0, data: mem });
+        return res.status(200).send({ code: 0, message: "success", data: mem });
 
     });
 }
@@ -399,7 +397,7 @@ exports.deleteMember = (req, res, next) => {
  */
 exports.updateMember = (req, res, next) => {
 
-    let memberData = JSON.parse(JSON.stringify(req.body));
+    const { ID, Name, PinYin = '', Telephone, City, Gender, Address = '', Remark = '', MobilPhone, WeiXinCode = '', IsWeixinFriend = '', FriendName = '', BirthYear = '', Diseases = '', RelationWithPatient = '' } = req.body;
 
     let ep = new eventproxy();
 
@@ -408,13 +406,20 @@ exports.updateMember = (req, res, next) => {
         return res.status(403).send({ code: -1, message: "系统错误", data: error });
     });
 
+    if (!ID || !Name || !Telephone || !City || !Gender || !MobilPhone) {
+        res.status(422);
+        return res.send({ code: 2, message: "参数不完整" });
+    };
+
+    let memberData = { ID, Name, PinYin, Telephone, City, Gender, Address, Remark, MobilPhone, WeiXinCode, IsWeixinFriend, FriendName, BirthYear, Diseases, RelationWithPatient };
+
     Member.updMember(memberData, function(err, mem) {
 
         if (err) {
             ep.emit('error', "数据库操作错误");
         };
 
-        return res.status(200).send({ code: 0, data: mem });
+        return res.status(200).send({ code: 0, message: "success", data: mem });
 
     });
 }
@@ -446,9 +451,7 @@ exports.memberList = (req, res, next) => {
             ep.emit('error', "数据库操作错误");
         };
 
-        console.log(mem);
-
-        return res.status(200).send({ code: 0, data: mem });
+        return res.status(200).send({ code: 0, message: "success", data: mem });
 
     });
 }
