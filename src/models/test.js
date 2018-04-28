@@ -1,11 +1,5 @@
-var member = require('../modles/member');
+const bcrypt = require('bcryptjs');
 
-member.showMemberList(function(err, db) {
+let passhash = bcrypt.hashSync("super1111", bcrypt.genSaltSync(10));
 
-    if (err) {
-        console.log(err);
-    }
-
-    console.log(db);
-
-});
+console.log(passhash);

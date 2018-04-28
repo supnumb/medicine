@@ -52,10 +52,13 @@ exports.signin = (req, res, next) => {
 
         if (mem) {
             bcrypt.compare(password, mem.Password, function(err, result) {
+
                 if (err) {
                     console.error(err);
                     ep.emit('error', err);
                 }
+
+                //console.log("result", result);
 
                 if (result) {
                     return res.send({ code: 0, message: "登录成功" });
@@ -64,6 +67,7 @@ exports.signin = (req, res, next) => {
                 }
             });
         } else {
+
             return res.status(200).send({ code: 2, message: `${login_name}没有注册。` });
         }
     });
@@ -114,6 +118,8 @@ exports.search = (req, res, next) => {
  * @param  {Function} next 管道操作，传递到下一步
  */
 exports.memberInfo = (req, res, next) => {
+
+    console.log("aaaaa");
 
     let { id = "" } = req.body;
 
@@ -293,12 +299,25 @@ exports.intentionAdd = (req, res, next) => {
  * @param  {Object}   req  http 请求对象
  * @param  {Object}   res  http 响应对象
  * @param  {Function} next 管道操作，传递到下一步
+ * @param  {Int}      req.body.ID 会员ID
+ * @param  {String}   req.body.Name 姓名
+ * @param  {String}   req.body.PinYin 姓名拼音
+ * @param  {String}   req.body.Telephone 座机
+ * @param  {String}   req.body.City 城市
+ * @param  {Nember}   req.body.Gender 行别
+ * @param  {String}   req.body.Address 地址
+ * @param  {String}   req.body.Remark 备注
+ * @param  {String}   req.body.MobilPhone 移动电话
+ * @param  {String}   req.body.WeiXinCode 微信号
+ * @param  {Tinyint}  req.body.IsWeixinFriend 是否微信好友
+ * @param  {String}   req.body.FriendNamek 是谁的好友
+ * @param  {String}   req.body.BirthYear 出生年代
+ * @param  {String}   req.body.Diseases 疾病
+ * @param  {String}   req.body.RelationWithPatient 与患者关系
  */
 exports.addMember = (req, res, next) => {
 
-    let { name, pinYin, telephone, city, gender, address, remark, mobilPhone, weiXinCode, isWeixinFriend, friendName, birthYear, diseases } = req.body;
-
-    let createTime = new moment(new Date()).format("YYYY-MM-DD");
+    let memberData = JSON.parse(JSON.stringify(req.body));
 
     let ep = new eventproxy();
 
@@ -307,12 +326,16 @@ exports.addMember = (req, res, next) => {
         return res.status(403).send({ code: -1, message: "系统错误", data: error });
     });
 
-    if (!name || !pinYin || !telephone || !city || !gender || !address || !remark || !mobilPhone || !weiXinCode || !isWeixinFriend || !friendName || !birthYear || !diseases) {
+    const { Name, Telephone, City, Gender, MobilPhone } = memberData;
+
+    if (!Name || !Telephone || !City || !Gender || !MobilPhone) {
         res.status(422);
         return res.send({ code: 2, message: "参数不完整" });
     };
 
-    Member.addMember(name, pinYin, telephone, city, gender, address, remark, mobilPhone, weiXinCode, isWeixinFriend, friendName, birthYear, diseases, function(err, mem) {
+    memberData.CreateTime = new moment(new Date()).format("YYYY-MM-DD");
+
+    Member.addMember(memberData, function(err, mem) {
 
         if (err) {
             ep.emit('error', "数据库操作错误");
@@ -331,7 +354,7 @@ exports.addMember = (req, res, next) => {
  */
 exports.deleteMember = (req, res, next) => {
 
-    let { memberId } = req.body;
+    let { memberid } = req.body;
 
     let ep = new eventproxy();
 
@@ -340,12 +363,12 @@ exports.deleteMember = (req, res, next) => {
         return res.status(403).send({ code: -1, message: "系统错误", data: error });
     });
 
-    if (!memberId) {
+    if (!memberid) {
         res.status(422);
         return res.send({ code: 2, message: "会员Id参数不完整" });
     };
 
-    Member.removeMember(memberId, function(err, mem) {
+    Member.removeMember(memberid, function(err, mem) {
 
         if (err) {
             ep.emit('error', "数据库操作错误");
@@ -361,10 +384,22 @@ exports.deleteMember = (req, res, next) => {
  * @param  {Object}   req  http 请求对象
  * @param  {Object}   res  http 响应对象
  * @param  {Function} next 管道操作，传递到下一步
+ * @param  {Int}      req.body.ID 会员ID
+ * @param  {String}   req.body.Name 姓名
+ * @param  {String}   req.body.PinYin 姓名拼音
+ * @param  {String}   req.body.Telephone 座机
+ * @param  {String}   req.body.City 城市
+ * @param  {Int}      req.body.Gender 行别
+ * @param  {String}   req.body.Address 地址
+ * @param  {String}   req.body.Remark 备注
+ * @param  {String}   req.body.MobilPhone 移动电话
+ * @param  {String}   req.body.BirthYear 出生年代
+ * @param  {String}   req.body.Diseases 疾病
+ * @param  {String}   req.body.RelationWithPatient 与患者关系
  */
 exports.updateMember = (req, res, next) => {
 
-    let { memberId, name, pinYin, telephone, city, gender, address, remark, mobilPhone, weiXinCode, isWeixinFriend, friendName, birthYear, diseases } = req.body;
+    let memberData = JSON.parse(JSON.stringify(req.body));
 
     let ep = new eventproxy();
 
@@ -373,7 +408,7 @@ exports.updateMember = (req, res, next) => {
         return res.status(403).send({ code: -1, message: "系统错误", data: error });
     });
 
-    Member.updMember(memberId, name, pinYin, telephone, city, gender, address, remark, mobilPhone, weiXinCode, isWeixinFriend, friendName, birthYear, diseases, function(err, mem) {
+    Member.updMember(memberData, function(err, mem) {
 
         if (err) {
             ep.emit('error', "数据库操作错误");
@@ -410,6 +445,8 @@ exports.memberList = (req, res, next) => {
         if (err) {
             ep.emit('error', "数据库操作错误");
         };
+
+        console.log(mem);
 
         return res.status(200).send({ code: 0, data: mem });
 

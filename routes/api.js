@@ -10,10 +10,10 @@ router.post('/employee/signin', member.signin);
 router.post('/employee/signout', member.signout);
 
 //会员查询(按电话、名称查询)
-router.post('/member/search', member.search);
+router.post('/member/search', member.memberList);
 
 //会员详情(会员信息、回访记录、意向记录)
-router.post('/member/:id', member.memberInfo);
+//router.post('/member/:id', member.memberInfo);
 
 //会员跟踪(回访记录列表,回访记录搜索）
 router.post('/visit/list', member.visitList);

@@ -7,6 +7,7 @@
         "dev": "NODE_ENV=dev nodemon ./bin/www"
     },
     "dependencies": {
+        "async": "^2.6.0",
         "bcryptjs": "2.4.3",
         "cookie-parser": "~1.4.3",
         "debug": "~2.6.9",
@@ -30,8 +31,6 @@
         "rsuite-schema": "0.0.11",
         "form-lib": "^2.0.0",
         "babel-cli": "^6.26.0",
-        "babel-preset-es2015": "^6.24.1",
-        "babel-preset-stage-2": "^6.24.1",
         "clean-webpack-plugin": "^0.1.19",
         "del": "^3.0.0",
         "gulp": "^3.9.1",

@@ -5,48 +5,47 @@ var agent = supertest.agent(app);
 var should = require('should');
 
 let memberData = {
-    Name: "测试会员" + Math.random(),
-    PinYin: "test Member",
-    Telephone: '13511111111',
-    Password: "super1111",
+    "Name": "测试会员" + Math.random(),
+    "PinYin": "test Member",
+    "Telephone": "13511111111",
+    "Password": "super1111",
     "City": "北京市",
-    Gender: "男",
-    Address: "",
-    Remark: "注释",
-    MobilPhone: "13511111111",
-    BirthYear: "70",
-    Diseases: "高血压",
-    RelationWithPatient: "妈妈"
+    "Gender": "男",
+    "Address": "",
+    "Remark": "注释",
+    "MobilPhone": "13511111111",
+    "BirthYear": "70",
+    "Diseases": "高血压",
+    "RelationWithPatient": "妈妈"
 };
 
 describe("#会员模块测试", function() {
     before(function(done) {
-        agent.post('/api/employee/signin').send({login_name: "13552085563", password: "sup340"}).expect(200).end(function(err, res) {
+        agent.post('/api/employee/signin').send({ login_name: "13511111111", password: "super1111" }).expect(200).end(function(err, res) {
             if (err) {
 
-                console.log(err);
+                //console.log(err);
             }
             res.text.should.containEql("登录成功");
             done();
         })
     })
 
-    it("##005.01 会员添加", function(doen) {
-
-        agent.post('/api/member/add').send({body: memberData}).expect(200).end(function(err, res) {
+    it.only("##005.01 会员添加", function(done) {
+        //.send(memberData)
+        agent.post('/api/member/add').send(memberData).expect(200).end(function(err, res) {
             if (err) {
                 return done(err);
             }
 
-            console.log(res.text);
             res.text.should.containEql("0");
             done();
         });
     })
 
-    it("##005.02 删除存在的会员，应该返回成功", function(done) {
+    it.only("##005.02 删除存在的会员，应该返回成功", function(done) {
         let memberid = 2;
-        agent.post('/api/member/delete').send({memberid}).expect(200).end(function(err, res) {
+        agent.post('/api/member/delete').send({ memberid }).expect(200).end(function(err, res) {
             if (err) {
                 return done(err);
             }
@@ -56,9 +55,11 @@ describe("#会员模块测试", function() {
         });
     })
 
-    it("##005.03 修改存在的会员，应该返回Code=0", function(done) {
+    it.only("##005.03 修改存在的会员，应该返回Code=0", function(done) {
 
-        agent.post('/api/member/update').send({body: memberData}).expect(200).end(function(err, res) {
+        memberData.ID = 1;
+
+        agent.post('/api/member/update').send(memberData).expect(200).end(function(err, res) {
             if (err) {
                 return done(err);
             }
@@ -70,7 +71,7 @@ describe("#会员模块测试", function() {
 
     it("##005.04 修改不存在的会员，应该返回Code=2", function(done) {
         let memberData = {};
-        agent.post('/api/member/update').send({body: memberData}).expect(200).end(function(err, res) {
+        agent.post('/api/member/update').send({ body: memberData }).expect(200).end(function(err, res) {
             if (err) {
                 return done(err);
             }
@@ -83,7 +84,7 @@ describe("#会员模块测试", function() {
     it("##005.05 修改会员,数据库连接不上，应该返回Code=-1", function(done) {
         let memberData = {};
 
-        agent.post('/api/member/update').send({memberData}).expect(200).end(function(err, res) {
+        agent.post('/api/member/update').send({ memberData }).expect(200).end(function(err, res) {
             if (err) {
                 return done(err);
             }
@@ -93,7 +94,7 @@ describe("#会员模块测试", function() {
         });
     })
 
-    it("##006 会员列表，按时间倒序列出，返回数据里包含：电话、姓名、意向单内容、回访记录数量，成单数量", function(done) {
+    it.only("##006 会员列表，按时间倒序列出，返回数据里包含：电话、姓名、意向单内容、回访记录数量，成单数量", function(done) {
         agent.post('/api/member/search').expect(200).end(function(err, res) {
             if (err) {
                 return done(err);
@@ -109,7 +110,7 @@ describe("#会员模块测试", function() {
         let startTime = "";
         let endTime = "";
 
-        agent.post('/api/member/search').send({keyword, startTime, endTime, action: "export"}).expect(200).end(function(err, res) {
+        agent.post('/api/member/search').send({ keyword, startTime, endTime, action: "export" }).expect(200).end(function(err, res) {
             if (err) {
                 return done(err);
             }
@@ -127,7 +128,7 @@ describe("#会员模块测试", function() {
 
         //名称和地址支持模糊查询
         //电话要精确查询
-        agent.post('/api/member/search').send({keyword, tele, start, length}).expect(200).end(function(err, res) {
+        agent.post('/api/member/search').send({ keyword, tele, start, length }).expect(200).end(function(err, res) {
             if (err) {
                 return done(err);
             }
@@ -169,7 +170,7 @@ describe("#会员模块测试", function() {
             Remarks: ""
         };
 
-        agent.post('/api/visit/save').send({visit}).expect(200).end(function(err, res) {
+        agent.post('/api/visit/save').send({ visit }).expect(200).end(function(err, res) {
             if (err) {
                 return done(err);
             }
@@ -181,7 +182,7 @@ describe("#会员模块测试", function() {
 
     it("##004 保存会员购买意向记录；返回Code=0", function(done) {
         let intention = {};
-        agent.post('/api/intention/save').send({intention}).expect(200).end(function(err, res) {
+        agent.post('/api/intention/save').send({ intention }).expect(200).end(function(err, res) {
             if (err) {
                 return done(err);
             }
@@ -222,7 +223,7 @@ describe("#会员模块测试", function() {
         let newpass = "";
         let employeeid = 0;
 
-        agent.post('/api/employee/alterpass').send({employeeid, oldpass, newpass}).expect(200).end(function(err, res) {
+        agent.post('/api/employee/alterpass').send({ employeeid, oldpass, newpass }).expect(200).end(function(err, res) {
             if (err) {
                 return done(err);
             }
@@ -236,7 +237,7 @@ describe("#会员模块测试", function() {
         let newpass = "";
         let employeeid = 0;
 
-        agent.post('/api/employee/alterpass').send({employeeid, newpass}).expect(200).end(function(err, res) {
+        agent.post('/api/employee/alterpass').send({ employeeid, newpass }).expect(200).end(function(err, res) {
             if (err) {
                 return done(err);
             }
@@ -250,7 +251,7 @@ describe("#会员模块测试", function() {
         let newpass = "";
         let employeeid = 0;
 
-        agent.post('/api/employee/alterpass').send({employeeid, newpass}).expect(200).end(function(err, res) {
+        agent.post('/api/employee/alterpass').send({ employeeid, newpass }).expect(200).end(function(err, res) {
             if (err) {
                 return done(err);
             }

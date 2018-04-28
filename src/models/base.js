@@ -13,7 +13,7 @@ function Base() {
 Base.prototype.mixin = function(host, obj) {
     for (var key in obj) {
         host[key] = function(param, callback) {
-            console.log(this.toString());
+            //console.log(this.toString());
             pool.query(this.toString(), param, function(err, result) {
                 if (callback && typeof callback == 'function')
                     callback(err, result);
