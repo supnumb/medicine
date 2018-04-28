@@ -1,7 +1,9 @@
 import React from 'react';
 import {Route, BrowserRouter as Router, Switch, NavLink} from 'react-router-dom';
 
-import {GoodList} from './components';
+import {GoodList,SiteIndex} from './index';
+
+console.log({Router})
 
 const routes = [
     {
@@ -45,15 +47,17 @@ class ManagerRouter extends React.Component {
 
     render() {
         let {employee} = this.state;
-        return (<Router>
-            <Switch>
-                {
-                    routes.map((route, i) => {
-                        return (<Container key={i} Employee={employee} {...route}/>)
-                    })
-                }
-            </Switch>
-        </Router>)
+
+
+        {/* <Switch>
+            {
+                routes.map((route, i) => {
+                    return (<Container key={i} Employee={employee} {...route}/>)
+                })
+            }
+        </Switch> */}
+        return ("<Router></Router>");
+        // return (<Router></Router>);
     }
 }
 

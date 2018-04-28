@@ -24,7 +24,7 @@ class IntentionEditor extends React.Component {
     _submitIntention() {
         let formData=new FormData();
 
-        fetch('/api/good/save', {
+        fetch('/api/intention/add', {
             body:formData,
             method:'POST',
             mode: 'same-origin',

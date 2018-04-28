@@ -8,9 +8,6 @@ const outputPath = isDebug
     ? path.join(__dirname, './libs/debug')
     : path.join(__dirname, './libs/disk');
 
-
-
-console.log(outputPath);
 const lib = [
     'react',
     'react-dom',

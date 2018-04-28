@@ -10,7 +10,7 @@ const libPath = isDebug
 
 module.exports = {
     entry: {
-        workspace: "./src/web/back.client.js",
+        workspace: "./src/web/back.client.js"
     },
     plugins: [
         //new CleanWebpackPlugin(['../public/assets/js/']),
@@ -28,7 +28,7 @@ module.exports = {
             filename: "html/back.html",
             template: "./views/back_template.html",
             hash: true,
-            chunks: ['cook']
+            chunks: ['workspace']
         })
     ],
     module: {
@@ -38,7 +38,10 @@ module.exports = {
                 loader: 'babel-loader'
             }, {
                 test: /\.jsx$/,
-                loader: 'babel-loader!jsx-loader?harmony'
+                loader: 'babel-loader!jsx-loader?harmony',
+                query: {
+                    presets: ['es2015', 'stage-0', 'react']
+                }
             }, {
                 test: /\.scss$/,
                 loader: 'style-loader!css-loader!sass-loader'
