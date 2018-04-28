@@ -9,6 +9,11 @@ const defaultState = {
     },
     goodEdit: {},
     orderList: {},
+    memberList: {
+        isFetching: false,
+        members: [],
+        member:{}
+    },
     xxxx: {}
 };
 
@@ -16,6 +21,24 @@ function XXXXReducer(state = defaultState.xxxx, action) {
     switch (action.type) {
         case "":
             break;
+        default:
+            return state;
+    }
+}
+
+function MemberListReducer(state = defaultState.memberList, action) {
+    switch (action.type) {
+        case "FETCH_MEMBER":
+            return Object.assign({}, state, {isFetching: true});
+        case "FETCH_MEMBER_DONE":
+            return Object.assign({}, state, {
+                isFetching: false,
+                members: action.payload
+            });
+            case "EDITOR_MEMBER":
+            return Object.assign({}, state, {
+                member: action.payload
+            });
         default:
             return state;
     }
@@ -77,6 +100,6 @@ function GoodEditorReducer(state = defaultState.goodEdit, action) {
     }
 }
 
-const reducer = combineReducers({goodList: GoodListReducer, goodEdit: GoodEditorReducer});
+const reducer = combineReducers({goodList: GoodListReducer, goodEdit: GoodEditorReducer, memberList: MemberListReducer});
 const store = createStore(reducer, applyMiddleware(thunk));
 export default store;

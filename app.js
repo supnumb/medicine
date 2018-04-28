@@ -14,13 +14,10 @@ var app = express();
 // view engine setup
 // app.set('views', path.join(__dirname, 'views'));
 // app.set('view engine', 'ejs');
-<<<<<<< HEAD
 // app.set('views', path.join(__dirname, 'view/'));
 app.set('views', path.join(__dirname, '/public/assets/html'));
-=======
-app.set('views', path.join(__dirname, 'views'));
+// app.set('views', path.join(__dirname, 'views'));
 // app.set('views', path.join(__dirname, '/public/assets/html'));
->>>>>>> 480b0f2ef55f2fbeb9deab1e80a6749ce3f87ecd
 app.engine('.html', ejs.__express);
 app.set('view engine', 'html');
 

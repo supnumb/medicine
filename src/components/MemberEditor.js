@@ -1,6 +1,9 @@
 import React from 'react';
 import Store from './Reducer'
 
+import {Form, Field, createFormControl} from 'form-lib';
+import {SchemaModel, StringType} from 'rsuite-schema';
+
 /**
  * 药品基础数据编辑组件
  * @extends React.Component
@@ -22,7 +25,12 @@ class MemberEditor extends React.Component {
     _loadObjectDetail() {}
 
     _submit() {
-        let formData = new FormData();
+        if (!this.form.check()) {
+            this.setState({message: "数据格式有错误"})
+            return;
+        }
+
+        let formData = new FormData(document.getElementById('form'));
 
         fetch('/api/member/add', {
             body: formData,
@@ -38,8 +46,6 @@ class MemberEditor extends React.Component {
 
     componentDidMount() {
         let {location} = this.props
-        let {state} = location;
-
     }
 
     componentUnMount() {
@@ -47,8 +53,28 @@ class MemberEditor extends React.Component {
     }
 
     render() {
+        let {member} = this.props;
+
         return (<div id="MemberEditor">
-            会员编辑页面
+            <Form className="form" ref={ref => this.form = ref} id="form" onChange={(values) => {
+                    this.setState({role: values});
+                    this.form.cleanErrors();
+                }} onCheck={(errors) => {
+                    this.setState({errors})
+                }}>
+                <div className="form-group">
+                    <Field name="Name" id="Name"/>
+                    &nbsp;&nbsp;
+                    <button onClick={this.submit} className="btn btn-default">
+                        查询
+                    </button>
+                </div>
+            </Form>
+
+            会员编辑页面: {member.Name}
+            {member.Gender}
+            {member.City}
+            {member.Telephone}
         </div>)
     }
 }
