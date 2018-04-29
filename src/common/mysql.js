@@ -28,6 +28,8 @@ pool.on("connection", function(connection) {
 var db = {
     query: function(sql, values, callback) {
 
+        //console.log("sql", sql);
+
         /**
          * 执行查询操作
          */

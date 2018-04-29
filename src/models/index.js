@@ -1,11 +1,13 @@
 const Good = require('./good');
-const Member = require('./member');
 const Intention = require('./intention');
+const Member = require('./member');
+const Order = require('./order');
 const Visit = require('./visit');
 
 module.exports = {
     Good,
-    Member,
     Intention,
+    Member,
+    Order,
     Visit
 }

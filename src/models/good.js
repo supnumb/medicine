@@ -2,29 +2,28 @@
  * 药品&员工表
  */
 const Base = require('./base');
+const moment = require('moment');
 
 function Good() {
     var _action = {
 
-        //药品查询(like 字段转义)
-        _search: "select * from Goods where Name like :KeyWord;",
+        //添加
+        _add: "insert into Goods (Name,PinYin,OfficalName,Dimension,FormOfDrug,Unit,DefaultCostPrice,DefaultPrice,LimitPrice,BidPrice,Manufacturer,Competion,Medicare,PeriodTreatment,Translation,UseWay,Remark,IsForeign,ApprovalNumber,CreateTime) values (:Name,:PinYin,:OfficalName,:Dimension,:FormOfDrug,:Unit,:DefaultCostPrice,:DefaultPrice,:LimitPrice,:BidPrice,:Manufacturer,:Competion,:Medicare,:PeriodTreatment,:Translation,:UseWay,:Remark,:IsForeign,:ApprovalNumber,curdate());",
 
-        //药品列表
-        _goodList: "select * from Goods order by ID desc limit :page,:limit;",
+        //删除
+        _delete: "update Goods set Status=0 where ID=:ID;",
 
-        //药品详情
-        _goodInfo: "select * from Goods where ID=:ID;",
+        //修改
+        _update: "update Goods set Name=:Name,PinYin=:PinYin,OfficalName=:OfficalName,Dimension=:Dimension,FormOfDrug=:FormOfDrug,Unit=:Unit,DefaultCostPrice=:DefaultCostPrice,DefaultPrice=:DefaultPrice,LimitPrice=:LimitPrice,BidPrice=:BidPrice,Manufacturer=:Manufacturer,Competion=:Competion,Medicare=:Medicare,PeriodTreatment=:PeriodTreatment,Translation=:Translation,UseWay=:UseWay,Remark=:Remark,IsForeign=:IsForeign,ApprovalNumber=:ApprovalNumber where ID=:ID;",
 
-        //药品添加
-        _add: "insert into Goods (Name,PinYin,OfficalName,Dimension,FormOfDrug,Unit,DefaultCostPrice,DefaultPrice,LimitPrice,BidPrice,Manufacturer,Medicare,PeriodTreatment,Translation,Usage,Remark,IsForeign,ApprovalNumber,CreateTime) values (:Name,:PinYin,:OfficalName,:Dimension,:FormOfDrug,:Unit,:DefaultCostPrice,:DefaultPrice,:LimitPrice,:BidPrice,:Manufacturer,:Medicare,:PeriodTreatment,:Translation,:Usage,:Remark,:IsForeign,:ApprovalNumber:CreateTime);",
+        //列表
+        _goodList: "select g.*,ifnull(s.TotalQuantity,0) TotalQuantity,ifnull(s.ValiableQuantity,0) ValiableQuantity,ifnull(s.SaledQuantity,0) SaledQuantity from Goods g left join Stocks s on g.ID=s.GoodID where g.Status=1 and concat(g.Name,g.OfficalName) like :KeyWord group by g.ID order by g.ID desc limit :Page,:Limit;",
 
-        //药品删除(status状态)
-        _remove: "update Goods set Status=1 where ID=:ID;",
+        //详情
+        _goodInfo: "select g.*,ifnull(s.TotalQuantity,0) TotalQuantity,ifnull(s.ValiableQuantity,0) ValiableQuantity,ifnull(s.SaledQuantity,0) SaledQuantity from Goods g left join Stocks s on g.ID=s.GoodID where g.ID=:ID;",
 
-        //药品修改
-        _update: "update Goods set Name=:Name,PinYin=:PinYin,OfficalName=:OfficalName,Dimension=:Dimension,FormOfDrug=:FormOfDrug,Unit=:Unit,DefaultCostPrice=:DefaultCostPrice,DefaultPrice=:DefaultPrice,LimitPrice=:LimitPrice,BidPrice=:BidPrice,Manufacturer=:Manufacturer,Medicare=:Medicare,PeriodTreatment=:PeriodTreatment,Translation=:Translation,Usage=:Usage,Remark=:Remark,IsForeign=:IsForeign,ApprovalNumber=:ApprovalNumber where ID=:ID;",
-
-
+        //药品查询
+        _search: "select * from Goods where Status=1 and Name like :KeyWord;",
 
     };
 
@@ -35,47 +34,91 @@ function Good() {
     Base.apply(this, arguments);
 };
 
-/**
- * 药品查询
- * @param  {String} KeyWord (MobilPhone,Name)
- */
-Good.prototype.Search = function(KeyWord, callback) {
 
-    this._search({
-        KeyWord: KeyWord
+/**
+ * 药品添加
+ * @param  {Object} Obj 药品信息
+ */
+Good.prototype.add = function(Obj, callback) {
+
+    this._add(Obj, function(err, rows) {
+        if (err) {
+            return callback(err, null);
+        }
+
+        callback(null, rows);
+    });
+};
+
+/**
+ * 药品删除
+ * @param  {Number} ID 药品ID
+ */
+Good.prototype.delete = function(ID, callback) {
+
+    this._delete({
+        ID: ID
     }, function(err, rows) {
         if (err) {
             return callback(err, null);
         }
 
-        callback(null, { data: rows });
+        callback(null, rows);
+    });
+};
+
+/**
+ * 药品修改
+ * @param  {Object} Obj 药品信息
+ */
+Good.prototype.update = function(Obj, callback) {
+
+    this._update(Obj, function(err, rows) {
+        if (err) {
+            return callback(err, null);
+        }
+
+        callback(null, rows);
     });
 };
 
 /**
  * 药品列表
- * @param  {Number} page 第几页
- * @param  {Number} limit 每页显示几条
+ * @param  {String} KeyWord 关键字
+ * @param  {Number} Page 第几页
+ * @param  {Number} Limit 每页显示几条
+ * @param  {Date}   StartTime 开始时间
+ * @param  {Date}   EndTime 结束时间
  */
-Good.prototype.GoodList = function(page, limit, callback) {
+Good.prototype.goodList = function(KeyWord, Page, Limit, StartTime, EndTime, callback) {
 
-    this._GoodList({
-        page,
-        limit
+    this._goodList({
+        KeyWord: `%${KeyWord}%`,
+        Page,
+        Limit,
+        StartTime,
+        EndTime
     }, function(err, rows) {
         if (err) {
             return callback(err, null);
         }
 
-        callback(null, { data: rows });
+        rows.forEach(function(element, index) {
+
+            rows[index].CreateTime = moment(rows[index].CreateTime).format('YYYY-MM-DD HH:mm:ss');
+            rows[index].UpdateTime = moment(rows[index].UpdateTime).format('YYYY-MM-DD HH:mm:ss');
+
+        });
+
+        callback(null, rows);
     });
 };
 
 /**
  * 药品详情
- * @param  {String} ID 药品ID
+ * @param  {Number} ID 药品ID
  */
-Good.prototype.GoodInfo = function(ID, callback) {
+Good.prototype.goodInfo = function(ID, callback) {
 
     this._goodInfo({
         ID: ID
@@ -84,96 +127,31 @@ Good.prototype.GoodInfo = function(ID, callback) {
             return callback(err, null);
         }
 
-        callback(null, { data: rows[0] });
+        if (rows.length == 1) {
+            rows[0].CreateTime = moment(rows[0].CreateTime).format('YYYY-MM-DD HH:mm:ss');
+            rows[0].UpdateTime = moment(rows[0].UpdateTime).format('YYYY-MM-DD HH:mm:ss');
+        }
+
+        callback(null, rows[0]);
     });
 };
 
 /**
- * 药品添加
- * @param  {Object} obj 药品信息
+ * 药品查询
+ * @param  {String} KeyWord (MobilPhone,Name)
  */
-Good.prototype.addGood = function(obj, callback) {
+Good.prototype.search = function(KeyWord, callback) {
 
-    this._add({
-        Name: obj.name,
-        PinYin: obj.pinYin,
-        OfficalName: obj.officalName,
-        Dimension: obj.dimension,
-        FormOfDrug: obj.formOfDrug,
-        Unit: obj.unit,
-        DefaultCostPrice: obj.defaultCostPrice,
-        DefaultPrice: obj.defaultCostPrice,
-        LimitPrice: obj.limitPrice,
-        BidPrice: obj.bidPrice,
-        Manufacturer: obj.manufacturer,
-        Medicare: obk.medicare,
-        PeriodTreatment: obj.periodTreatment,
-        Translation: obj.translation,
-        Usage: obj.usage,
-        Remark: obj.remark,
-        IsForeign: obj.isForeign,
-        ApprovalNumber: obj.approvalNumber,
-        CreateTime: obj.createTime
+    this._search({
+        KeyWord: `%${KeyWord}%`
     }, function(err, rows) {
         if (err) {
             return callback(err, null);
         }
 
-        callback(null, { data: rows });
+        callback(null, rows);
     });
 };
 
-/**
- * 药品删除
- * @param  {Int} ID 药品ID
- */
-Good.prototype.removeGood = function(ID, callback) {
-
-    this._remove({
-        ID: ID
-    }, function(err, rows) {
-        if (err) {
-            return callback(err, null);
-        }
-
-        callback(null, { data: rows[0] });
-    });
-};
-
-/**
- * 药品修改
- * @param  {Object} obj 药品信息
- */
-Good.prototype.updateGood = function(obj, callback) {
-
-    this._update({
-        ID: obj.id,
-        Name: obj.name,
-        PinYin: obj.pinyin,
-        OfficalName: obj.officalName,
-        Dimension: obj.dimension,
-        FormOfDrug: obj.formOfDrug,
-        Unit: obj.unit,
-        DefaultCostPrice: obj.defaultCostPrice,
-        DefaultPrice: obj.defaultCostPrice,
-        LimitPrice: obj.limitPrice,
-        BidPrice: obj.bidPrice,
-        Manufacturer: obj.manufacturer,
-        Medicare: obk.medicare,
-        PeriodTreatment: obj.periodTreatment,
-        Translation: obj.translation,
-        Usage: obj.usage,
-        Remark: obj.remark,
-        IsForeign: obj.isForeign,
-        ApprovalNumber: obj.approvalNumber,
-        CreateTime: obj.createTime
-    }, function(err, rows) {
-        if (err) {
-            return callback(err, null);
-        }
-
-        callback(null, { data: rows });
-    });
-};
 
 module.exports = new Good();

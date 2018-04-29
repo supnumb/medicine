@@ -4,25 +4,10 @@ var member = require('../src/controllers/member');
 var good = require('../src/controllers/good');
 
 //管理员登录
-router.post('/employee/signin', member.signin);
+router.post('/employee/signin', member.signIn);
 
 //管理员登出
-router.post('/employee/signout', member.signout);
-
-//会员查询(按电话、名称查询)
-router.post('/member/search', member.memberList);
-
-//会员详情(会员信息、回访记录、意向记录)
-//router.post('/member/:id', member.memberInfo);
-
-//会员跟踪(回访记录列表,回访记录搜索）
-router.post('/visit/list', member.visitList);
-
-//会员购买意向(意向记录列表)
-router.post('/intention/list', member.intentionList);
-
-//会员购买意向(意向记录添加)
-router.post('/intention/add', member.intentionAdd);
+router.post('/employee/signout', member.signOut);
 
 //添加会员
 router.post('/member/add', member.addMember);
@@ -33,24 +18,38 @@ router.post('/member/delete', member.deleteMember);
 //修改会员
 router.post('/member/update', member.updateMember);
 
-//会员列表(电话、姓名、意向单内容、回访记录数量、成单数量)
-router.post('/member/list', member.memberList);
+//会员列表(会员信息、意向单数量、回访记录数量、成单数量)
+router.post('/member/search', member.memberList);
 
+//会员详情(会员信息、意向记录、回访记录、、成单记录)
+router.post('/member/:MemberID', member.memberInfo);
+
+//回访记录添加
+router.post('/visit/save', member.addVisit);
+
+//回访记录列表,回访记录搜索
+router.post('/visit/list', member.visitList);
+
+//意向记录添加
+router.post('/intention/save', member.addIntention);
+
+//意向记录列表
+router.post('/intention/list', member.intentionList);
 
 //药品添加
-router.post('/good/add', good.addGood);
+router.post('/good/save', good.addGood);
+
+//药品删除
+router.post('/good/delete', good.deleteGood);
 
 //药品修改
 router.post('/good/update', good.updateGood);
 
-//药品删除
-router.post('/good/remove', good.deleteGood);
-
-//药品列表
-router.post('/good/lits', good.goodList);
-
 //药品查询
-router.post('/good/search', good.search);
+router.post('/good/search', good.goodList);
+
+//药品详情
+router.post('/good/:GoodID', good.goodInfo);
 
 
 module.exports = router;

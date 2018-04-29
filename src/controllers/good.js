@@ -4,7 +4,7 @@
  * 药品相关功能接口，主要实现功能有：
  *
  * <ol>
- * <li>药品列表，添加、修改、删除</li>
+ * <li>药品添加、修改、删除</li>
  * </ol>
  *
  */
@@ -19,32 +19,30 @@ const { Good } = require('../models/index');
  * 添加药品
  * @param  {Object}   req  http 请求对象
  * @param  {Object}   res  http 响应对象
- * @param  {String}   req.body.name 名称
- * @param  {String}   req.body.pinYin 拼音
- * @param  {String}   req.body.officalName 学名
- * @param  {String}   req.body.dimension 规格尺寸
- * @param  {String}   req.body.formOfDrug 剂型
- * @param  {String}   req.body.unit 单位
- * @param  {String}   req.body.defaultCostPrice 默认进价
- * @param  {String}   req.body.defaultPrice 默认零售价
- * @param  {Tinyint}  req.body.limitPrice 权限价
- * @param  {String}   req.body.competion
- * @param  {String}   req.body.medicare 医保情况
- * @param  {String}   req.body.periodTreatment 疗程
- * @param  {String}   req.body.translation 适应症
- * @param  {String}   req.body.usage 用法用量
- * @param  {String}   req.body.remark 备注
- * @param  {String}   req.body.isForeign 是否进口
- * @param  {String}   req.body.approvalNumber 批准文号
+ * @param  {String}   req.body.Name 名称
+ * @param  {String}   req.body.PinYin 拼音
+ * @param  {String}   req.body.OfficalName 学名
+ * @param  {String}   req.body.Dimension 规格尺寸
+ * @param  {String}   req.body.FormOfDrug 剂型
+ * @param  {String}   req.body.Unit 单位
+ * @param  {Number}   req.body.DefaultCostPrice 默认进价
+ * @param  {Number}   req.body.DefaultPrice 默认零售价
+ * @param  {Number}   req.body.LimitPrice 权限价
+ * @param  {Number}   req.body.BidPrice  中标价
+ * @param  {String}   req.body.Manufacturer 生产厂家
+ * @param  {String}   req.body.Cmpetion
+ * @param  {String}   req.body.Medicare 医保情况
+ * @param  {String}   req.body.PeriodTreatment 疗程
+ * @param  {String}   req.body.Translation 适应症
+ * @param  {String}   req.body.Usage 用法用量
+ * @param  {String}   req.body.Remark 备注
+ * @param  {String}   req.body.IsForeign 是否进口
+ * @param  {String}   req.body.ApprovalNumber 批准文号
  * @param  {Function} next 管道操作，传递到下一步
  */
 exports.addGood = (req, res, next) => {
 
-    let employData = JSON.parse(JSON.stringify(req.body));
-
-    let { name, pinYin, officalName, dimension, formOfDrug, unit, defaultCostPrice, defaultPrice, limitPrice, bidPrice, manufacturer, medicare, periodTreatment, translation, usage, remark, isForeign, approvalNumber } = employData;
-
-    let createTime = new moment(new Date()).format("YYYY-MM-DD");
+    let { Name, PinYin = '', OfficalName, Dimension, FormOfDrug, Unit, DefaultCostPrice, DefaultPrice, LimitPrice = 0, BidPrice = 0, Manufacturer, Competion, Medicare = '', PeriodTreatment, Translation, UseWay, Remark = '', IsForeign = 0, ApprovalNumber } = req.body;
 
     let ep = new eventproxy();
 
@@ -53,20 +51,20 @@ exports.addGood = (req, res, next) => {
         return res.status(403).send({ code: -1, message: "系统错误", data: error });
     });
 
-    if (!name || !pinYin || !officalName || !dimension || !formOfDrug || !unit || !defaultCostPrice || !defaultPrice || !limitPrice || !bidPrice || !manufacturer || !medicare || !periodTreatment || !translation || !usage || !remark || !isForeign || !approvalNumber) {
+    if (!Name || !OfficalName || !Dimension || !FormOfDrug || !Unit || !DefaultCostPrice || !DefaultPrice || !Manufacturer || !Competion || !PeriodTreatment || !Translation || !UseWay || !ApprovalNumber) {
         res.status(422);
         return res.send({ code: 2, message: "参数不完整" });
     };
 
-    employData.createTime = createTime;
+    const goodData = { Name, PinYin, OfficalName, Dimension, FormOfDrug, Unit, DefaultCostPrice, DefaultPrice, LimitPrice, BidPrice, Manufacturer, Competion, Medicare, PeriodTreatment, Translation, UseWay, Remark, IsForeign, ApprovalNumber };
 
-    Good.addGood(employData, function(err, mem) {
+    Good.add(goodData, function(err, mem) {
 
         if (err) {
             ep.emit('error', "数据库操作错误");
         };
 
-        return res.status(200).send({ code: 0, data: mem });
+        return res.status(200).send({ code: 0, message: "success", data: mem });
 
     });
 }
@@ -76,10 +74,11 @@ exports.addGood = (req, res, next) => {
  * @param  {Object}   req  http 请求对象
  * @param  {Object}   res  http 响应对象
  * @param  {Function} next 管道操作，传递到下一步
+ * @param  {Number}   req.body.ID 药品ID
  */
 exports.deleteGood = (req, res, next) => {
 
-    let { id } = req.body;
+    let { ID } = req.body;
 
     let ep = new eventproxy();
 
@@ -88,18 +87,22 @@ exports.deleteGood = (req, res, next) => {
         return res.status(403).send({ code: -1, message: "系统错误", data: error });
     });
 
-    if (!id) {
+    if (!ID) {
         res.status(422);
         return res.send({ code: 2, message: "药品Id参数不完整" });
     };
 
-    Good.removeGood(id, function(err, mem) {
+    Good.delete(ID, function(err, mem) {
 
         if (err) {
             ep.emit('error', "数据库操作错误");
         };
 
-        return res.status(200).send({ code: 0, data: mem });
+        if (mem.affectedRows == 0) {
+            return res.status(200).send({ code: 2, message: "未找到对应信息！" });
+        }
+
+        return res.status(200).send({ code: 0, message: "success", data: mem });
 
     });
 }
@@ -108,31 +111,31 @@ exports.deleteGood = (req, res, next) => {
  * 修改药品
  * @param  {Object}   req  http 请求对象
  * @param  {Object}   res  http 响应对象
- * @param  {String}   req.body.id 药品id
- * @param  {String}   req.body.name 名称
- * @param  {String}   req.body.pinYin 拼音
- * @param  {String}   req.body.officalName 学名
- * @param  {String}   req.body.dimension 规格尺寸
- * @param  {String}   req.body.formOfDrug 剂型
- * @param  {String}   req.body.unit 单位
- * @param  {String}   req.body.defaultCostPrice 默认进价
- * @param  {String}   req.body.defaultPrice 默认零售价
- * @param  {Tinyint}  req.body.limitPrice 权限价
- * @param  {String}   req.body.competion
- * @param  {String}   req.body.medicare 医保情况
- * @param  {String}   req.body.periodTreatment 疗程
- * @param  {String}   req.body.translation 适应症
- * @param  {String}   req.body.usage 用法用量
- * @param  {String}   req.body.remark 备注
- * @param  {String}   req.body.isForeign 是否进口
- * @param  {String}   req.body.approvalNumber 批准文号
+ * @param  {String}   req.body.ID 药品ID
+ * @param  {String}   req.body.Name 名称
+ * @param  {String}   req.body.PinYin 拼音
+ * @param  {String}   req.body.OfficalName 学名
+ * @param  {String}   req.body.Dimension 规格尺寸
+ * @param  {String}   req.body.FormOfDrug 剂型
+ * @param  {String}   req.body.Unit 单位
+ * @param  {Number}   req.body.DefaultCostPrice 默认进价
+ * @param  {Number}   req.body.DefaultPrice 默认零售价
+ * @param  {Number}   req.body.LimitPrice 权限价
+ * @param  {Number}   req.body.BidPrice  中标价
+ * @param  {String}   req.body.Manufacturer 生产厂家
+ * @param  {String}   req.body.Cmpetion
+ * @param  {String}   req.body.Medicare 医保情况
+ * @param  {String}   req.body.PeriodTreatment 疗程
+ * @param  {String}   req.body.Translation 适应症
+ * @param  {String}   req.body.Usage 用法用量
+ * @param  {String}   req.body.Remark 备注
+ * @param  {String}   req.body.IsForeign 是否进口
+ * @param  {String}   req.body.ApprovalNumber 批准文号
  * @param  {Function} next 管道操作，传递到下一步
  */
 exports.updateGood = (req, res, next) => {
 
-    let employData = JSON.parse(JSON.stringify(req.body));
-
-    let { id, name, pinYin, officalName, dimension, formOfDrug, unit, defaultCostPrice, defaultPrice, limitPrice, bidPrice, manufacturer, medicare, periodTreatment, translation, usage, remark, isForeign, approvalNumber } = employData;
+    let { ID, Name, PinYin = '', OfficalName, Dimension, FormOfDrug, Unit, DefaultCostPrice, DefaultPrice, LimitPrice = 0, BidPrice = 0, Manufacturer, Competion, Medicare = '', PeriodTreatment, Translation, UseWay, Remark = '', IsForeign = 0, ApprovalNumber } = req.body;
 
     let ep = new eventproxy();
 
@@ -141,13 +144,14 @@ exports.updateGood = (req, res, next) => {
         return res.status(403).send({ code: -1, message: "系统错误", data: error });
     });
 
-
-    if (!id || !name || !pinYin || !officalName || !dimension || !formOfDrug || !unit || !defaultCostPrice || !defaultPrice || !limitPrice || !bidPrice || !manufacturer || !medicare || !periodTreatment || !translation || !usage || !remark || !isForeign || !approvalNumber) {
+    if (!ID || !Name || !OfficalName || !Dimension || !FormOfDrug || !Unit || !DefaultCostPrice || !DefaultPrice || !Manufacturer || !Competion || !PeriodTreatment || !Translation || !UseWay || !ApprovalNumber) {
         res.status(422);
         return res.send({ code: 2, message: "参数不完整" });
     };
 
-    Good.updateGood(employData, function(err, mem) {
+    const goodData = { ID, Name, PinYin, OfficalName, Dimension, FormOfDrug, Unit, DefaultCostPrice, DefaultPrice, LimitPrice, BidPrice, Manufacturer, Competion, Medicare, PeriodTreatment, Translation, UseWay, Remark, IsForeign, ApprovalNumber };
+
+    Good.update(goodData, function(err, mem) {
 
         if (err) {
             ep.emit('error', "数据库操作错误");
@@ -163,10 +167,15 @@ exports.updateGood = (req, res, next) => {
  * @param  {Object}   req  http 请求对象
  * @param  {Object}   res  http 响应对象
  * @param  {Function} next 管道操作，传递到下一步
+ * @param  {String}   req.body.KeyWord 关键字
+ * @param  {Number}   req.body.Page 第几页
+ * @param  {Number}   req.body.Limit 每页几条
+ * @param  {Date}     req.body.StartTime 开始时间
+ * @param  {Date}     req.body.EndTime 结束时间
  */
 exports.goodList = (req, res, next) => {
 
-    let { page = 0, limit = 10 } = req.body;
+    let { KeyWord = '', Page = 0, Limit = 10, StartTime = '', EndTime = '' } = req.body;
 
     let ep = new eventproxy();
 
@@ -175,11 +184,11 @@ exports.goodList = (req, res, next) => {
         return res.status(403).send({ code: -1, message: "系统错误", data: error });
     });
 
-    if (page > 0) {
-        page = (page - 1) * limit;
+    if (Page > 0) {
+        Page = (Page - 1) * Limit;
     }
 
-    Good.GoodList(page, limit, function(err, mem) {
+    Good.goodList(KeyWord, Page, Limit, StartTime, EndTime, function(err, mem) {
 
         if (err) {
             ep.emit('error', "数据库操作错误");
@@ -191,14 +200,15 @@ exports.goodList = (req, res, next) => {
 }
 
 /**
- * 药品列表
+ * 药品详情
  * @param  {Object}   req  http 请求对象
  * @param  {Object}   res  http 响应对象
  * @param  {Function} next 管道操作，传递到下一步
+ * @param  {String}   req.params.GoodID 药品ID
  */
-exports.search = (req, res, next) => {
+exports.goodInfo = (req, res, next) => {
 
-    let { keyWord = '' } = req.body;
+    let { GoodID = '' } = req.params;
 
     let ep = new eventproxy();
 
@@ -207,7 +217,12 @@ exports.search = (req, res, next) => {
         return res.status(403).send({ code: -1, message: "系统错误", data: error });
     });
 
-    Good.Search(keyWord, function(err, mem) {
+    if (!GoodID) {
+        res.status(422);
+        return res.send({ code: 2, message: "参数不匹配" });
+    };
+
+    Good.goodInfo(GoodID, function(err, mem) {
 
         if (err) {
             ep.emit('error', "数据库操作错误");
