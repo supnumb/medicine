@@ -1,7 +1,9 @@
-var express = require('express');
-var router = express.Router();
-var member = require('../src/controllers/member');
-var good = require('../src/controllers/good');
+const express = require('express');
+const router = express.Router();
+const member = require('../src/controllers/member');
+const good = require('../src/controllers/good');
+const Order = require('../src/controllers/order');
+
 
 //管理员登录
 router.post('/employee/signin', member.signIn);
@@ -50,6 +52,18 @@ router.post('/good/search', good.goodList);
 
 //药品详情
 router.post('/good/:GoodID', good.goodInfo);
+
+//销售单添加、修改
+router.post('/order/submit', Order.edit);
+
+//销售单退回
+router.post('/order/cancel', Order.cancel);
+
+//销售单列表
+router.post('/order/search', Order.orderList);
+
+//销售订单详情
+router.post('/order/:OrderID', Order.orderInfo);
 
 
 module.exports = router;

@@ -185,7 +185,7 @@ describe("#会员模块测试", function() {
         });
     })
 
-    it.only("##004 保存会员购买意向记录；返回Code=0", function(done) {
+    it("##004 保存会员购买意向记录；返回Code=0", function(done) {
         let intention = {
             MemberID: 2,
             Goods: "意向商品"

@@ -2,7 +2,9 @@
  * 订单
  */
 const Base = require('./base');
+const pool = require('../common/mysql.js');
 const moment = require('moment');
+const async = require('async');
 
 function Order() {
     var _action = {
@@ -11,10 +13,10 @@ function Order() {
         _search: "select * from Orders where MemberID=:MemberID;",
 
         //订单记录列表
-        _intentionstList: "select MemberID,Goods from Intentions order by ID desc limit :page,:limit;",
+        _orderList: "select o.*,m.Name,m.MobilPhone from Orders o left join Members m on o.MemberID=m.MemberID where m.MobilPhone like :KeyWord order by o.Date desc limit :page,:limit;",
 
-        //订单记录添加
-        _add: "insert into Intentions (MemberID,OperatorID,Goods,CreateTime) values (:MemberID,:OperatorID,:Goods,:CreateTime);",
+        //订单记录详情
+        _orderInfo: "select * from Orders where ID=:ID;"
 
     };
 
@@ -24,6 +26,10 @@ function Order() {
     this.prototype = base;
     Base.apply(this, arguments);
 };
+
+function OrderTran() {
+
+}
 
 
 /**
@@ -52,45 +58,821 @@ Order.prototype.search = function(MemberID, callback) {
 
 /**
  * 订单记录列表
+ * @param  {String} KeyWord 关键字
  * @param  {Number} Page 第几页
  * @param  {Number} Limit 每页几条
+ * @param  {Date}   StartTime 开始时间
+ * @param  {Date}   EndTime 结束时间
  */
-Order.prototype.orderList = function(Page, Limit, callback) {
+Order.prototype.orderList = function(KeyWord, Page, Limit, StartTime, EndTime, callback) {
 
-    this._intentionstList({
+    this._orderList({
+        KeyWord: `%${KeyWord}%`,
         page,
-        limit
+        limit,
+        StartTime,
+        EndTime
     }, function(err, rows) {
         if (err) {
             return callback(err, null);
         }
 
-        callback(null, { data: rows });
+        callback(null, rows);
     });
 };
 
 
 /**
- * 添加订单记录
- * @param  {String} MemberID 会员ID
- * @param  {String} OperatorID 操作员ID
- * @param  {String} Goods 意向商品
- * @param  {Date} CreateTime 添加时间
+ * 订单记录详情
  */
-Order.prototype.add = function(MemberID, OperatorID, Goods, CreateTime, callback) {
+Order.prototype.orderInfo = function(ID, callback) {
 
-    this._add({
-        MemberID,
-        OperatorID,
-        Goods,
-        CreateTime
+    this._orderInfo({
+        ID
     }, function(err, rows) {
         if (err) {
             return callback(err, null);
         }
 
-        callback(null, { data: rows });
+        callback(null, rows[0]);
     });
+
+}
+
+
+/**
+ * 创建订单
+ * @param  {Object} Obj 订单信息
+ * 
+ * 1、创建订单
+ * 2、根据商品ID查询入库单(获取入库单ID,成本价，该入库单有效数量)
+ * 3、创建子订单
+ * 4、修改入库单
+ * 5、修改库存
+ * 6、添加库存变动记录
+ */
+
+/**
+ * 修改订单
+ * @param  {Object} Obj 订单信息
+ * 
+ * 1、修改订单
+ * 2、查询子订单信息
+ * 3、比对子订单
+ * 3、返还入库单数量
+ * 4、删除子订单
+ * 5、根据商品ID查询入库单(获取入库单ID,成本价，该入库单有效数量)
+ * 6、创建子订单
+ * 7、修改入库单
+ * 8、修改库存
+ * 9、添加库存变动记录
+ */
+
+OrderTran.prototype.edit = function(Obj, callback) {
+
+    let tran = pool.getTran();
+
+    const { ID, OperatorID, Goods } = Obj;
+
+    tran.beginTransaction(function(err) {
+
+        if (err) {
+            return callback(err, null);
+        }
+
+        if (!ID) {
+
+            let Order_add = 'insert into Orders (MemberID,OperatorID,Address,Connact,Telephone,TotalAmount,ReceiptAmount,PayStyle,DeliveryCompany,DeliveryFee,DeliverCode,DeliverReceiptFee,Remark,Date,CreateTime) values (:MemberID,:OperatorID,:Address,:Connact,:Telephone,:TotalAmount,:ReceiptAmount,:PayStyle,:DeliveryCompany,:DeliveryFee,:DeliverCode,:DeliverReceiptFee,:Remark,:Date,now())';
+
+            let ReceiptGood_search = 'select ID,ReceiptID,GoodID,CostPrice,ValiableQuantity from ReceiptGoods where GoodID=:GoodID and ValiableQuantity>0;';
+
+            let OrderGood_add = 'insert into OrderGoods(GoodID,OrderID,GoodName,Quantity,FinalPrice,TotalCostPrice,ReceiptGoodID,ReceiptQuantity) values ';
+
+            let ReceiptGood_update = 'update ReceiptGoods set ValiableQuantity= case ';
+
+            let Stock_update = 'update Stocks set ValiableQuantity= case GoodID';
+
+            let Stock_update_child = 'SaledQuantity= case GoodID';
+
+            let StockChangeRecord_add = 'insert into StockChangeRecords (OperatorID,GoodID,DeltaQuantity,Remark,Type,RelatedObjectID,SalePrice,CreateTime) values ';
+
+            tran.query(Order_add, Obj, function(err, rows) {
+
+                if (err) {
+                    tran.rollback(() => {
+                        return callback(err, null);
+                    });
+                }
+
+                const OrderID = rows.insertId;
+
+                let ReceiptGoodIDs = '';
+
+                async.eachSeries(Goods, function(item, cb) {
+
+                    let { GoodID, GoodName, Quantity, FinalPrice } = item;
+
+                    let Quantity_num = Quantity;
+
+                    let TotalCostPrice = 0;
+
+                    let ReceiptGoodID = '';
+
+                    let ReceiptQuantity = '';
+
+                    pool.query(ReceiptGood_search, {
+                        GoodID: GoodID
+                    }, function(err, arrs) {
+
+                        if (err) {
+                            return cb(err, null);
+                        }
+
+                        for (let i = 0; i < arrs.length; i++) {
+
+                            if (arrs[i].ValiableQuantity >= Quantity_num) {
+                                TotalCostPrice += arrs[i].CostPrice * Quantity_num;
+                                arrs[i].ValiableQuantity = arrs[i].ValiableQuantity - Quantity_num;
+                                ReceiptQuantity += Quantity_num;
+                                Quantity_num = 0;
+                                ReceiptGoodID += arrs[i].ID;
+                                ReceiptGoodIDs += arrs[i].ID + ",";
+                                ReceiptGood_update += ` when ID=${arrs[i].ID} then ${arrs[i].ValiableQuantity} `;
+                            } else {
+                                TotalCostPrice += arrs[i].CostPrice * arrs[i].ValiableQuantity;
+                                Quantity_num -= arrs[i].ValiableQuantity;
+                                ReceiptQuantity += arrs[i].ValiableQuantity + ",";
+                                arrs[i].ValiableQuantity = 0;
+                                ReceiptGoodID += arrs[i].ID + ",";
+                                ReceiptGoodIDs += arrs[i].ID + ",";
+                                ReceiptGood_update += ` when ID=${arrs[i].ID} then 0 `
+                            }
+                        }
+
+                        if (Quantity_num > 0) {
+                            return cb({ message: GoodName + "商品库存不足!" }, null);
+                        }
+
+                        OrderGood_add += `(${GoodID},${OrderID},'${GoodName}', ${Quantity}, ${FinalPrice},${TotalCostPrice},'${ReceiptGoodID}','${ReceiptQuantity}'),`;
+
+                        Stock_update += ` when ${GoodID} then ValiableQuantity-${Quantity} `;
+
+                        Stock_update_child += ` when ${GoodID} then SaledQuantity+${Quantity} `;
+
+                        StockChangeRecord_add += `(${OperatorID},${GoodID},${Quantity},'备注',2,${OrderID},${TotalCostPrice},now()),`;
+
+
+                        cb(null, arrs);
+
+                    });
+
+
+                }, function(err) {
+
+                    if (err) {
+                        tran.rollback(() => {
+                            return callback(err, null);
+                        });
+                    } else {
+
+                        ReceiptGoodIDs = ReceiptGoodIDs.slice(0, ReceiptGoodIDs.length - 1);
+
+                        OrderGood_add = OrderGood_add.slice(0, OrderGood_add.length - 1);
+
+                        ReceiptGood_update += ` end where ID in (${ReceiptGoodIDs});`;
+
+                        Stock_update = Stock_update + ' end,' + Stock_update_child + ' end where GoodID in (' + ReceiptGoodIDs + ')';
+
+                        StockChangeRecord_add = StockChangeRecord_add.slice(0, StockChangeRecord_add.length - 1);
+
+                        //console.log("OrderGood_add", OrderGood_add);
+                        //console.log("-----------------------------");
+                        //console.log("ReceiptGood_update", ReceiptGood_update);
+                        //console.log("-----------------------------");
+                        //console.log("Stock_update", Stock_update);
+                        //console.log("-----------------------------");
+                        //console.log("StockChangeRecord_add", StockChangeRecord_add);
+
+                        async.parallel([
+
+                            function(cb) {
+
+                                tran.query(OrderGood_add, {}, function(err, db) {
+
+                                    if (err) {
+                                        return cb(err, null);
+                                    }
+
+                                    cb(null, db);
+
+                                });
+
+                            },
+
+                            function(cb) {
+
+                                tran.query(ReceiptGood_update, {}, function(err, db) {
+
+                                    if (err) {
+                                        return cb(err, null);
+                                    }
+
+                                    cb(null, db);
+
+                                });
+
+                            },
+
+                            function(cb) {
+
+                                tran.query(Stock_update, {}, function(err, db) {
+
+                                    if (err) {
+                                        return cb(err, null);
+                                    }
+
+                                    cb(null, db);
+
+                                });
+
+                            },
+
+                            function(cb) {
+
+                                tran.query(StockChangeRecord_add, {}, function(err, db) {
+
+                                    if (err) {
+                                        return cb(err, null);
+                                    }
+
+                                    cb(null, db);
+
+                                });
+
+                            }
+
+                        ], function(err, result) {
+
+
+                            if (err) {
+                                tran.rollback();
+                                return callback(err, null);
+                            }
+
+
+                            tran.commit(function(err) {
+
+                                if (err) {
+                                    console.log("提交事务失败", err);
+                                    tran.rollback();
+                                    return callback(err, null);
+                                }
+
+                                return callback(null, 1);
+
+                            });
+
+                        });
+
+                    }
+
+                });
+
+            });
+
+        } else {
+
+            console.log("eeee");
+
+            let Order_update = 'update Orders set MemberID=:MemberID,OperatorID=:OperatorID,Address=:Address,Connact=:Connact,Telephone=:Telephone,TotalAmount=:TotalAmount,ReceiptAmount=:ReceiptAmount,PayStyle=:PayStyle,DeliveryCompany=:DeliveryCompany,DeliveryFee=:DeliveryFee,DeliverCode=:DeliverCode,DeliverReceiptFee=:DeliverReceiptFee,Remark=:Remark,Date=:Date where ID=:ID';
+
+            let OrderGood_search = 'select ID,GoodID,Quantity,ReceiptGoodID,ReceiptQuantity from OrderGoods where OrderID=:ID;';
+
+            let OrderGood_delete = 'delete from OrderGoods where OrderID=:OrderID;';
+
+            let ReceiptGood_update = 'update ReceiptGoods set ValiableQuantity= ';
+
+            let Stock_update = 'update Stocks set ValiableQuantity= ';
+
+            const OrderID = ID;
+
+            tran.query(Order_update, Obj, function(err, rows) {
+
+                if (err) {
+                    tran.rollback(() => {
+                        return callback(err, null);
+                    });
+                }
+
+                let add_arr = [],
+                    upd_arr = [],
+                    del_arr = [],
+                    update_ReceiptQuantity = '',
+                    update_ReceiptGoodID = '',
+                    update_Stock = '0',
+                    update_Stock_Valiable = '',
+                    update_Stock_Saled = '';
+
+
+                pool.query(OrderGood_search, { ID }, function(err, rows) {
+
+                    for (let i = 0; i < rows.length; i++) {
+
+                        let { ReceiptGoodID, ReceiptQuantity } = rows[i];
+
+                        for (let j = 0; j < Goods.length; j++) {
+
+                            if (rows[i].GoodID == Goods[j].GoodID) {
+
+                                if (rows[i].Quantity == Goods[j].Quantity) {
+
+                                    rows[i].log = 'initial';
+                                    Goods[j].log = 'initial';
+                                } else {
+                                    rows[i].log = 'initial';
+                                    Goods[j].log = 'update';
+                                    Goods[j].update_num = rows[i].Quantity - Goods[j].Quantity;
+                                }
+                            }
+                        }
+
+                        let ReceiptGoodIDArr = ReceiptGoodID.split(",");
+                        let ReceiptQuantityArr = ReceiptQuantity.split(",");
+
+                        ReceiptGoodIDArr.forEach(function(element, index) {
+                            update_ReceiptGoodID += `${element},`;
+                            update_ReceiptQuantity += `ValiableQuantity+${ReceiptQuantityArr[index]},`;
+                        });
+
+                        update_Stock += `,${rows[i].GoodID}`;
+                        update_Stock_Valiable += `ValiableQuantity+${rows[i].Quantity},`;
+                        update_Stock_Saled += `SaledQuantity-${rows[i].Quantity},`;
+                    }
+
+                    update_ReceiptGoodID = update_ReceiptGoodID.slice(0, update_ReceiptGoodID.length - 1);
+                    update_ReceiptQuantity = update_ReceiptQuantity.slice(0, update_ReceiptQuantity.length - 1);
+                    update_Stock_Valiable = update_Stock_Valiable.slice(0, update_Stock_Valiable.length - 1);
+                    update_Stock_Saled = update_Stock_Saled.slice(0, update_Stock_Saled.length - 1);
+
+                    ReceiptGood_update += ` ELT (ID,${update_ReceiptQuantity}) where ID in (${update_ReceiptGoodID});`;
+                    Stock_update += ` ELT (GoodID,${update_Stock_Valiable}),SaledQuantity= ELT (GoodID,${update_Stock_Saled}) where ID in (${update_Stock});`;
+
+                    rows.forEach(function(element, index) {
+
+                        if (!element.log) {
+                            del_arr.push(element);
+                        }
+
+                    });
+
+                    Goods.forEach(function(element, index) {
+
+                        if (!element.log) {
+                            add_arr.push(element);
+                        }
+
+                        if (element.log == 'update') {
+                            upd_arr.push(Goods[index]);
+                        }
+
+                    });
+
+                    //添加的商品
+                    //console.log("add_arr", add_arr);
+                    //修改的商品
+                    //console.log("upd_arr", upd_arr);
+                    //删除的商品
+                    //console.log("del_arr", del_arr);
+
+                    //入库单修改
+                    //console.log("ReceiptGood_update", ReceiptGood_update);
+
+                    //库存修改
+                    //console.log("Stock_update", Stock_update);
+
+                    if (add_arr.length == 0 && upd_arr.length == 0 && del_arr.length == 0) {
+                        tran.commit(function(err) {
+
+                            if (err) {
+                                console.log("提交事务失败", err);
+                                tran.rollback();
+                                return callback(err, null);
+                            }
+
+                            return callback(null, 1);
+
+                        });
+                    } else {
+
+                        async.parallel([
+
+                            function(cb) {
+
+                                pool.query(OrderGood_delete, { OrderID }, function(err, db) {
+
+                                    if (err) {
+                                        return cb(err, null);
+                                    }
+
+                                    cb(null, db);
+
+                                });
+
+                            },
+
+                            function(cb) {
+
+                                pool.query(ReceiptGood_update, {}, function(err, db) {
+
+                                    if (err) {
+                                        return cb(err, null);
+                                    }
+
+                                    cb(null, db);
+
+                                });
+
+                            },
+
+                            function(cb) {
+
+                                pool.query(Stock_update, {}, function(err, db) {
+
+                                    if (err) {
+                                        return cb(err, null);
+                                    }
+
+                                    cb(null, db);
+
+                                });
+
+                            }
+
+                        ], function(err, result) {
+
+                            if (err) {
+                                return callback(err, null);
+                            }
+
+                            let ReceiptGood_search = 'select ID,ReceiptID,GoodID,CostPrice,ValiableQuantity from ReceiptGoods where GoodID=:GoodID and ValiableQuantity>0;';
+
+                            let OrderGood_add = 'insert into OrderGoods(GoodID,OrderID,GoodName,Quantity,FinalPrice,TotalCostPrice,ReceiptGoodID,ReceiptQuantity) values ';
+
+                            let ReceiptGood_update = 'update ReceiptGoods set ValiableQuantity= case ';
+
+                            let Stock_update = 'update Stocks set ValiableQuantity= case GoodID';
+
+                            let Stock_update_child = 'SaledQuantity= case GoodID';
+
+                            let StockChangeRecord_add = 'insert into StockChangeRecords (OperatorID,GoodID,DeltaQuantity,Remark,Type,RelatedObjectID,SalePrice,CreateTime) values ';
+
+                            let ReceiptGoodIDs = '';
+
+                            async.eachSeries(Goods, function(item, cb) {
+
+                                let { GoodID, GoodName, Quantity, FinalPrice } = item;
+
+                                let Quantity_num = Quantity;
+
+                                let TotalCostPrice = 0;
+
+                                let ReceiptGoodID = '';
+
+                                let ReceiptQuantity = '';
+
+                                pool.query(ReceiptGood_search, {
+                                    GoodID: GoodID
+                                }, function(err, arrs) {
+
+                                    if (err) {
+                                        return cb(err, null);
+                                    }
+
+                                    for (let i = 0; i < arrs.length; i++) {
+
+                                        if (arrs[i].ValiableQuantity >= Quantity_num) {
+                                            TotalCostPrice += arrs[i].CostPrice * Quantity_num;
+                                            arrs[i].ValiableQuantity = arrs[i].ValiableQuantity - Quantity_num;
+                                            ReceiptQuantity += Quantity_num;
+                                            Quantity_num = 0;
+                                            ReceiptGoodID += arrs[i].ID;
+                                            ReceiptGoodIDs += arrs[i].ID + ",";
+                                            ReceiptGood_update += ` when ID=${arrs[i].ID} then ${arrs[i].ValiableQuantity} `;
+                                        } else {
+                                            TotalCostPrice += arrs[i].CostPrice * arrs[i].ValiableQuantity;
+                                            Quantity_num -= arrs[i].ValiableQuantity;
+                                            ReceiptQuantity += arrs[i].ValiableQuantity + ",";
+                                            arrs[i].ValiableQuantity = 0;
+                                            ReceiptGoodID += arrs[i].ID + ",";
+                                            ReceiptGoodIDs += arrs[i].ID + ",";
+                                            ReceiptGood_update += ` when ID=${arrs[i].ID} then 0 `
+                                        }
+                                    }
+
+                                    if (Quantity_num > 0) {
+                                        return cb({ message: GoodName + "商品库存不足!" }, null);
+                                    }
+
+                                    OrderGood_add += `(${GoodID},${OrderID},'${GoodName}', ${Quantity}, ${FinalPrice},${TotalCostPrice},'${ReceiptGoodID}','${ReceiptQuantity}'),`;
+
+                                    Stock_update += ` when ${GoodID} then ValiableQuantity-${Quantity} `;
+
+                                    Stock_update_child += ` when ${GoodID} then SaledQuantity+${Quantity} `;
+
+                                    StockChangeRecord_add += `(${OperatorID},${GoodID},${Quantity},'备注',2,${OrderID},${TotalCostPrice},now()),`;
+
+
+                                    cb(null, arrs);
+
+                                });
+
+
+                            }, function(err) {
+
+                                if (err) {
+                                    tran.rollback(() => {
+                                        return callback(err, null);
+                                    });
+                                } else {
+
+                                    ReceiptGoodIDs = ReceiptGoodIDs.slice(0, ReceiptGoodIDs.length - 1);
+
+                                    OrderGood_add = OrderGood_add.slice(0, OrderGood_add.length - 1);
+
+                                    ReceiptGood_update += ` end where ID in (${ReceiptGoodIDs});`;
+
+                                    Stock_update = Stock_update + ' end,' + Stock_update_child + ' end where GoodID in (' + ReceiptGoodIDs + ')';
+
+                                    StockChangeRecord_add = StockChangeRecord_add.slice(0, StockChangeRecord_add.length - 1);
+
+                                    //console.log("OrderGood_add", OrderGood_add);
+                                    //console.log("-----------------------------");
+                                    //console.log("ReceiptGood_update", ReceiptGood_update);
+                                    //console.log("-----------------------------");
+                                    //console.log("Stock_update", Stock_update);
+                                    //console.log("-----------------------------");
+                                    //console.log("StockChangeRecord_add", StockChangeRecord_add);
+
+                                    async.parallel([
+
+                                        function(cb) {
+
+                                            tran.query(OrderGood_add, {}, function(err, db) {
+
+                                                if (err) {
+                                                    return cb(err, null);
+                                                }
+
+                                                cb(null, db);
+
+                                            });
+
+                                        },
+
+                                        function(cb) {
+
+                                            tran.query(ReceiptGood_update, {}, function(err, db) {
+
+                                                if (err) {
+                                                    return cb(err, null);
+                                                }
+
+                                                cb(null, db);
+
+                                            });
+
+                                        },
+
+                                        function(cb) {
+
+                                            tran.query(Stock_update, {}, function(err, db) {
+
+                                                if (err) {
+                                                    return cb(err, null);
+                                                }
+
+                                                cb(null, db);
+
+                                            });
+
+                                        },
+
+                                        function(cb) {
+
+                                            tran.query(StockChangeRecord_add, {}, function(err, db) {
+
+                                                if (err) {
+                                                    return cb(err, null);
+                                                }
+
+                                                cb(null, db);
+
+                                            });
+
+                                        }
+
+                                    ], function(err, result) {
+
+
+                                        if (err) {
+                                            tran.rollback();
+                                            return callback(err, null);
+                                        }
+
+
+                                        tran.commit(function(err) {
+
+                                            if (err) {
+                                                console.log("提交事务失败", err);
+                                                tran.rollback();
+                                                return callback(err, null);
+                                            }
+
+                                            return callback(null, 1);
+
+                                        });
+
+                                    });
+
+                                }
+
+                            });
+
+                        });
+                    }
+
+                });
+
+            });
+
+        }
+
+    });
+
 };
 
-module.exports = new Order();
+
+OrderTran.prototype.cancel = function(ID, callback) {
+
+    tran.beginTransaction(function(err) {
+
+        if (err) {
+            return callback(err, null);
+        }
+
+        let Order_update = 'update Orders set status=2 where ID=:ID';
+
+        let OrderGood_search = 'select ID,GoodID,Quantity,ReceiptGoodID,ReceiptQuantity from OrderGoods where OrderID=:ID;';
+
+        let ReceiptGood_update = 'update ReceiptGoods set ValiableQuantity= ';
+
+        let Stock_update = 'update Stocks set ValiableQuantity= ';
+
+        const OrderID = ID;
+
+        tran.query(Order_update, { ID }, function(err, rows) {
+
+            if (err) {
+                tran.rollback(() => {
+                    return callback(err, null);
+                });
+            }
+
+            let add_arr = [],
+                upd_arr = [],
+                del_arr = [],
+                update_ReceiptQuantity = '',
+                update_ReceiptGoodID = '',
+                update_Stock = '0',
+                update_Stock_Valiable = '',
+                update_Stock_Saled = '';
+
+
+            pool.query(OrderGood_search, { ID }, function(err, rows) {
+
+                for (let i = 0; i < rows.length; i++) {
+
+                    let { ReceiptGoodID, ReceiptQuantity } = rows[i];
+
+                    let ReceiptGoodIDArr = ReceiptGoodID.split(",");
+                    let ReceiptQuantityArr = ReceiptQuantity.split(",");
+
+                    ReceiptGoodIDArr.forEach(function(element, index) {
+                        update_ReceiptGoodID += `${element},`;
+                        update_ReceiptQuantity += `ValiableQuantity+${ReceiptQuantityArr[index]},`;
+                    });
+
+                    update_Stock += `,${rows[i].GoodID}`;
+                    update_Stock_Valiable += `ValiableQuantity+${rows[i].Quantity},`;
+                    update_Stock_Saled += `SaledQuantity-${rows[i].Quantity},`;
+                }
+
+                update_ReceiptGoodID = update_ReceiptGoodID.slice(0, update_ReceiptGoodID.length - 1);
+                update_ReceiptQuantity = update_ReceiptQuantity.slice(0, update_ReceiptQuantity.length - 1);
+                update_Stock_Valiable = update_Stock_Valiable.slice(0, update_Stock_Valiable.length - 1);
+                update_Stock_Saled = update_Stock_Saled.slice(0, update_Stock_Saled.length - 1);
+
+                ReceiptGood_update += ` ELT (ID,${update_ReceiptQuantity}) where ID in (${update_ReceiptGoodID});`;
+                Stock_update += ` ELT (GoodID,${update_Stock_Valiable}),SaledQuantity= ELT (GoodID,${update_Stock_Saled}) where ID in (${update_Stock});`;
+
+
+                //入库单修改
+                //console.log("ReceiptGood_update", ReceiptGood_update);
+
+                //库存修改
+                //console.log("Stock_update", Stock_update);
+
+                async.parallel([
+
+                    function(cb) {
+
+                        tran.query(ReceiptGood_update, {}, function(err, db) {
+
+                            if (err) {
+                                return cb(err, null);
+                            }
+
+                            cb(null, db);
+
+                        });
+
+                    },
+
+                    function(cb) {
+
+                        tran.query(Stock_update, {}, function(err, db) {
+
+                            if (err) {
+                                return cb(err, null);
+                            }
+
+                            cb(null, db);
+
+                        });
+
+                    }
+
+                ], function(err, result) {
+
+                    if (err) {
+                        return callback(err, null);
+                    }
+
+                    tran.commit(function(err) {
+
+                        if (err) {
+                            console.log("提交事务失败", err);
+                            tran.rollback();
+                            return callback(err, null);
+                        }
+
+                        return callback(null, 1);
+
+                    });
+
+                });
+
+            });
+
+        });
+
+    });
+
+}
+
+
+module.exports.Order = new Order();
+
+module.exports.OrderTran = new OrderTran();
+
+// const m = new OrderTran();
+
+// const Obj = {
+//     ID: 70,
+//     MemberID: 1,
+//     OperatorID: 1,
+//     Address: '北京',
+//     Connact: '测试',
+//     Telephone: '10086',
+//     TotalAmount: 128,
+//     ReceiptAmount: 128,
+//     PayStyle: 1,
+//     DeliveryCompany: '',
+//     DeliveryFee: '',
+//     DeliverCode: '',
+//     DeliverReceiptFee: '',
+//     Remark: '',
+//     Date: '2018-04-30',
+//     Goods: [
+//         { GoodID: 1, GoodName: '感冒药', Quantity: 5, FinalPrice: 10 },
+//         { GoodID: 2, GoodName: '退烧药', Quantity: 5, FinalPrice: 6 }
+//     ]
+// };
+
+// m.edit(Obj, function(err, rows) {
+
+//     console.log(err);
+
+//     console.log(rows);
+
+// });
