@@ -58,7 +58,7 @@ Member.prototype.check = function(MobilPhone, callback) {
  */
 Member.prototype.addMember = function(Obj, callback) {
 
-    this._add(obj, function(err, rows) {
+    this._add(Obj, function(err, rows) {
         if (err) {
             return callback(err, null);
         }
