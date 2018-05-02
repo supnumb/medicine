@@ -15,6 +15,8 @@ describe("#药品数据模块测试", function() {
         })
     })
 
+    let ID = 0;
+
     it("##016.01 添加|修改药品、应该返回成功，Code=0", function(done) {
         let goodData = {
             ID: 8,
@@ -40,17 +42,19 @@ describe("#药品数据模块测试", function() {
         };
 
         //api/good/save 药品添加
-        agent.post('/api/good/update').send(goodData).expect(200).end(function(err, res) {
+        agent.post('/api/good/save').send(goodData).expect(200).end(function(err, res) {
             if (err) {
                 return done(err);
             }
+
+            ID = res.body.data.insertId;
+
             res.text.should.containEql("0");
             done();
         });
     })
 
     it("##016.02 删除存在的药品、应该返回成功，Code=0", function(done) {
-        let ID = 8;
 
         agent.post('/api/good/delete').send({ ID }).expect(200).end(function(err, res) {
             if (err) {

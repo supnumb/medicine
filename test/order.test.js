@@ -15,6 +15,8 @@ describe("#药品基础数据模块测试", function() {
         })
     })
 
+    let ID = 0;
+
     it("##009 雇员保存销售单 应该返回成功，Code=0", function(done) {
         let orderData = {
             MemberID: 1,
@@ -31,25 +33,29 @@ describe("#药品基础数据模块测试", function() {
             Remark: '',
             Date: '2018-04-30',
             Goods: [
-                { GoodID: 1, GoodName: '感冒药', Quantity: 5, FinalPrice: 10 },
-                { GoodID: 2, GoodName: '退烧药', Quantity: 5, FinalPrice: 6 }
+                { GoodID: 1, GoodName: '感冒药', Quantity: 1, FinalPrice: 10 },
+                { GoodID: 2, GoodName: '退烧药', Quantity: 1, FinalPrice: 6 }
             ]
         };
 
-        agent.post('/api/order/edit').send(orderData).expect(200).end(function(err, res) {
+        agent.post('/api/order/submit').send(orderData).expect(200).end(function(err, res) {
             if (err) {
                 return done(err);
             }
 
-            console.log(res.text);
-            res.text.should.containEql("0");
+            console.log("save", res.text);
+
+            ID = req.body.data.insertId;
+
+            res.text.should.containEql(0);
             done();
         });
     })
 
     it("##009.01 雇员修改销售单 应该返回成功，Code=0", function(done) {
         let orderData = {
-            MemberID: 71,
+            ID,
+            MemberID: 1,
             OperatorID: 1,
             Address: '北京',
             Connact: '测试',
@@ -74,8 +80,9 @@ describe("#药品基础数据模块测试", function() {
                 return done(err);
             }
 
-            console.log(res.text);
-            res.text.should.containEql("0");
+            console.log("update", res.text);
+
+            res.text.should.containEql(0);
             done();
         });
     })
@@ -96,10 +103,10 @@ describe("#药品基础数据模块测试", function() {
         });
     })
 
-    it.only("##012 雇员设置销售单为退回 应该返回成功，Code=0", function(done) {
+    it("##012 雇员设置销售单为退回 应该返回成功，Code=0", function(done) {
         let ID = 72;
 
-        agent.post('/api/order/canclesss').send({ ID }).expect(200).end(function(err, res) {
+        agent.post('/api/order/cancel').send({ ID }).expect(200).end(function(err, res) {
             if (err) {
                 return done(err);
             }
