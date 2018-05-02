@@ -328,7 +328,7 @@ OrderTran.prototype.edit = function(Obj, callback) {
                                     return callback(err, null);
                                 }
 
-                                return callback(null, 1);
+                                return callback(null, { ID: OrderID });
 
                             });
 
@@ -341,8 +341,6 @@ OrderTran.prototype.edit = function(Obj, callback) {
             });
 
         } else {
-
-            console.log("eeee");
 
             let Order_update = 'update Orders set MemberID=:MemberID,OperatorID=:OperatorID,Address=:Address,Connact=:Connact,Telephone=:Telephone,TotalAmount=:TotalAmount,ReceiptAmount=:ReceiptAmount,PayStyle=:PayStyle,DeliveryCompany=:DeliveryCompany,DeliveryFee=:DeliveryFee,DeliverCode=:DeliverCode,DeliverReceiptFee=:DeliverReceiptFee,Remark=:Remark,Date=:Date where ID=:ID';
 

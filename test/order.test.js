@@ -43,9 +43,7 @@ describe("#药品基础数据模块测试", function() {
                 return done(err);
             }
 
-            console.log("save", res.text);
-
-            ID = req.body.data.insertId;
+            ID = res.body.data.ID;
 
             res.text.should.containEql(0);
             done();
@@ -53,6 +51,7 @@ describe("#药品基础数据模块测试", function() {
     })
 
     it("##009.01 雇员修改销售单 应该返回成功，Code=0", function(done) {
+
         let orderData = {
             ID,
             MemberID: 1,
@@ -79,8 +78,6 @@ describe("#药品基础数据模块测试", function() {
             if (err) {
                 return done(err);
             }
-
-            console.log("update", res.text);
 
             res.text.should.containEql(0);
             done();
