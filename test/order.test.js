@@ -93,36 +93,31 @@ describe("#药品基础数据模块测试", function() {
             if (err) {
                 return done(err);
             }
-
-            console.log(res.text);
             res.text.should.containEql("0");
             done();
         });
     })
 
     it("##012 雇员设置销售单为退回 应该返回成功，Code=0", function(done) {
-        let ID = 72;
+        ID = ID || 117;
 
         agent.post('/api/order/cancel').send({ ID }).expect(200).end(function(err, res) {
             if (err) {
                 return done(err);
             }
 
-            console.log(res.text);
             res.text.should.containEql("0");
             done();
         });
     })
 
     it("##010.ADD 得到指定销售单详细信息：销售单信息、销售单药品信息 应该返回成功，Code=0", function(done) {
-        let ID = 72;
+        ID = ID || 117;
 
-        agent.post(`/api/order/${ID}`).expect(200).end(function(err, res) {
+        agent.post('/api/order/info').send({ ID }).expect(200).end(function(err, res) {
             if (err) {
                 return done(err);
             }
-
-            console.log(res.text);
             res.text.should.containEql("0");
             done();
         });

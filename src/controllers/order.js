@@ -83,7 +83,7 @@ exports.edit = (req, res, next) => {
  */
 exports.cancel = (req, res, next) => {
 
-    let { ID = '' } = req.params;
+    let { ID = '' } = req.body;
 
     let ep = new eventproxy();
 
@@ -141,7 +141,9 @@ exports.orderList = (req, res, next) => {
             ep.emit('error', "数据库操作错误");
         };
 
-        return res.status(200).send({ code: 0, data: mem });
+        let { Quantity, rows } = mem;
+
+        return res.status(200).send({ code: 0, Quantity, data: rows });
 
     });
 }
@@ -155,7 +157,7 @@ exports.orderList = (req, res, next) => {
  */
 exports.orderInfo = (req, res, next) => {
 
-    let { ID = '' } = req.params;
+    let { ID } = req.body;
 
     let ep = new eventproxy();
 
@@ -175,7 +177,9 @@ exports.orderInfo = (req, res, next) => {
             ep.emit('error', "数据库操作错误");
         };
 
-        return res.status(200).send({ code: 0, data: mem });
+        const { rows, goods } = mem;
+
+        return res.status(200).send({ code: 0, data: rows[0], goodsData: goods });
 
     });
 }

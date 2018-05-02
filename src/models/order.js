@@ -13,10 +13,16 @@ function Order() {
         _search: "select * from Orders where MemberID=:MemberID;",
 
         //订单记录列表
-        _orderList: "select o.*,m.Name,m.MobilPhone from Orders o left join Members m on o.MemberID=m.MemberID where m.MobilPhone like :KeyWord order by o.Date desc limit :page,:limit;",
+        _orderList: "select o.*,m.Name,m.MobilPhone from Orders o left join Members m on o.MemberID=m.ID where m.MobilPhone like :KeyWord order by o.Date desc limit :Page,:Limit;",
 
         //订单记录详情
-        _orderInfo: "select * from Orders where ID=:ID;"
+        _orderInfo: "select * from Orders where ID=:ID;",
+
+        //订单商品
+        _orderGood: "select * from OrderGoods where OrderID=:ID;",
+
+        //订单列表总数
+        _orderQuantity: "select count(1) as Quantity from Orders o left join Members m on o.MemberID=m.ID where m.MobilPhone like :KeyWord ;"
 
     };
 
@@ -66,35 +72,122 @@ Order.prototype.search = function(MemberID, callback) {
  */
 Order.prototype.orderList = function(KeyWord, Page, Limit, StartTime, EndTime, callback) {
 
-    this._orderList({
-        KeyWord: `%${KeyWord}%`,
-        page,
-        limit,
-        StartTime,
-        EndTime
-    }, function(err, rows) {
+    const that = this;
+
+    async.parallel([
+
+        function(cb) {
+
+            that._orderQuantity({
+                KeyWord: `%${KeyWord}%`,
+                StartTime,
+                EndTime
+            }, function(err, db) {
+                if (err) {
+                    return cb(err, null);
+                }
+
+                cb(null, db[0]);
+
+            });
+
+        },
+
+        function(cb) {
+
+            that._orderList({
+                KeyWord: `%${KeyWord}%`,
+                Page,
+                Limit,
+                StartTime,
+                EndTime
+            }, function(err, db) {
+                if (err) {
+                    return cb(err, null);
+                }
+
+                cb(null, db);
+            });
+
+        }
+
+    ], function(err, result) {
+
         if (err) {
             return callback(err, null);
         }
 
-        callback(null, rows);
-    });
-};
+        const Quantity = result[0].Quantity;
 
+        const rows = result[1];
+
+        rows.forEach(function(element, index) {
+
+            rows[index].Date = moment(rows[index].Date).format('YYYY-MM-DD');
+            rows[index].CreateTime = moment(rows[index].CreateTime).format('YYYY-MM-DD HH:mm:ss');
+            rows[index].UpdateTime = moment(rows[index].UpdateTime).format('YYYY-MM-DD HH:mm:ss');
+
+        });
+
+        return callback(null, { Quantity, rows });
+
+    });
+
+};
 
 /**
  * 订单记录详情
  */
 Order.prototype.orderInfo = function(ID, callback) {
 
-    this._orderInfo({
-        ID
-    }, function(err, rows) {
+    const that = this;
+
+    async.parallel([
+
+        function(cb) {
+            that._orderInfo({
+                ID
+            }, function(err, db) {
+                if (err) {
+                    return cb(err, null);
+                }
+
+                cb(null, db);
+            });
+
+        },
+
+        function(cb) {
+
+            that._orderGood({
+                ID
+            }, function(err, db) {
+                if (err) {
+                    return cb(err, null);
+                }
+
+                cb(null, db);
+            });
+
+        }
+
+    ], function(err, result) {
+
         if (err) {
             return callback(err, null);
         }
 
-        callback(null, rows[0]);
+        const rows = result[0];
+        const goods = result[1];
+
+        if (rows.length == 1) {
+            rows[0].Date = moment(rows[0].Date).format('YYYY-MM-DD');
+            rows[0].CreateTime = moment(rows[0].CreateTime).format('YYYY-MM-DD HH:mm:ss');
+            rows[0].UpdateTime = moment(rows[0].UpdateTime).format('YYYY-MM-DD HH:mm:ss');
+        }
+
+        return callback(null, { rows, goods });
+
     });
 
 }
@@ -711,6 +804,8 @@ OrderTran.prototype.edit = function(Obj, callback) {
 
 
 OrderTran.prototype.cancel = function(ID, callback) {
+
+    let tran = pool.getTran();
 
     tran.beginTransaction(function(err) {
 

@@ -3,7 +3,7 @@ const router = express.Router();
 const member = require('../src/controllers/member');
 const good = require('../src/controllers/good');
 const order = require('../src/controllers/order');
-
+const vendor = require('../src/controllers/vendor');
 
 //管理员登录
 router.post('/employee/signin', member.signIn);
@@ -57,13 +57,28 @@ router.post('/good/:GoodID', good.goodInfo);
 router.post('/order/submit', order.edit);
 
 //销售单退回
-router.post('/order/cancel', order.cancel);
+router.post('/order/cancel', order.cancel);
 
 //销售单列表
-router.post('/order/search', order.orderList);
+router.post('/order/search', order.orderList);
 
 //销售订单详情
-router.post('/order/:ID', order.orderInfo);
+router.post('/order/info', order.orderInfo);
+
+//供应商添加
+router.post('/vendor/save', vendor.addVendor);
+
+//供应商删除
+router.post('/vendor/delete', vendor.deleteVendor);
+
+//供应商修改
+router.post('/vendor/update', vendor.updateVendor);
+
+//供应商查询
+router.post('/vendor/search', vendor.vendorList);
+
+//供应商详情
+router.post('/vendor/:VendorID', vendor.vendorInfo);
 
 
 module.exports = router;
