@@ -47,6 +47,8 @@ exports.signIn = (req, res, next) => {
         return res.send({ code: 2, message: "电话、密码参数不完整" });
     };
 
+    req.session = {};
+
     Member.check(login_name, function(err, mem) {
         if (err) {
             ep.emit('error', "数据库操作错误");
@@ -60,9 +62,8 @@ exports.signIn = (req, res, next) => {
                     ep.emit('error', err);
                 }
 
-                //console.log("result", result);
-
                 if (result) {
+                    req.session.user = mem;
                     return res.send({ code: 0, message: "登录成功" });
                 } else {
                     return res.status(422).send({ code: 2, message: "电话或密码不正确" });
@@ -232,10 +233,11 @@ exports.updateMember = (req, res, next) => {
  * @param  {String}   req.body.MobilPhone 移动电话
  * @param  {Number}   req.body.Page 第几页
  * @param  {Number}   req.body.Limit 每页几条
+ * @param  {String}   req.body.OrderBy 排序规则，默认ID倒序
  */
 exports.memberList = (req, res, next) => {
 
-    let { KeyWord = '', MobilPhone = '', Page = 0, Limit = 10 } = req.body;
+    let { KeyWord = '', MobilPhone = '', Page = 0, Limit = 10, OrderBy = 'ID' } = req.body;
 
     let ep = new eventproxy();
 
@@ -254,7 +256,7 @@ exports.memberList = (req, res, next) => {
         }
     }
 
-    Member.memberList(KeyWord, MobilPhone, Page, Limit, function(err, mem) {
+    Member.memberList(KeyWord, MobilPhone, Page, Limit, OrderBy, function(err, mem) {
 
         if (err) {
             ep.emit('error', "数据库操作错误");
@@ -357,7 +359,7 @@ exports.memberInfo = (req, res, next) => {
             return res.status(200).send({ code: 2, message: "未找到对应信息！" });
         }
 
-        return res.status(200).send({ code: 0, message: "success", data: result[0], intentionData: result[1], visitData: result[1], orderData: result[2] });
+        return res.status(200).send({ code: 0, message: "success", data: result[0], intentionData: result[1], visitData: result[2], orderData: result[3] });
 
     });
 
@@ -463,6 +465,45 @@ exports.addIntention = (req, res, next) => {
     const OperatorID = req.session ? req.session.user.ID : 1;
 
     Intention.add(MemberID, OperatorID, Goods, function(err, mem) {
+
+        if (err) {
+            ep.emit('error', "数据库操作错误");
+        };
+
+        return res.status(200).send({ code: 0, message: "success", data: mem });
+
+    });
+}
+
+
+/**
+ * 意向记录修改
+ * @param  {Object}   req  http 请求对象
+ * @param  {Object}   res  http 响应对象
+ * @param  {Function} next 管道操作，传递到下一步
+ * @param  {Number}   req.body.ID 意向单ID
+ * @param  {String}   req.body.Goods 意向商品
+ * @param  {Number}   req.body.Status 意向单状态
+ */
+exports.updateIntention = (req, res, next) => {
+
+    let { ID, Goods, Status = 5 } = req.body;
+
+    let ep = new eventproxy();
+
+    ep.fail(function(error) {
+        console.error(error);
+        return res.status(403).send({ code: -1, message: "系统错误", data: error });
+    });
+
+    if (!ID || !Goods) {
+        res.status(422);
+        return res.send({ code: 2, message: "意向单Id、意向商品参数不完整" });
+    };
+
+    const OperatorID = req.session ? req.session.user.ID : 1;
+
+    Intention.update(ID, OperatorID, Goods, Status, function(err, mem) {
 
         if (err) {
             ep.emit('error', "数据库操作错误");

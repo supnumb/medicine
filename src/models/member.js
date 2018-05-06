@@ -20,7 +20,7 @@ function Member() {
         _update: "update Members set Name=:Name,PinYin=:PinYin,Telephone=:Telephone,City=:City,Gender=:Gender,Address=:Address,Remark=:Remark,MobilPhone=:MobilPhone,WeiXinCode=:WeiXinCode,IsWeixinFriend=:IsWeixinFriend,FriendName=:FriendName,BirthYear=:BirthYear,Diseases=:Diseases,RelationWithPatient=:RelationWithPatient where ID=:ID;",
 
         //会员列表
-        _memberList: "select m.*,count(i.ID) as IntentionQuantity,count(v.ID) as VisitQuantity,count(o.ID) as OrderQuantity from Members m left join Intentions i on m.ID=i.MemberID left join Visits v on m.ID=v.MemberID left join Orders o on m.ID=o.MemberID where m.Flag=:Flag and m.Status=1 and m.MobilPhone like :MobilPhone and concat(m.Name,m.Address) like :KeyWord group by m.ID order by m.ID desc limit :Page,:Limit;",
+        _memberList: "select m.*,count(i.ID) as IntentionQuantity,count(v.ID) as VisitQuantity,count(o.ID) as OrderQuantity from Members m left join Intentions i on m.ID=i.MemberID left join Visits v on m.ID=v.MemberID left join Orders o on m.ID=o.MemberID where m.Flag=:Flag and m.Status=1 and m.MobilPhone like :MobilPhone and concat(m.Name,m.Address) like :KeyWord group by m.ID order by :OrderBy desc limit :Page,:Limit;",
 
         //会员详情
         _memberInfo: "select * from Members where ID=:ID;",
@@ -109,14 +109,15 @@ Member.prototype.updateMember = function(Obj, callback) {
  * @param  {Number} Limit 每页显示几条
  * @param  {Function} callback 回调
  */
-Member.prototype.memberList = function(KeyWord, MobilPhone, Page, Limit, callback) {
+Member.prototype.memberList = function(KeyWord, MobilPhone, Page, Limit, OrderBy, callback) {
 
     this._memberList({
         Flag: 0,
         KeyWord: `%${KeyWord}%`,
         MobilPhone: `%${MobilPhone}%`,
         Page,
-        Limit
+        Limit,
+        OrderBy: ` m.${OrderBy}`,
     }, function(err, rows) {
         if (err) {
             return callback(err, null);
@@ -142,6 +143,7 @@ Member.prototype.memberList = function(KeyWord, MobilPhone, Page, Limit, callbac
         });
 
         callback(null, rows);
+
     });
 };
 

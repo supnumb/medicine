@@ -4,6 +4,8 @@ const member = require('../src/controllers/member');
 const good = require('../src/controllers/good');
 const order = require('../src/controllers/order');
 const vendor = require('../src/controllers/vendor');
+const receipt = require('../src/controllers/receipt');
+const stock = require('../src/controllers/stock');
 
 //管理员登录
 router.post('/employee/signin', member.signIn);
@@ -34,6 +36,9 @@ router.post('/visit/list', member.visitList);
 
 //意向记录添加
 router.post('/intention/save', member.addIntention);
+
+//意向单修改
+router.post('/intention/update', member.updateIntention);
 
 //意向记录列表
 router.post('/intention/list', member.intentionList);
@@ -80,5 +85,22 @@ router.post('/vendor/search', vendor.vendorList);
 //供应商详情
 router.post('/vendor/:VendorID', vendor.vendorInfo);
 
+//入库单添加
+router.post('/receipt/save', receipt.add);
+
+//入库单修改、退回
+router.post('/receipt/cancel', receipt.cancel);
+
+//入库单查询
+router.post('/receipt/search', receipt.receiptList);
+
+//入库单详情
+router.post('/receipt/:ReceiptID', receipt.receiptInfo);
+
+//库存查询
+router.post('/stock/search', stock.stockList);
+
+//调整单录入
+router.post('/stock/revision', stock.revision);
 
 module.exports = router;

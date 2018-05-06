@@ -122,6 +122,23 @@ Order.prototype.orderList = function(KeyWord, Page, Limit, StartTime, EndTime, c
         const rows = result[1];
 
         rows.forEach(function(element, index) {
+            //支付方式 1、微信，2、支付宝，3、现金，4、货到付款，5、二维码
+            let PayStyleLabel = '';
+
+            switch (element.PayStyle) {
+                case 1:
+                    PayStyleLabel = '微信';
+                case 2:
+                    PayStyleLabel = '支付宝';
+                case 3:
+                    PayStyleLabel = '现金';
+                case 4:
+                    PayStyleLabel = '货到付款';
+                case 5:
+                    PayStyleLabel = '二维码';
+            }
+
+            rows[index].PayStyleLabel = PayStyleLabel;
 
             rows[index].Date = moment(rows[index].Date).format('YYYY-MM-DD');
             rows[index].CreateTime = moment(rows[index].CreateTime).format('YYYY-MM-DD HH:mm:ss');
@@ -235,7 +252,7 @@ OrderTran.prototype.edit = function(Obj, callback) {
 
         if (!ID) {
 
-            let Order_add = 'insert into Orders (MemberID,OperatorID,Address,Connact,Telephone,TotalAmount,ReceiptAmount,PayStyle,DeliveryCompany,DeliveryFee,DeliverCode,DeliverReceiptFee,Remark,Date,CreateTime) values (:MemberID,:OperatorID,:Address,:Connact,:Telephone,:TotalAmount,:ReceiptAmount,:PayStyle,:DeliveryCompany,:DeliveryFee,:DeliverCode,:DeliverReceiptFee,:Remark,:Date,now())';
+            let Order_add = 'insert into Orders (MemberID,OperatorID,EmployeeID,Address,Connact,Telephone,TotalAmount,ReceiptAmount,PayStyle,DeliveryCompany,DeliveryFee,DeliverCode,DeliverReceiptFee,Remark,Date,CreateTime) values (:MemberID,:OperatorID,:EmployeeID,:Address,:Connact,:Telephone,:TotalAmount,:ReceiptAmount,:PayStyle,:DeliveryCompany,:DeliveryFee,:DeliverCode,:DeliverReceiptFee,:Remark,:Date,now())';
 
             let ReceiptGood_search = 'select ID,ReceiptID,GoodID,CostPrice,ValiableQuantity from ReceiptGoods where GoodID=:GoodID and ValiableQuantity>0;';
 
