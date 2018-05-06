@@ -1,5 +1,7 @@
 import React from 'react';
 import {Route, BrowserRouter as Router, Switch, NavLink} from 'react-router-dom';
+import { hot } from 'react-hot-loader'
+
 import {
     GoodList,
     OrderList,
@@ -11,8 +13,6 @@ import {
     Container,
     MainMenu
 } from './index';
-
-console.log(OrderList);
 
 const routes = [
     {
@@ -99,4 +99,7 @@ class ManagerRouter extends React.Component {
     }
 }
 
-export default ManagerRouter;
+// export default ManagerRouter;
+
+export default hot(module)(ManagerRouter)
+

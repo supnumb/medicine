@@ -63,12 +63,32 @@ class MemberEditor extends React.Component {
                     this.setState({errors})
                 }}>
                 <div className="form-group">
+                  
+                    <Field name="Name" id="Name"/>
+                </div>
+
+                <div className="form-group">
                     <Field name="Name" id="Name"/>
                     &nbsp;&nbsp;
                     <button onClick={this.submit} className="btn btn-default">
                         查询
                     </button>
                 </div>
+                <div className="form-group">
+                    <Field name="Name" id="Name"/>
+                    &nbsp;&nbsp;
+                    <button onClick={this.submit} className="btn btn-default">
+                        查询
+                    </button>
+                </div>
+                <div className="form-group">
+                    <Field name="Name" id="Name"/>
+                    &nbsp;&nbsp;
+                    <button onClick={this.submit} className="btn btn-default">
+                        查询
+                    </button>
+                </div>
+
             </Form>
 
             会员编辑页面: {member.Name}

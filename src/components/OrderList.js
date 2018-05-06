@@ -1,8 +1,8 @@
 import React from 'react';
 import Store from './Reducer';
 
-import {Form, Field, createFormControl} from 'form-lib';
-import {SchemaModel, StringType} from 'rsuite-schema';
+import { Form, Field, createFormControl } from 'form-lib';
+import { SchemaModel, StringType } from 'rsuite-schema';
 
 /**
  * 销售订单页面
@@ -17,29 +17,72 @@ class OrderList extends React.Component {
         });
 
         this.state = Store.getState();
+        this.loadOrdersFromDB = this._loadOrdersFromDB.bind(this);
     }
 
-    componentDidMount() {}
+    _loadOrdersFromDB() {
+        Store.dispatch({ type: "FETCH_ORDERS" });
+
+        let formData = new FormData();
+        formData.append("keyword", "");
+
+        fetch('/api/order/search', {
+            body: formData,
+            method: 'POST',
+            mode: 'same-origin',
+            credentials: 'same-origin'
+        }).then(res => res.json()).then(json => {
+            console.log(json);
+            if (json.code == 0) {
+                Store.dispatch({ type: "FETCH_ORDERS_DONE", payload: json.data })
+            } else {
+                alert(json.message);
+            }
+        }).catch(err => {
+            console.error(err);
+        })
+    }
+
+    componentDidMount() {
+
+        this.loadOrdersFromDB();
+
+    }
 
     componentUnMount() {
         this.unSubscribe();
     }
 
     render() {
-        let {orders} = this.state;
+        let { orderList: { orders, isFetching } } = this.state;
+
+        let listJsx = orders.map((o, index) => {
+            return (<tr>
+                <td>{o.Name}</td>
+                <td>{o.Name}</td>
+                <td>{o.Name}</td>
+                <td>{o.Name}</td>
+                <td>{o.Name}</td>
+                <td>{o.Name}</td>
+                <td>{o.Name}</td>
+                <td>{o.Name}</td>
+            </tr>);
+        });
+
+
         return (<div id="OrderList" className="col-md-10 col-md-offset-1 main">
 
             <div id="page_title">
                 <h4>销售订单管理</h4>
                 <div className="fun_zone">
                     <Form className="form-inline" ref={ref => this.form = ref} id="form" onChange={(values) => {
-                            this.setState({role: values});
-                            this.form.cleanErrors();
-                        }} onCheck={(errors) => {
-                            this.setState({errors})
-                        }}>
+                        this.setState({ role: values });
+                        this.form.cleanErrors();
+                    }} onCheck={(errors) => {
+                        this.setState({ errors })
+                    }}>
                         <div className="form-group">
-                            <Field name="Name" id="Name"/>
+                            <Field name="Name" id="Name" />
                             &nbsp;&nbsp;
                             <button onClick={this.submit} className="btn btn-default">
                                 查询
@@ -63,16 +106,8 @@ class OrderList extends React.Component {
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
+                    {listJsx}
+
                 </tbody>
             </table>
 
@@ -81,3 +116,5 @@ class OrderList extends React.Component {
 }
 
 export default OrderList;
+
+
