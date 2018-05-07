@@ -1,8 +1,8 @@
 import React from 'react';
 import Store from './Reducer';
 
-import {Form, Field, createFormControl} from 'form-lib';
-import {SchemaModel, StringType} from 'rsuite-schema';
+import { Form, Field, createFormControl } from 'form-lib';
+import { SchemaModel, StringType } from 'rsuite-schema';
 
 /**
  * 销售订单页面
@@ -28,7 +28,7 @@ class OrderList extends React.Component {
     }
 
     _loadOrderListFromDB() {
-        Store.dispatch({type: "FETCH_ORDERS"});
+        Store.dispatch({ type: "FETCH_ORDERS" });
 
         let formData = new FormData();
 
@@ -44,7 +44,7 @@ class OrderList extends React.Component {
         }).then(res => res.json()).then(json => {
             console.log(json);
             if (json.code == 0) {
-                Store.dispatch({type: "FETCH_ORDERS_DONE", payload: json.data})
+                Store.dispatch({ type: "FETCH_ORDERS_DONE", payload: json.data })
             } else {
                 alert(json.message);
             }
@@ -55,6 +55,35 @@ class OrderList extends React.Component {
 
     componentDidMount() {
         this.loadOrderListFromDB();
+    }
+
+    _loadOrdersFromDB() {
+        Store.dispatch({ type: "FETCH_ORDERS" });
+
+        let formData = new FormData();
+        formData.append("keyword", "");
+
+        fetch('/api/order/search', {
+            body: formData,
+            method: 'POST',
+            mode: 'same-origin',
+            credentials: 'same-origin'
+        }).then(res => res.json()).then(json => {
+            console.log(json);
+            if (json.code == 0) {
+                Store.dispatch({ type: "FETCH_ORDERS_DONE", payload: json.data })
+            } else {
+                alert(json.message);
+            }
+        }).catch(err => {
+            console.error(err);
+        })
+    }
+
+    componentDidMount() {
+
+        this.loadOrdersFromDB();
+
     }
 
     componentUnMount() {
@@ -69,7 +98,7 @@ class OrderList extends React.Component {
             }
         } = this.state;
 
-        let mListJsx = orders.map((o, index) => (<tr>
+        let mListJsx = orders.map((o, index) => (<tr key={index}>
             <td>{o.Name}</td>
             <td></td>
             <td>{o.ReceiptAmount}</td>
@@ -80,11 +109,11 @@ class OrderList extends React.Component {
             <td>{o.DeliverReceiptFee}</td>
 
             <td style={{
-                    "width" : "80px"
-                }}>
+                "width": "80px"
+            }}>
                 <button onClick={() => {
-                        Store.dispatch({type: "EDITOR_MEMBER", payload: m})
-                    }}>编辑</button>
+                    Store.dispatch({ type: "EDITOR_MEMBER", payload: m })
+                }}>编辑</button>
             </td>
         </tr>));
 
@@ -94,13 +123,13 @@ class OrderList extends React.Component {
                 <h4>销售订单管理</h4>
                 <div className="fun_zone">
                     <Form className="form-inline" ref={ref => this.form = ref} id="form" onChange={(values) => {
-                            this.setState({role: values});
-                            this.form.cleanErrors();
-                        }} onCheck={(errors) => {
-                            this.setState({errors})
-                        }}>
+                        this.setState({ role: values });
+                        this.form.cleanErrors();
+                    }} onCheck={(errors) => {
+                        this.setState({ errors })
+                    }}>
                         <div className="form-group">
-                            <Field name="Name" id="Name"/>
+                            <Field name="Name" id="Name" />
                             &nbsp;&nbsp;
                             <button onClick={this.submit} className="btn btn-default">
                                 查询
@@ -135,3 +164,5 @@ class OrderList extends React.Component {
 }
 
 export default OrderList;
+
+

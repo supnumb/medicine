@@ -6,6 +6,10 @@ import {SchemaModel, StringType} from 'rsuite-schema';
 
 import GoodEditor from './GoodEditor';
 
+/**
+ * 药品列表管理
+ * @extends React.Component
+ */
 class GoodList extends React.Component {
     constructor(props) {
         super(props);

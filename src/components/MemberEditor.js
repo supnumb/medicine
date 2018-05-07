@@ -260,12 +260,32 @@ class MemberEditor extends React.Component {
 
                 <div className="form-group">
                     <label className="control-label col-sm-3"></label>
+                    <Field name="Name" id="Name"/>
+                </div>
+
+                <div className="form-group">
+                    &nbsp;&nbsp;
                     <button onClick={this.submit} className="btn btn-default">
                         保存
                     </button>
                     &nbsp;&nbsp;
                     <button className="btn" onClick={this.cancel}>取消</button>
                 </div>
+                <div className="form-group">
+                    <Field name="Name" id="Name"/>
+                    &nbsp;&nbsp;
+                    <button onClick={this.submit} className="btn btn-default">
+                        查询
+                    </button>
+                </div>
+                <div className="form-group">
+                    <Field name="Name" id="Name"/>
+                    &nbsp;&nbsp;
+                    <button onClick={this.submit} className="btn btn-default">
+                        查询
+                    </button>
+                </div>
+
             </Form>
         </div>)
     }

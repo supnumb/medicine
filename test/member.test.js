@@ -22,6 +22,8 @@ let memberData = {
     "RelationWithPatient": "妈妈"
 };
 
+let MemberID = 0;
+
 describe("#会员模块测试", function() {
     before(function(done) {
         agent.post('/api/employee/signin').send({login_name: "13511111111", password: "super1111"}).expect(200).end(function(err, res) {
@@ -30,15 +32,16 @@ describe("#会员模块测试", function() {
             }
             res.text.should.containEql("登录成功");
             done();
-        })
+        });
     })
 
     it("##005.01 会员添加", function(done) {
-        //.send(memberData)
         agent.post('/api/member/add').send(memberData).expect(200).end(function(err, res) {
             if (err) {
                 return done(err);
             }
+
+            MemberID = res.body.data.insertId;
 
             res.text.should.containEql("0");
             done();
@@ -47,7 +50,7 @@ describe("#会员模块测试", function() {
 
     it("##005.02 删除存在的会员，应该返回成功", function(done) {
         let MemberID = 2;
-        agent.post('/api/member/delete').send({MemberID}).expect(200).end(function(err, res) {
+        agent.post('/api/member/delete').send({ MemberID }).expect(200).end(function(err, res) {
             if (err) {
                 return done(err);
             }
@@ -59,7 +62,7 @@ describe("#会员模块测试", function() {
 
     it("##005.03 修改存在的会员，应该返回Code=0", function(done) {
 
-        memberData.ID = 1;
+        memberData.ID = MemberID;
 
         agent.post('/api/member/update').send(memberData).expect(200).end(function(err, res) {
             if (err) {
@@ -72,7 +75,7 @@ describe("#会员模块测试", function() {
     })
 
     it("##005.04 修改不存在的会员，应该返回Code=2", function(done) {
-        memberData.ID = 100;
+        memberData.ID = 2000;
         agent.post('/api/member/update').send(memberData).expect(200).end(function(err, res) {
             if (err) {
                 return done(err);
@@ -92,13 +95,14 @@ describe("#会员模块测试", function() {
                 return done(err);
             }
 
-            res.text.should.containEql("-1");
+            res.text.should.containEql("2");
             done();
         });
     })
 
     it("##006 会员列表，按时间倒序列出，返回数据里包含：电话、姓名、意向单内容、回访记录数量，成单数量", function(done) {
-        agent.post('/api/member/search').expect(200).end(function(err, res) {
+
+        agent.post('/api/member/search').send({ OrderBy: "ID" }).expect(200).end(function(err, res) {
             if (err) {
                 return done(err);
             }
@@ -110,11 +114,14 @@ describe("#会员模块测试", function() {
 
     //skip
     it("##006.01 导出指定条件的会员列表", function(done) {
-        let Keyword = "";
-        let Page = "";
-        let Limit = "";
+        let KeyWord = "";
+        let Page = 0;
+        let Limit = 10;
+        let MobilPhone = '';
+        let startTime = "";
+        let endTime = "";
 
-        agent.post('/api/member/search').send({Keyword, Page, Limit, action: "export"}).expect(200).end(function(err, res) {
+        agent.post('/api/member/search').send({ KeyWord, Page, Limit, MobilPhone, action: "export" }).expect(200).end(function(err, res) {
             if (err) {
                 return done(err);
             }
@@ -148,7 +155,6 @@ describe("#会员模块测试", function() {
     })
 
     it("##002 得到指定的会员详细信息(数据存在)，应该返回Code=0;详细信息有：会员基本信息、回访记录、意向记录、成单记录", function(done) {
-        let MemberID = 1;
 
         agent.post(`/api/member/${MemberID}`).expect(200).end(function(err, res) {
             if (err) {
@@ -169,7 +175,6 @@ describe("#会员模块测试", function() {
                 return done(err);
             }
 
-            console.log(res.text);
             res.text.should.containEql("2");
             done();
         });
@@ -207,7 +212,6 @@ describe("#会员模块测试", function() {
         });
     })
 
-    //
     it("## 公司雇员添加 ", function(done) {
         let employeeData = {};
 

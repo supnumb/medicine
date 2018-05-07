@@ -66,3 +66,23 @@ passuser01
 1、
 2、
 3、
+
+
+
+# 配置React开发环境
+
+需要的插件：
+
+1. Webpack-dev-server 静态资源伺服器
+2. react-hot-loader react组件热替换加载器 [组件热替换加载器](https://github.com/gaearon/react-hot-loader)
+3. 
+
+
+需要配置的地方：
+
+1. webpack.config.js配置
+    1. 路径配置:
+    2. 
+     
+2. react-hot-loader配置
+3. 

@@ -14,10 +14,10 @@ function Intention() {
         _delete: "update Intentions set Status=0 where ID=:ID;",
 
         //修改
-        _update: "update Intentions set Goods=:Goods where ID=:ID;",
+        _update: "update Intentions set Goods=:Goods,OperatorID=:OperatorID,Status=:Status where ID=:ID;",
 
         //列表
-        _intentionList: "select * from Intentions where Goods like :KeyWord order by ID desc limit :Page,:Limit;",
+        _intentionList: "select i.*,m.Name from Intentions i left Member m on i.MemberID=m.ID where i.Goods like :KeyWord order by i.ID desc limit :Page,:Limit;",
 
         //详情
         _intentionInfo: "select * from Intentions where ID=:ID;",
@@ -77,11 +77,13 @@ Intention.prototype.delete = function(ID, callback) {
  * @param  {String} ID 会员ID
  * @param  {String} Goods 意向商品
  */
-Intention.prototype.update = function(ID, Goods, callback) {
+Intention.prototype.update = function(ID, OperatorID, Goods, Status, callback) {
 
     this._update({
         ID,
-        Goods
+        OperatorID,
+        Goods,
+        Status
     }, function(err, rows) {
         if (err) {
             return callback(err, null);
