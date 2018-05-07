@@ -5,14 +5,42 @@ const defaultState = {
     goodList: {
         goods: [],
         isFetching: false,
-        checkedGood: null
+        good: null,
+        action: "hidden"
     },
-    goodEdit: {},
-    orderList: {},
+    goodEdit: {
+        good: null,
+        isFetching: false
+    },
+    orderList: {
+        isFetching: false,
+        orders: [],
+        order: null
+    },
     memberList: {
         isFetching: false,
         members: [],
-        member:{}
+        member: null,
+        action: "hidden"
+    },
+    memberEditor: {
+        isFetching: false,
+        values: [],
+        errors: {}
+    },
+
+    intentionList: {
+        isFetching: false,
+        intentions: [],
+        values: {},
+        errors: {}
+    },
+
+    invistList: {
+        isFetching: false,
+        invists: [],
+        values: {},
+        errors: {}
     },
     xxxx: {}
 };
@@ -21,6 +49,51 @@ function XXXXReducer(state = defaultState.xxxx, action) {
     switch (action.type) {
         case "":
             break;
+        default:
+            return state;
+    }
+}
+
+function InvistListReducer(state = defaultState.invistList, action) {
+    switch (action.type) {
+        case "FETCH_INVITE":
+            return Object.assign({}, state, {isFetching: true});
+        case "FETCH_INVITE_DONE":
+            return Object.assign({}, state, {
+                isFetching: false,
+                invists: action.payload
+            });
+
+        default:
+            return state;
+    }
+}
+
+function IntentionsListReducer(state = defaultState.intentionList, action) {
+    switch (action.type) {
+        case "FETCH_INTENTIONS":
+            return Object.assign({}, state, {isFetching: true});
+        case "FETCH_INTENTIONS_DONE":
+            return Object.assign({}, state, {
+                isFetching: false,
+                intentions: action.payload
+            });
+
+        default:
+            return state;
+    }
+}
+
+function MemberEditorReducer(state = defaultState.memberEditor, action) {
+    switch (action.type) {
+        case "FETCH_MEMBER":
+            return Object.assign({}, state, {isFetching: true});
+        case "FETCH_MEMBER_DONE":
+            return Object.assign({}, state, {
+                isFetching: false,
+                members: action.payload
+            });
+
         default:
             return state;
     }
@@ -35,8 +108,31 @@ function MemberListReducer(state = defaultState.memberList, action) {
                 isFetching: false,
                 members: action.payload
             });
-            case "EDITOR_MEMBER":
+        case "EDITOR_MEMBER":
             return Object.assign({}, state, {
+                member: action.payload,
+                action: "update_member"
+            });
+        case "MEMBER_EDITOR_DONE":
+            return Object.assign({}, state, {
+                member: null,
+                action: "hidden"
+            });
+        case "SET_ADD_MODE":
+            return Object.assign({}, state, {action: "add_member"});
+        case "MEMBER_EDITOR_CANCEL":
+            return Object.assign({}, state, {
+                action: "hidden",
+                member: null
+            });
+        case "EDITOR_MEMBER_INTENTIONS":
+            return Object.assign({}, state, {
+                action: "add_intention",
+                member: action.payload
+            });
+        case "EDITOR_MEMBER_VISIT":
+            return Object.assign({}, state, {
+                action: "add_visit",
                 member: action.payload
             });
         default:
@@ -46,8 +142,15 @@ function MemberListReducer(state = defaultState.memberList, action) {
 
 function OrderListReducer(state = defaultState.orderList, action) {
     switch (action.type) {
+        case "FETCH_ORDERS":
+            return Object.assign({}, state, {isFetching: true});
+        case "FETCH_ORDERS_DONE":
+            return Object.assign({}, state, {
+                isFetching: false,
+                orders: action.payload
+            });
         case "":
-            break;
+            return;
         default:
             return state;
     }
@@ -55,22 +158,28 @@ function OrderListReducer(state = defaultState.orderList, action) {
 
 function GoodListReducer(state = defaultState.goodList, action) {
     switch (action.type) {
-        case "LOAD_GOODS":
+        case "FETCH_GOODS":
             return Object.assign({}, state, {isFetching: true});
-        case "LOAD_GOODS_DONE":
+        case "FETCH_GOODS_DONE":
             return Object.assign({}, state, {
                 isFetching: false,
-                items: action.payload
+                goods: action.payload
             });
-        case "LOAD_GOOD":
-            return Object.assign({}, state, {isFetching: true});
-        case "LOAD_GOOD_DONE":
+        case "EDITOR_GOOD":
             return Object.assign({}, state, {
-                isFetching: false,
-                item: action.payload
+                good: action.payload,
+                action: "update"
             });
-        case "LOAD_GOOD_CHECKED":
-            return Object.assign({}, state, {checkedGood: action.payload});
+        case "SET_ADD_MODE":
+            return Object.assign({}, state, {
+                good: null,
+                action: "add"
+            });
+        case "GOOD_EDITOR_CANCEL":
+            return Object.assign({}, state, {
+                action: "hidden",
+                good: null
+            });
 
         default:
             return state;
@@ -100,6 +209,14 @@ function GoodEditorReducer(state = defaultState.goodEdit, action) {
     }
 }
 
-const reducer = combineReducers({goodList: GoodListReducer, goodEdit: GoodEditorReducer, memberList: MemberListReducer});
+const reducer = combineReducers({
+    goodList: GoodListReducer,
+    goodEdit: GoodEditorReducer,
+    memberList: MemberListReducer,
+    orderList: OrderListReducer,
+    invistList: InvistListReducer,
+    intentionList: IntentionsListReducer
+});
+
 const store = createStore(reducer, applyMiddleware(thunk));
 export default store;

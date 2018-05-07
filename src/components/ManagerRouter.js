@@ -60,18 +60,18 @@ class ManagerRouter extends React.Component {
     }
 
     componentDidMount() {
-        fetch('/api/employee/profile', {
-            method: "GET",
-            mode: 'same-origin',
-            credentials: 'same-origin'
-        }).then(res => res.json()).then(json => {
-            if (json.code == 0) {
-                console.log("加载雇员详细信息", json);
-                this.setState({employee: json.data})
-            } else {
-                alert(json.message);
-            }
-        }).catch(err => console.log(err));
+        // fetch('/api/employee/profile', {
+        //     method: "GET",
+        //     mode: 'same-origin',
+        //     credentials: 'same-origin'
+        // }).then(res => res.json()).then(json => {
+        //     if (json.code == 0) {
+        //         console.log("加载雇员详细信息", json);
+        //         this.setState({employee: json.data})
+        //     } else {
+        //         alert(json.message);
+        //     }
+        // }).catch(err => console.log(err));
     }
 
     render() {
@@ -79,7 +79,9 @@ class ManagerRouter extends React.Component {
 
         return (<Router>
             <div>
-                <div className="navbar navbar-inverse navbar-fixed-top"></div>
+                <div className="navbar navbar-inverse navbar-fixed-top">
+                    <h2>美信康年大药房</h2>
+                </div>
                 <div className="container-fluid">
                     <div className="row">
                         {/* 左侧菜单 */}

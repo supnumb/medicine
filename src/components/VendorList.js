@@ -24,9 +24,11 @@ class VendorList extends React.Component {
                         <div className="form-group">
                             <Field name="Name" id="Name"/>
                             &nbsp;&nbsp;
-                            <button onClick={this.submit} className="btn btn-default">
+                            <button onClick={this.submit} className="btn btn-primary">
                                 查询
                             </button>
+
+                            <button className="btn btn-default">添加供应商</button>
                         </div>
                     </Form>
                 </div>

@@ -17,16 +17,77 @@ class OrderList extends React.Component {
         });
 
         this.state = Store.getState();
+
+        this.loadOrderListFromDB = this._loadOrderListFromDB.bind(this);
+        this.onGoOrderEditor = this._onGoOrderEditor.bind(this);
+
     }
 
-    componentDidMount() {}
+    _onGoOrderEditor(order) {
+        this.props.history.push("/order/editor");
+    }
+
+    _loadOrderListFromDB() {
+        Store.dispatch({type: "FETCH_ORDERS"});
+
+        let formData = new FormData();
+
+        formData.append("keyword", "");
+        formData.append("start", 0);
+        formData.append("length", 10);
+
+        fetch('/api/order/search', {
+            body: formData,
+            method: 'POST',
+            mode: 'same-origin',
+            credentials: 'same-origin'
+        }).then(res => res.json()).then(json => {
+            console.log(json);
+            if (json.code == 0) {
+                Store.dispatch({type: "FETCH_ORDERS_DONE", payload: json.data})
+            } else {
+                alert(json.message);
+            }
+        }).catch(err => {
+            console.error(err);
+        })
+    }
+
+    componentDidMount() {
+        this.loadOrderListFromDB();
+    }
 
     componentUnMount() {
         this.unSubscribe();
     }
 
     render() {
-        let {orders} = this.state;
+        let {
+            orderList: {
+                orders,
+                order
+            }
+        } = this.state;
+
+        let mListJsx = orders.map((o, index) => (<tr>
+            <td>{o.Name}</td>
+            <td></td>
+            <td>{o.ReceiptAmount}</td>
+            <td></td>
+            <td>{o.DeliveryCompany}</td>
+            <td>{o.DeliveryFee}</td>
+            <td>{o.DeliverCode}</td>
+            <td>{o.DeliverReceiptFee}</td>
+
+            <td style={{
+                    "width" : "80px"
+                }}>
+                <button onClick={() => {
+                        Store.dispatch({type: "EDITOR_MEMBER", payload: m})
+                    }}>编辑</button>
+            </td>
+        </tr>));
+
         return (<div id="OrderList" className="col-md-10 col-md-offset-1 main">
 
             <div id="page_title">
@@ -55,24 +116,17 @@ class OrderList extends React.Component {
                         <th>客人姓名</th>
                         <th>药品</th>
                         <th>金额</th>
-                        <th>代收</th>
-                        <th>快递费</th>
+                        <th>付款方式</th>
                         <th>快递公司</th>
-                        <th>药师</th>
+                        <th>快递费</th>
+                        <th>快递单</th>
+                        <th>代收</th>
+                        <th>销售员</th>
                         <th>操作</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
+                    {mListJsx}
                 </tbody>
             </table>
 
