@@ -80,12 +80,6 @@ class OrderList extends React.Component {
         })
     }
 
-    componentDidMount() {
-
-        this.loadOrdersFromDB();
-
-    }
-
     componentUnMount() {
         this.unSubscribe();
     }

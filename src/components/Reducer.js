@@ -47,6 +47,11 @@ const defaultState = {
         members: [],
         member: {}
     },
+    vendorList: {
+        vendors: [],
+        isFetching: false,
+        vendor: {}
+    },
     xxxx: {}
 };
 
@@ -54,6 +59,23 @@ function XXXXReducer(state = defaultState.xxxx, action) {
     switch (action.type) {
         case "":
             break;
+        default:
+            return state;
+    }
+}
+
+
+function VendorListReducer(state = defaultState.vendorList, action) {
+    switch (action.type) {
+        case "FETCH_VENDORS":
+            return Object.assign({}, state, { isFetching: true });
+        case "FETCH_VENDORS_DONE":
+            return Object.assign({}, state, { isFetching: false, vendors: action.payload });
+        case "CHECKED_VENDOR":
+            return Object.assign({}, state, { isFetching: false, vendor: action.payload });
+        case "CHECKED_NONE":
+            return Object.assign({}, state, { isFetching: false, vendor: null });
+
         default:
             return state;
     }
@@ -220,7 +242,9 @@ const reducer = combineReducers({
     memberList: MemberListReducer,
     orderList: OrderListReducer,
     invistList: InvistListReducer,
-    intentionList: IntentionsListReducer
+    intentionList: IntentionsListReducer,
+    vendorList: VendorListReducer,
+    // vendorEditor: VendorEditorReducer
 });
 
 const store = createStore(reducer, applyMiddleware(thunk));

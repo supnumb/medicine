@@ -73,6 +73,36 @@ passuser01
 
 需要的插件：
 
+>    "scripts": {  
+>        "webpack:dev": "webpack-dev-server   --config build/webpack.dev.js"  
+>    },  
+
+
+>  "devDependencies": {  
+>        "react-hot-loader": "^4.1.2",  
+>        "webpack-dev-server": "^3.1.4",  
+>   }
+
+
+>  devServer: {  
+>        hot: true,  
+>        historyApiFallback: true,  
+>        headers: {   "Access-Control-Allow-Origin": "*" },  
+> }  
+
+>  plugins: [
+>      new webpack.HotModuleReplacementPlugin(),  
+>      new webpack.NamedModulesPlugin(),  
+> ],
+
+> output: {
+>        path: path.resolve(__dirname, '../public/assets/'),
+>        filename: 'js/[name].bundle.js',
+>        publicPath:'http://localhost:8080/assets/'
+>    }
+
+
+
 1. Webpack-dev-server 静态资源伺服器
 2. react-hot-loader react组件热替换加载器 [组件热替换加载器](https://github.com/gaearon/react-hot-loader)
 3. 
@@ -85,4 +115,7 @@ passuser01
     2. 
      
 2. react-hot-loader配置
-3. 
+
+
+
+"webpack:dev": "webpack-dev-server --config build/webpack.dev.js"
