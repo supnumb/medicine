@@ -31,7 +31,12 @@ class GoodEditor extends React.Component {
     }
 
     _submitGood() {
-        let formData = new FormData();
+        if (!this.form.check()) {
+            this.setState({ message: "数据格式有错误" })
+            return;
+        }
+
+        let formData = new FormData(document.getElementById('form'));
 
         fetch('/api/good/save', {
             body: formData,

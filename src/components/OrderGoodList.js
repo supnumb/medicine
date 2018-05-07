@@ -11,11 +11,37 @@ class OrderGoodList extends React.Component {
         });
 
         this.state = Store.getState();
+
+        this.loadOrderGoodsFromDB() = this._loadOrderGoodsFromDB.bind(this);
+    }
+
+    _loadOrderGoodsFromDB() {
+        let {order} = this.props;
+
+        let formData = new FormData();
+        formData.append("orderid", order.ID);
+
+        fetch('/api/order/goods', {
+            body: formData,
+            method: 'POST',
+            mode: 'same-origin',
+            credentials: 'same-origin'
+        }).then(res => res.json()).then(json => {
+
+            console.log({json});
+
+            if (json.code == 0) {
+                Store.dispatch({type: "", payload: json.data});
+            }
+        }).catch(err => {
+            console.error(err);
+        })
     }
 
     componentDidMount() {}
 
     render() {
+
         return (<div id="OrderGoodList">
             <table className="table">
                 <tbody>
