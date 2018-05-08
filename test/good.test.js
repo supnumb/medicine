@@ -19,7 +19,6 @@ describe("#药品数据模块测试", function() {
 
     it("##016.01 添加|修改药品、应该返回成功，Code=0", function(done) {
         let goodData = {
-            ID: 8,
             Name: "感冒灵颗粒111",
             PinYin: "ganmaoling",
             OfficalName: "感冒药",
@@ -91,6 +90,7 @@ describe("#药品数据模块测试", function() {
                 return done(err);
             }
 
+            //console.log(res.text);
             res.text.should.containEql("0");
             done();
         });
