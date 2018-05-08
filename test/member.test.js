@@ -49,6 +49,7 @@ describe("#会员模块测试", function() {
     })
 
     it("##005.02 删除存在的会员，应该返回成功", function(done) {
+        let MemberID = 2;
         agent.post('/api/member/delete').send({ MemberID }).expect(200).end(function(err, res) {
             if (err) {
                 return done(err);
@@ -131,10 +132,10 @@ describe("#会员模块测试", function() {
     });
 
     it("##001/007 查询会员，按名称、电话、地址,默认返回前10个", function(done) {
-        let KeyWord = "";
+        let KeyWord = "测试";
         let MobilPhone = "";
         let Page = 0; //第几页
-        let Limit = 10; //查询几个；
+        let Limit = 20; //查询几个；
 
         //名称和地址支持模糊查询
         //电话要精确查询
@@ -142,6 +143,11 @@ describe("#会员模块测试", function() {
             if (err) {
                 return done(err);
             }
+
+            let json = JSON.parse(res.text);
+
+            console.log(json);
+            console.log(json.data.length);
 
             res.text.should.containEql(KeyWord);
             done();
@@ -154,6 +160,8 @@ describe("#会员模块测试", function() {
             if (err) {
                 return done(err);
             }
+
+            console.log(res.text);
 
             res.text.should.containEql("0");
             done();
@@ -203,7 +211,6 @@ describe("#会员模块测试", function() {
             done();
         });
     })
-
 
     it("## 公司雇员添加 ", function(done) {
         let employeeData = {

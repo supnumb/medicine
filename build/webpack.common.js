@@ -3,18 +3,21 @@ const webpack = require('webpack');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const isDebug = (process.env.NODE_ENV === 'development');
+// var DashboardPlugin = require('webpack-dashboard/plugin');
 
 const libPath = isDebug
     ? path.join(__dirname, './libs/debug/manifest.json')
     : path.join(__dirname, './libs/disk/manifest.json');
 
 module.exports = {
+
     entry: {
         workspace: "./src/web/back.client.js"
     },
+
     plugins: [
         //new CleanWebpackPlugin(['../public/assets/js/']),
-        new webpack.optimize.SplitChunksPlugin({name: 'common'}),
+        new webpack.optimize.SplitChunksPlugin({ name: 'common' }),
 
         new webpack.DllReferencePlugin({
             manifest: require(libPath),
@@ -29,16 +32,23 @@ module.exports = {
             template: "./views/back_template.html",
             hash: true,
             chunks: ['workspace']
-        })
+        }),
+
+        // new DashboardPlugin(),
+
+        new webpack.HotModuleReplacementPlugin(),
+
+        new webpack.NamedModulesPlugin(),
     ],
     module: {
         rules: [
             {
                 test: /\.js$/,
+                exclude: /node_modules/,
                 loader: 'babel-loader'
             }, {
                 test: /\.jsx$/,
-                loader: 'babel-loader!jsx-loader?harmony',
+                loader: 'react-hot-loader!babel-loader!jsx-loader?harmony',
                 query: {
                     presets: ['es2015', 'stage-0', 'react']
                 }
@@ -53,6 +63,7 @@ module.exports = {
     },
     output: {
         path: path.resolve(__dirname, '../public/assets/'),
-        filename: 'js/[name].bundle.js'
+        filename: 'js/[name].bundle.js',
+        publicPath:'http://localhost:8080/assets/'
     }
 };

@@ -1,39 +1,31 @@
-<!DOCTYPE html>
-<html lang="en">
-
-    <head>
-        <title>
-            药师工作台
-        </title>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-
-        <link href="/dist/css/bootstrap.min.css" rel="stylesheet">
-        <link href="/assets/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
-        <link href="/stylesheets/dashboard.css" rel="stylesheet">
-        <link href="/assets/css/main.min.css" rel="stylesheet">
-        <script src="../../assets/js/ie-emulation-modes-warning.js"></script>
-
-        <script type="text/javascript" src="/assets/js/lib.js"></script>
-
-        
-    </head>
-
-    <body>
-        <div id="App"></div>
-        
-            <script type="text/javascript" src="/assets/js/../js/workspace.bundle.js?7cdd1b56a9070d947e3f"></script>
-        
-
-        <!-- Bootstrap core JavaScript ================================================== -->
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-        <script>
-            window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')
-        </script>
-        <script src="/dist/js/bootstrap.min.js"></script>
-        <script src="/assets/js/vendor/holder.min.js"></script>
-        <script src="/assets/js/ie10-viewport-bug-workaround.js"></script>
-    </body>
-</html>
+Html Webpack Plugin:
+<pre>
+  Error: Child compilation failed:
+  Module not found: Error: Can't resolve '../node_modules/html-webpack-plugin/node_modules/lodash/lodash.js' in '/Users/bing.kong/node/medicine/views':
+  Error: Can't resolve '../node_modules/html-webpack-plugin/node_modules/lodash/lodash.js' in '/Users/bing.kong/node/medicine/views'
+  
+  - compiler.js:79 childCompiler.runAsChild
+    [medicine]/[html-webpack-plugin]/lib/compiler.js:79:16
+  
+  - Compiler.js:242 compile
+    [medicine]/[webpack]/lib/Compiler.js:242:11
+  
+  - Compiler.js:487 hooks.afterCompile.callAsync.err
+    [medicine]/[webpack]/lib/Compiler.js:487:14
+  
+  
+  - Hook.js:35 AsyncSeriesHook.lazyCompileHook [as _callAsync]
+    [medicine]/[tapable]/lib/Hook.js:35:21
+  
+  - Compiler.js:484 compilation.seal.err
+    [medicine]/[webpack]/lib/Compiler.js:484:30
+  
+  
+  - Hook.js:35 AsyncSeriesHook.lazyCompileHook [as _callAsync]
+    [medicine]/[tapable]/lib/Hook.js:35:21
+  
+  - Compilation.js:966 hooks.optimizeAssets.callAsync.err
+    [medicine]/[webpack]/lib/Compilation.js:966:35
+  
+  
+</pre>

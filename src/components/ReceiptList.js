@@ -14,15 +14,64 @@ class ReceiptList extends React.Component {
         });
 
         this.state = Store.getState();
+
+        this.loadReceiptsFromDB = this._loadReceiptsFromDB.bind(this);
     }
 
-    componentDidMount() {}
+    _loadReceiptsFromDB() {
+        Store.dispatch({type: "FETCH_RECEIPTS"});
+
+        let formData = new FormData();
+
+        formData.append("KeyWord", "");
+        formData.append("Page", 0);
+        formData.append("Limit", 10);
+
+        fetch('/api/receipt/search', {
+            body: formData,
+            method: 'POST',
+            mode: 'same-origin',
+            credentials: 'same-origin'
+        }).then(res => res.json()).then(json => {
+            console.log(json);
+            if (json.code == 0) {
+                Store.dispatch({type: "FETCH_RECEIPTS_DONE", payload: json.data})
+            } else {
+                alert(json.message);
+            }
+        }).catch(err => {
+            console.error(err);
+        })
+    }
+
+    componentDidMount() {
+        this.loadReceiptsFromDB();
+    }
 
     componentUnMount() {
         this.unSubscribe();
     }
 
     render() {
+
+        let {
+            receiptList: {
+                receipts,
+                receipt,
+                isFetching
+            }
+        } = this.state;
+
+        let listJsx = receipts.map((r, index) => (<tr key={index}>
+            <td>{r.Name}</td>
+            <td>{r.Name}</td>
+            <td>{r.Name}</td>
+            <td>{r.Name}</td>
+            <td>{r.Name}</td>
+            <td>{r.Name}</td>
+            <td>{r.Name}</td>
+        </tr>));
+
         return (<div id="ReceiptList" className="col-md-10 col-md-offset-1 main">
             <div id="page_title">
                 <h4>进货单管理</h4>
@@ -56,15 +105,7 @@ class ReceiptList extends React.Component {
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
+                    {listJsx}
                 </tbody>
             </table>
         </div>)

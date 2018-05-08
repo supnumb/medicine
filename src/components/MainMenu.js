@@ -15,13 +15,13 @@ const MainMenu = () => (<ul id="back_menu" className="nav nav-sidebar">
         <NavLink to="/stats" activeClassName="checked">数据</NavLink>
     </li>
     <li>
-        <NavLink to="/members" activeClassName="checked">会员管理</NavLink>
+        <NavLink to="/members" activeClassName="checked">会员</NavLink>
     </li>
     <li>
-        <NavLink to="/goods" activeClassName="checked">药品管理</NavLink>
+        <NavLink to="/goods" activeClassName="checked">药品</NavLink>
     </li>
     <li>
-        <NavLink to="/vendors" activeClassName="checked">供应商管理</NavLink>
+        <NavLink to="/vendors" activeClassName="checked">供应商</NavLink>
     </li>
 
 </ul>);
