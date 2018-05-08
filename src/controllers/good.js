@@ -42,7 +42,7 @@ const { Good } = require('../models/index');
  */
 exports.addGood = (req, res, next) => {
 
-    let { Name, PinYin = '', OfficalName, Dimension, FormOfDrug, Unit, DefaultCostPrice, DefaultPrice, LimitPrice = 0, BidPrice = 0, Manufacturer, Competion, Medicare = '', PeriodTreatment, Translation, UseWay, Remark = '', IsForeign = 0, ApprovalNumber } = req.body;
+    let { ID, Name, PinYin = '', OfficalName, Dimension, FormOfDrug, Unit, DefaultCostPrice, DefaultPrice, LimitPrice = 0, BidPrice = 0, Manufacturer, Competion, Medicare = '', PeriodTreatment, Translation, UseWay, Remark = '', IsForeign = 0, ApprovalNumber } = req.body;
 
     let ep = new eventproxy();
 
@@ -56,17 +56,35 @@ exports.addGood = (req, res, next) => {
         return res.send({ code: 2, message: "参数不完整" });
     };
 
-    const goodData = { Name, PinYin, OfficalName, Dimension, FormOfDrug, Unit, DefaultCostPrice, DefaultPrice, LimitPrice, BidPrice, Manufacturer, Competion, Medicare, PeriodTreatment, Translation, UseWay, Remark, IsForeign, ApprovalNumber };
+    const goodData = { ID, Name, PinYin, OfficalName, Dimension, FormOfDrug, Unit, DefaultCostPrice, DefaultPrice, LimitPrice, BidPrice, Manufacturer, Competion, Medicare, PeriodTreatment, Translation, UseWay, Remark, IsForeign, ApprovalNumber };
 
-    Good.add(goodData, function(err, mem) {
 
-        if (err) {
-            ep.emit('error', "数据库操作错误");
-        };
+    if (ID && ID > 0) {
 
-        return res.status(200).send({ code: 0, message: "success", data: mem });
+        Good.update(goodData, function(err, mem) {
 
-    });
+            if (err) {
+                ep.emit('error', "数据库操作错误");
+            };
+
+            return res.status(200).send({ code: 0, data: mem });
+
+        });
+
+    } else {
+
+        Good.add(goodData, function(err, mem) {
+
+            if (err) {
+                ep.emit('error', "数据库操作错误");
+            };
+
+            return res.status(200).send({ code: 0, message: "success", data: mem });
+
+        });
+
+    }
+
 }
 
 /**

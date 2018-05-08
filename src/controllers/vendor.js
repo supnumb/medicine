@@ -29,7 +29,7 @@ const { Vendor } = require('../models/index');
  */
 exports.addVendor = (req, res, next) => {
 
-    let { Name, Telephone, Address, Contact, Remark = '' } = req.body;
+    let { ID, Name, Telephone, Address, Contact, Remark = '' } = req.body;
 
     let ep = new eventproxy();
 
@@ -42,17 +42,33 @@ exports.addVendor = (req, res, next) => {
         return res.status(200).send({ code: 2, message: "Name|Telephone|Address|Contact参数不匹配！" });
     };
 
-    const vendorData = { Name, Telephone, Address, Contact, Remark };
+    const vendorData = { ID, Name, Telephone, Address, Contact, Remark };
 
-    Vendor.add(vendorData, function(err, mem) {
+    if (ID) {
 
-        if (err) {
-            ep.emit('error', "数据库操作错误");
-        };
+        Vendor.update(VendorData, function(err, mem) {
 
-        return res.status(200).send({ code: 0, message: "success", data: mem });
+            if (err) {
+                ep.emit('error', "数据库操作错误");
+            };
 
-    });
+            return res.status(200).send({ code: 0, data: mem });
+
+        });
+
+    } else {
+
+        Vendor.add(vendorData, function(err, mem) {
+
+            if (err) {
+                ep.emit('error', "数据库操作错误");
+            };
+
+            return res.status(200).send({ code: 0, message: "success", data: mem });
+
+        });
+    }
+
 }
 
 /**
@@ -115,7 +131,7 @@ exports.updateVendor = (req, res, next) => {
         return res.status(403).send({ code: -1, message: "系统错误", data: error });
     });
 
-    if (!ID || Name || Telephone || Address || Contact) {
+    if (!ID || !Name || !Telephone || !Address || !Contact) {
         return res.status(200).send({ code: 2, message: "ID|Name|Telephone|Address|Contact参数不匹配！" });
     };
 
