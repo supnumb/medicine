@@ -53,7 +53,7 @@ exports.cash = (req, res, next) => {
     Order.cash(StartTime, EndTime, function(err, mem) {
 
         if (err) {
-            ep.emit('error', "数据库操作错误");
+            return ep.emit('error', "数据库操作错误");
         };
 
         if (action == 'export') {
@@ -100,7 +100,7 @@ exports.rate = (req, res, next) => {
     Order.rate(StartTime, EndTime, function(err, mem) {
 
         if (err) {
-            ep.emit('error', "数据库操作错误");
+            return ep.emit('error', "数据库操作错误");
         };
 
         if (action == 'export') {
@@ -147,7 +147,7 @@ exports.good = (req, res, next) => {
     Order.good(StartTime, EndTime, function(err, mem) {
 
         if (err) {
-            ep.emit('error', "数据库操作错误");
+            return ep.emit('error', "数据库操作错误");
         };
 
         if (action == 'export') {

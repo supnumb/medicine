@@ -37,7 +37,7 @@ exports.signIn = (req, res, next) => {
     let { login_name, password } = req.body;
 
     let ep = new eventproxy();
-    ep.fail(function (error) {
+    ep.fail(function(error) {
         console.error(error);
         return res.status(403).send({ code: -1, message: "系统错误", data: error });
     });
@@ -49,13 +49,13 @@ exports.signIn = (req, res, next) => {
 
     req.session = {};
 
-    Member.check(login_name, function (err, mem) {
+    Member.check(login_name, function(err, mem) {
         if (err) {
-            ep.emit('error', "数据库操作错误");
+            return ep.emit('error', "数据库操作错误");
         };
 
         if (mem) {
-            bcrypt.compare(password, mem.Password, function (err, result) {
+            bcrypt.compare(password, mem.Password, function(err, result) {
 
                 if (err) {
                     console.error(err);
@@ -130,7 +130,7 @@ exports.addMember = (req, res, next) => {
 
     let ep = new eventproxy();
 
-    ep.fail(function (error) {
+    ep.fail(function(error) {
         console.error(error);
         return res.status(403).send({ code: -1, message: "系统错误", data: error });
     });
@@ -157,10 +157,10 @@ exports.addMember = (req, res, next) => {
         RelationWithPatient
     };
 
-    Member.addMember(memberData, function (err, mem) {
+    Member.addMember(memberData, function(err, mem) {
 
         if (err) {
-            ep.emit('error', "数据库操作错误");
+            return ep.emit('error', "数据库操作错误");
         };
 
         return res.status(200).send({ code: 0, message: "success", data: mem });
@@ -181,7 +181,7 @@ exports.deleteMember = (req, res, next) => {
 
     let ep = new eventproxy();
 
-    ep.fail(function (error) {
+    ep.fail(function(error) {
         console.error(error);
         return res.status(403).send({ code: -1, message: "系统错误", data: error });
     });
@@ -191,10 +191,10 @@ exports.deleteMember = (req, res, next) => {
         return res.send({ code: 2, message: "会员Id参数不完整" });
     };
 
-    Member.deleteMember(MemberID, function (err, mem) {
+    Member.deleteMember(MemberID, function(err, mem) {
 
         if (err) {
-            ep.emit('error', "数据库操作错误");
+            return ep.emit('error', "数据库操作错误");
         };
 
         return res.status(200).send({ code: 0, message: "success", data: mem });
@@ -242,7 +242,7 @@ exports.updateMember = (req, res, next) => {
 
     let ep = new eventproxy();
 
-    ep.fail(function (error) {
+    ep.fail(function(error) {
         console.error(error);
         return res.status(403).send({ code: -1, message: "系统错误", data: error });
     });
@@ -270,10 +270,10 @@ exports.updateMember = (req, res, next) => {
         RelationWithPatient
     };
 
-    Member.updateMember(memberData, function (err, mem) {
+    Member.updateMember(memberData, function(err, mem) {
 
         if (err) {
-            ep.emit('error', "数据库操作错误");
+            return ep.emit('error', "数据库操作错误");
             //return res.status(200).send({ code: -1, message: "数据库连接失败！" });
         };
 
@@ -303,7 +303,7 @@ exports.memberList = (req, res, next) => {
 
     let ep = new eventproxy();
 
-    ep.fail(function (error) {
+    ep.fail(function(error) {
         console.error(error);
         return res.status(403).send({ code: -1, message: "系统错误", data: error });
     });
@@ -318,10 +318,10 @@ exports.memberList = (req, res, next) => {
         }
     }
 
-    Member.memberList(KeyWord, MobilPhone, Page, Limit, OrderBy, function (err, mem) {
+    Member.memberList(KeyWord, MobilPhone, Page, Limit, OrderBy, function(err, mem) {
 
         if (err) {
-            ep.emit('error', "数据库操作错误");
+            return ep.emit('error', "数据库操作错误");
         };
 
         return res.status(200).send({ code: 0, message: "success", data: mem });
@@ -344,7 +344,7 @@ exports.memberInfo = (req, res, next) => {
 
     let ep = new eventproxy();
 
-    ep.fail(function (error) {
+    ep.fail(function(error) {
         console.error(error);
         return res.status(403).send({ code: -1, message: "系统错误", data: error });
     });
@@ -356,23 +356,9 @@ exports.memberInfo = (req, res, next) => {
 
     async.parallel([
 
-        function (cb) {
+        function(cb) {
 
-            Member.memberInfo(MemberID, function (err, mem) {
-
-                if (err) {
-                    return cb(err, null);
-                };
-
-                cb(null, mem);
-
-            });
-
-        },
-
-        function (cb) {
-
-            Intention.search(MemberID, function (err, mem) {
+            Member.memberInfo(MemberID, function(err, mem) {
 
                 if (err) {
                     return cb(err, null);
@@ -384,9 +370,9 @@ exports.memberInfo = (req, res, next) => {
 
         },
 
-        function (cb) {
+        function(cb) {
 
-            Visit.search(MemberID, function (err, mem) {
+            Intention.search(MemberID, function(err, mem) {
 
                 if (err) {
                     return cb(err, null);
@@ -398,9 +384,23 @@ exports.memberInfo = (req, res, next) => {
 
         },
 
-        function (cb) {
+        function(cb) {
 
-            Order.search(MemberID, function (err, mem) {
+            Visit.search(MemberID, function(err, mem) {
+
+                if (err) {
+                    return cb(err, null);
+                };
+
+                cb(null, mem);
+
+            });
+
+        },
+
+        function(cb) {
+
+            Order.search(MemberID, function(err, mem) {
 
                 if (err) {
                     return cb(err, null);
@@ -412,7 +412,7 @@ exports.memberInfo = (req, res, next) => {
 
         }
 
-    ], function (err, result) {
+    ], function(err, result) {
 
         if (err) {
             ep.emit('error', "数据库操作错误");
@@ -442,7 +442,7 @@ exports.addVisit = (req, res, next) => {
 
     let ep = new eventproxy();
 
-    ep.fail(function (error) {
+    ep.fail(function(error) {
         console.error(error);
         return res.status(403).send({ code: -1, message: "系统错误", data: error });
     });
@@ -452,14 +452,14 @@ exports.addVisit = (req, res, next) => {
         return res.send({ code: 2, message: "参数不完整" });
     };
 
-    const OperatorID = req.session
-        ? req.session.user.ID
-        : 1;
+    const OperatorID = req.session ?
+        req.session.user.ID :
+        1;
 
-    Visit.add(MemberID, OperatorID, Remarks, function (err, mem) {
+    Visit.add(MemberID, OperatorID, Remarks, function(err, mem) {
 
         if (err) {
-            ep.emit('error', "数据库操作错误");
+            return ep.emit('error', "数据库操作错误");
         };
 
         return res.status(200).send({ code: 0, message: "success", data: mem });
@@ -480,13 +480,13 @@ exports.visitList = (req, res, next) => {
 
     let {
         KeyWord = '',
-        Page = 0,
-        Limit = 10
+            Page = 0,
+            Limit = 10
     } = req.body;
 
     let ep = new eventproxy();
 
-    ep.fail(function (error) {
+    ep.fail(function(error) {
         console.error(error);
         return res.status(403).send({ code: -1, message: "系统错误", data: error });
     });
@@ -495,10 +495,10 @@ exports.visitList = (req, res, next) => {
         Page = (Page - 1) * Limit;
     }
 
-    Visit.visitList(KeyWord, Page, Limit, function (err, mem) {
+    Visit.visitList(KeyWord, Page, Limit, function(err, mem) {
 
         if (err) {
-            ep.emit('error', "数据库操作错误");
+            return ep.emit('error', "数据库操作错误");
         };
 
         return res.status(200).send({ code: 0, message: "success", data: mem });
@@ -520,7 +520,7 @@ exports.addIntention = (req, res, next) => {
 
     let ep = new eventproxy();
 
-    ep.fail(function (error) {
+    ep.fail(function(error) {
         console.error(error);
         return res.status(403).send({ code: -1, message: "系统错误", data: error });
     });
@@ -530,14 +530,14 @@ exports.addIntention = (req, res, next) => {
         return res.send({ code: 2, message: "会员Id、意向商品参数不完整" });
     };
 
-    const OperatorID = req.session
-        ? req.session.user.ID
-        : 1;
+    const OperatorID = req.session ?
+        req.session.user.ID :
+        1;
 
-    Intention.add(MemberID, OperatorID, Goods, function (err, mem) {
+    Intention.add(MemberID, OperatorID, Goods, function(err, mem) {
 
         if (err) {
-            ep.emit('error', "数据库操作错误");
+            return ep.emit('error', "数据库操作错误");
         };
 
         return res.status(200).send({ code: 0, message: "success", data: mem });
@@ -561,7 +561,7 @@ exports.updateIntention = (req, res, next) => {
 
     let ep = new eventproxy();
 
-    ep.fail(function (error) {
+    ep.fail(function(error) {
         console.error(error);
         return res.status(403).send({ code: -1, message: "系统错误", data: error });
     });
@@ -573,10 +573,10 @@ exports.updateIntention = (req, res, next) => {
 
     const OperatorID = req.session ? req.session.user.ID : 1;
 
-    Intention.update(ID, OperatorID, Goods, Status, function (err, mem) {
+    Intention.update(ID, OperatorID, Goods, Status, function(err, mem) {
 
         if (err) {
-            ep.emit('error', "数据库操作错误");
+            return ep.emit('error', "数据库操作错误");
         };
 
         return res.status(200).send({ code: 0, message: "success", data: mem });
@@ -597,13 +597,13 @@ exports.intentionList = (req, res, next) => {
 
     let {
         KeyWord = '',
-        Page = 0,
-        Limit = 10
+            Page = 0,
+            Limit = 10
     } = req.body;
 
     let ep = new eventproxy();
 
-    ep.fail(function (error) {
+    ep.fail(function(error) {
         console.error(error);
         return res.status(403).send({ code: -1, message: "系统错误", data: error });
     });
@@ -612,10 +612,10 @@ exports.intentionList = (req, res, next) => {
         Page = (Page - 1) * Limit;
     }
 
-    Intention.intentionList(KeyWord, Page, Limit, function (err, mem) {
+    Intention.intentionList(KeyWord, Page, Limit, function(err, mem) {
 
         if (err) {
-            ep.emit('error', "数据库操作错误");
+            return ep.emit('error', "数据库操作错误");
         };
 
         return res.status(200).send({ code: 0, message: "success", data: mem });

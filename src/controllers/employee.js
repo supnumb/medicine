@@ -59,7 +59,7 @@ exports.addEmployee = (req, res, next) => {
     Member.addEmployee(memberData, function(err, mem) {
 
         if (err) {
-            ep.emit('error', "数据库操作错误");
+            return ep.emit('error', "数据库操作错误");
         };
 
         return res.status(200).send({ code: 0, message: "success", data: mem });
@@ -92,7 +92,7 @@ exports.profile = (req, res, next) => {
     Member.memberInfo(MemberID, function(err, mem) {
 
         if (err) {
-            ep.emit('error', "数据库操作错误");
+            return ep.emit('error', "数据库操作错误");
         };
 
         return res.status(200).send({ code: 0, message: "success", data: mem });
@@ -137,7 +137,7 @@ exports.alterpass = (req, res, next) => {
 
     Member.checkByID(MemberID, function(err, mem) {
         if (err) {
-            ep.emit('error', "数据库操作错误");
+            return ep.emit('error', "数据库操作错误");
         };
 
         if (mem) {
@@ -148,7 +148,7 @@ exports.alterpass = (req, res, next) => {
 
                     if (err) {
                         console.error(err);
-                        ep.emit('error', err);
+                        return ep.emit('error', err);
                     }
 
                     if (result) {
@@ -157,7 +157,7 @@ exports.alterpass = (req, res, next) => {
 
                             if (err) {
                                 console.error(err);
-                                ep.emit('error', err);
+                                return ep.emit('error', err);
                             }
 
                             return res.status(200).send({ code: 0, message: "修改成功！" });
@@ -174,7 +174,7 @@ exports.alterpass = (req, res, next) => {
 
                     if (err) {
                         console.error(err);
-                        ep.emit('error', err);
+                        return ep.emit('error', err);
                     }
 
                     return res.status(200).send({ code: 0, message: "修改成功！" });

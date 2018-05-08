@@ -10,7 +10,7 @@ function Receipt() {
     var _action = {
 
         //列表
-        _search: "select r.*,g.Name from Receipts r,ReceiptGoods p,Goods g where r.ID=p.ReceiptID and p.GoodID=g.ID and concat(r.ID,g.Name) like '%%' group by r.ID order by r.ID desc limit :Page,:Limit;",
+        _search: "select r.*,m.name as EmployeeName,g.Name,p.Amount,p.CostPrice,v.Contact,v.Telephone,v.Address from Receipts r,ReceiptGoods p,Goods g,Vendors v,Members m  where r.ID=p.ReceiptID and p.GoodID=g.ID and r.VendorID=v.ID and r.OperatorID=m.ID and concat(r.ID,g.Name) like :KeyWord group by r.ID order by r.ID desc limit :Page,:Limit;",
 
         //详情
         _ReceiptInfo: "select * from Receipts where ID=:ID;",

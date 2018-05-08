@@ -53,7 +53,7 @@ exports.add = (req, res, next) => {
         }
 
         if (err) {
-            ep.emit('error', "数据库操作错误");
+            return ep.emit('error', "数据库操作错误");
         };
 
         return res.status(200).send({ code: 0, message: "success", data: mem });
@@ -99,7 +99,7 @@ exports.cancel = (req, res, next) => {
         }
 
         if (err) {
-            ep.emit('error', "数据库操作错误");
+            return ep.emit('error', "数据库操作错误");
         };
 
         return res.status(200).send({ code: 0, data: mem });
@@ -137,7 +137,7 @@ exports.receiptList = (req, res, next) => {
     Receipt.search(KeyWord, Page, Limit, StartTime, EndTime, function(err, mem) {
 
         if (err) {
-            ep.emit('error', "数据库操作错误");
+            return ep.emit('error', "数据库操作错误");
         };
 
         return res.status(200).send({ code: 0, data: mem });
@@ -170,7 +170,7 @@ exports.receiptInfo = (req, res, next) => {
     Receipt.receiptInfo(ID, function(err, mem) {
 
         if (err) {
-            ep.emit('error', "数据库操作错误");
+            return ep.emit('error', "数据库操作错误");
         };
 
         const { data, ReceiptGood } = mem;

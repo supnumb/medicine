@@ -49,7 +49,7 @@ exports.addVendor = (req, res, next) => {
         Vendor.update(VendorData, function(err, mem) {
 
             if (err) {
-                ep.emit('error', "数据库操作错误");
+                return ep.emit('error', "数据库操作错误");
             };
 
             return res.status(200).send({ code: 0, data: mem });
@@ -61,7 +61,7 @@ exports.addVendor = (req, res, next) => {
         Vendor.add(vendorData, function(err, mem) {
 
             if (err) {
-                ep.emit('error', "数据库操作错误");
+                return ep.emit('error', "数据库操作错误");
             };
 
             return res.status(200).send({ code: 0, message: "success", data: mem });
@@ -96,7 +96,7 @@ exports.deleteVendor = (req, res, next) => {
     Vendor.delete(ID, function(err, mem) {
 
         if (err) {
-            ep.emit('error', "数据库操作错误");
+            return ep.emit('error', "数据库操作错误");
         };
 
         if (mem.affectedRows == 0) {
@@ -140,7 +140,7 @@ exports.updateVendor = (req, res, next) => {
     Vendor.update(VendorData, function(err, mem) {
 
         if (err) {
-            ep.emit('error', "数据库操作错误");
+            return ep.emit('error', "数据库操作错误");
         };
 
         return res.status(200).send({ code: 0, data: mem });
@@ -175,7 +175,7 @@ exports.vendorList = (req, res, next) => {
     Vendor.vendorList(KeyWord, Page, Limit, function(err, mem) {
 
         if (err) {
-            ep.emit('error', "数据库操作错误");
+            return ep.emit('error', "数据库操作错误");
         };
 
         return res.status(200).send({ code: 0, data: mem });
@@ -208,7 +208,7 @@ exports.vendorInfo = (req, res, next) => {
     Vendor.vendorInfo(VendorID, function(err, mem) {
 
         if (err) {
-            ep.emit('error', "数据库操作错误");
+            return ep.emit('error', "数据库操作错误");
         };
 
         return res.status(200).send({ code: 0, data: mem });

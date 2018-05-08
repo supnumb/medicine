@@ -45,7 +45,7 @@ exports.stockList = (req, res, next) => {
     Stock.search(KeyWord, Page, Limit, StartTime, EndTime, function(err, mem) {
 
         if (err) {
-            ep.emit('error', "数据库操作错误");
+            return ep.emit('error', "数据库操作错误");
         };
 
         return res.status(200).send({ code: 0, data: mem });
@@ -82,7 +82,7 @@ exports.revision = (req, res, next) => {
     StockTran.revision(StockData, function(err, mem) {
 
         if (err) {
-            ep.emit('error', "数据库操作错误");
+            return ep.emit('error', "数据库操作错误");
         };
 
 

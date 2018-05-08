@@ -64,7 +64,7 @@ exports.addGood = (req, res, next) => {
         Good.update(goodData, function(err, mem) {
 
             if (err) {
-                ep.emit('error', "数据库操作错误");
+                return ep.emit('error', "数据库操作错误");
             };
 
             return res.status(200).send({ code: 0, data: mem });
@@ -76,7 +76,7 @@ exports.addGood = (req, res, next) => {
         Good.add(goodData, function(err, mem) {
 
             if (err) {
-                ep.emit('error', "数据库操作错误");
+                return ep.emit('error', "数据库操作错误");
             };
 
             return res.status(200).send({ code: 0, message: "success", data: mem });
@@ -113,7 +113,7 @@ exports.deleteGood = (req, res, next) => {
     Good.delete(ID, function(err, mem) {
 
         if (err) {
-            ep.emit('error', "数据库操作错误");
+            return ep.emit('error', "数据库操作错误");
         };
 
         if (mem.affectedRows == 0) {
@@ -172,7 +172,7 @@ exports.updateGood = (req, res, next) => {
     Good.update(goodData, function(err, mem) {
 
         if (err) {
-            ep.emit('error', "数据库操作错误");
+            return ep.emit('error', "数据库操作错误");
         };
 
         return res.status(200).send({ code: 0, data: mem });
@@ -209,7 +209,7 @@ exports.goodList = (req, res, next) => {
     Good.goodList(KeyWord, Page, Limit, StartTime, EndTime, function(err, mem) {
 
         if (err) {
-            ep.emit('error', "数据库操作错误");
+            return ep.emit('error', "数据库操作错误");
         };
 
         return res.status(200).send({ code: 0, data: mem });
@@ -243,7 +243,7 @@ exports.goodInfo = (req, res, next) => {
     Good.goodInfo(GoodID, function(err, mem) {
 
         if (err) {
-            ep.emit('error', "数据库操作错误");
+            return ep.emit('error', "数据库操作错误");
         };
 
         return res.status(200).send({ code: 0, data: mem });

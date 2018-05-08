@@ -64,7 +64,7 @@ exports.edit = (req, res, next) => {
         }
 
         if (err) {
-            ep.emit('error', "数据库操作错误");
+            return ep.emit('error', "数据库操作错误");
         };
 
         return res.status(200).send({ code: 0, message: "success", data: mem });
@@ -98,7 +98,7 @@ exports.cancel = (req, res, next) => {
     OrderTran.cancel(ID, function(err, mem) {
 
         if (err) {
-            ep.emit('error', "数据库操作错误");
+            return ep.emit('error', "数据库操作错误");
         };
 
         return res.status(200).send({ code: 0, data: mem });
@@ -136,7 +136,7 @@ exports.orderList = (req, res, next) => {
     Order.orderList(KeyWord, Page, Limit, StartTime, EndTime, function(err, mem) {
 
         if (err) {
-            ep.emit('error', "数据库操作错误");
+            return ep.emit('error', "数据库操作错误");
         };
 
         let { Quantity, rows } = mem;
@@ -172,7 +172,7 @@ exports.orderInfo = (req, res, next) => {
     Order.orderInfo(ID, function(err, mem) {
 
         if (err) {
-            ep.emit('error', "数据库操作错误");
+            return ep.emit('error', "数据库操作错误");
         };
 
         const { rows, goods } = mem;
