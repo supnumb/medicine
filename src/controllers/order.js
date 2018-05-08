@@ -52,7 +52,6 @@ exports.edit = (req, res, next) => {
     });
 
     if (!MemberID || !EmployeeID || !Address || !Connact || !Telephone || !TotalAmount || !ReceiptAmount || !PayStyle || Goods.length == 0) {
-        res.status(422);
         return res.send({ code: 2, message: "参数不完整" });
     };
 

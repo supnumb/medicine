@@ -22,7 +22,16 @@ function Order() {
         _orderGood: "select * from OrderGoods where OrderID=:ID;",
 
         //订单列表总数
-        _orderQuantity: "select count(1) as Quantity from Orders o left join Members m on o.MemberID=m.ID where m.MobilPhone like :KeyWord ;"
+        _orderQuantity: "select count(1) as Quantity from Orders o left join Members m on o.MemberID=m.ID where m.MobilPhone like :KeyWord ;",
+
+        //收银统计
+        _cash: "select ID,EmployeeID,PayStyle,TotalAmount,ReceiptAmount,CreateTime,UpdateTime from Orders where date_format(CreateTime,'%Y-%m-%d')>=:StartTime and date_format(CreateTime,'%Y-%m-%d')<=:EndTime;",
+
+        //销售员毛利率统计//销售员每个订单的毛利率
+        _rate: "select o.ID,m.Name,o.EmployeeID,o.ReceiptAmount,sum(g.TotalCostPrice) as TotalCostPrice from Orders o left join OrderGoods g on o.ID=g.OrderID left join Members m on o.EmployeeID=m.ID where date_format(o.CreateTime,'%Y-%m-%d')>=:StartTime and date_format(o.CreateTime,'%Y-%m-%d')<=:EndTime group by o.ID desc;",
+
+        //销售商品统计
+        _good: "select g.GoodID,g.GoodName,sum(g.Quantity) as Quantity,o.CreateTime from Orders o left join OrderGoods g on o.ID=g.OrderID where date_format(o.CreateTime,'%Y-%m-%d')>=:StartTime and date_format(o.CreateTime,'%Y-%m-%d')<=:EndTime group by g.GoodID;",
 
     };
 
@@ -946,6 +955,74 @@ OrderTran.prototype.cancel = function(ID, callback) {
 
         });
 
+    });
+
+}
+
+
+Order.prototype.cash = function(StartTime, EndTime, callback) {
+
+    this._cash({
+        StartTime,
+        EndTime
+    }, function(err, rows) {
+        if (err) {
+            return callback(err, null);
+        }
+
+        rows.forEach(function(element, index) {
+
+            rows[index].CreateTime = moment(rows[index].CreateTime).format('YYYY-MM-DD HH:mm:ss');
+            rows[index].UpdateTime = moment(rows[index].UpdateTime).format('YYYY-MM-DD HH:mm:ss');
+
+        });
+
+        callback(null, rows);
+    });
+
+}
+
+
+Order.prototype.rate = function(StartTime, EndTime, callback) {
+
+    this._rate({
+        StartTime,
+        EndTime
+    }, function(err, rows) {
+        if (err) {
+            return callback(err, null);
+        }
+
+        rows.forEach(function(element, index) {
+
+            rows[index].CreateTime = moment(rows[index].CreateTime).format('YYYY-MM-DD HH:mm:ss');
+            rows[index].UpdateTime = moment(rows[index].UpdateTime).format('YYYY-MM-DD HH:mm:ss');
+
+        });
+
+        callback(null, rows);
+    });
+
+}
+
+Order.prototype.good = function(StartTime, EndTime, callback) {
+
+    this._good({
+        StartTime,
+        EndTime
+    }, function(err, rows) {
+        if (err) {
+            return callback(err, null);
+        }
+
+        rows.forEach(function(element, index) {
+
+            rows[index].CreateTime = moment(rows[index].CreateTime).format('YYYY-MM-DD HH:mm:ss');
+            rows[index].UpdateTime = moment(rows[index].UpdateTime).format('YYYY-MM-DD HH:mm:ss');
+
+        });
+
+        callback(null, rows);
     });
 
 }

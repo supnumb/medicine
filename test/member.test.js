@@ -206,7 +206,11 @@ describe("#会员模块测试", function() {
 
 
     it("## 公司雇员添加 ", function(done) {
-        let employeeData = {};
+        let employeeData = {
+            Name: "张三",
+            MobilPhone: "11111111111",
+            Password: "123456"
+        };
 
         agent.post('/api/employee/save').send(employeeData).expect(200).end(function(err, res) {
             if (err) {
@@ -219,9 +223,9 @@ describe("#会员模块测试", function() {
     })
 
     it("## 登录雇员详细信息 ", function(done) {
-        let employeeData = {};
+        let employeeData = { MemberID: 48 };
 
-        agent.get('/api/employee/profile').expect(200).end(function(err, res) {
+        agent.post('/api/employee/profile').send(employeeData).expect(200).end(function(err, res) {
             if (err) {
                 return done(err);
             }
@@ -232,11 +236,11 @@ describe("#会员模块测试", function() {
     })
 
     it("## 公司雇员修改密码 ", function(done) {
-        let oldpass = "";
-        let newpass = "";
-        let employeeid = 0;
+        let OldPass = "123";
+        let NewPass = "123";
+        let MemberID = 50;
 
-        agent.post('/api/employee/alterpass').send({ employeeid, oldpass, newpass }).expect(200).end(function(err, res) {
+        agent.post('/api/employee/alterpass').send({ OldPass, NewPass, MemberID }).expect(200).end(function(err, res) {
             if (err) {
                 return done(err);
             }
@@ -247,24 +251,10 @@ describe("#会员模块测试", function() {
     })
 
     it("## 管理员重置雇员密码 ", function(done) {
-        let newpass = "";
-        let employeeid = 0;
+        let NewPass = "123";
+        let MemberID = 50;
 
-        agent.post('/api/employee/alterpass').send({ employeeid, newpass }).expect(200).end(function(err, res) {
-            if (err) {
-                return done(err);
-            }
-
-            res.text.should.containEql("0");
-            done();
-        });
-    })
-
-    it("## 管理员重置雇员密码 ", function(done) {
-        let newpass = "";
-        let employeeid = 0;
-
-        agent.post('/api/employee/alterpass').send({ employeeid, newpass }).expect(200).end(function(err, res) {
+        agent.post('/api/employee/alterpass').send({ MemberID, NewPass }).expect(200).end(function(err, res) {
             if (err) {
                 return done(err);
             }

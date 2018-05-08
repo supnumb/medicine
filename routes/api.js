@@ -1,17 +1,28 @@
 const express = require('express');
 const router = express.Router();
+const employee = require('../src/controllers/employee');
 const member = require('../src/controllers/member');
 const good = require('../src/controllers/good');
 const order = require('../src/controllers/order');
 const vendor = require('../src/controllers/vendor');
 const receipt = require('../src/controllers/receipt');
 const stock = require('../src/controllers/stock');
+const stat = require('../src/controllers/stat');
 
 //管理员登录
 router.post('/employee/signin', member.signIn);
 
 //管理员登出
 router.post('/employee/signout', member.signOut);
+
+//添加雇员
+router.post('/employee/save', employee.addEmployee);
+
+// 雇员详情
+router.post('/employee/profile', employee.profile);
+
+//管理员重置密码
+router.post('/employee/alterpass', employee.alterpass);
 
 //添加会员
 router.post('/member/add', member.addMember);
@@ -102,5 +113,14 @@ router.post('/stock/search', stock.stockList);
 
 //调整单录入
 router.post('/stock/revision', stock.revision);
+
+//收银统计
+router.get('/stat/cash', stat.cash);
+
+//销售员毛利率统计
+router.get('/stat/rate', stat.rate);
+
+//品类统计
+router.get('/stat/good', stat.good);
 
 module.exports = router;

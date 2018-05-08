@@ -19,7 +19,8 @@ describe("#药品基础数据模块测试", function() {
 
     it("##009 雇员保存销售单 应该返回成功，Code=0", function(done) {
         let orderData = {
-            MemberID: 1,
+            MemberID: 34,
+            EmployeeID: 50,
             Address: '北京',
             Connact: '测试',
             Telephone: '10086',
@@ -34,7 +35,7 @@ describe("#药品基础数据模块测试", function() {
             Date: '2018-04-30',
             Goods: [
                 { GoodID: 1, GoodName: '感冒药', Quantity: 1, FinalPrice: 10 },
-                { GoodID: 2, GoodName: '退烧药', Quantity: 1, FinalPrice: 6 }
+                { GoodID: 17, GoodName: '退烧药', Quantity: 1, FinalPrice: 6 }
             ]
         };
 
@@ -55,6 +56,7 @@ describe("#药品基础数据模块测试", function() {
         let orderData = {
             ID,
             MemberID: 1,
+            EmployeeID: 50,
             OperatorID: 1,
             Address: '北京',
             Connact: '测试',
@@ -70,7 +72,7 @@ describe("#药品基础数据模块测试", function() {
             Date: '2018-04-30',
             Goods: [
                 { GoodID: 1, GoodName: '感冒药', Quantity: 1, FinalPrice: 10 },
-                { GoodID: 2, GoodName: '退烧药', Quantity: 0, FinalPrice: 6 }
+                { GoodID: 17, GoodName: '退烧药', Quantity: 0, FinalPrice: 6 }
             ]
         };
 
@@ -78,6 +80,8 @@ describe("#药品基础数据模块测试", function() {
             if (err) {
                 return done(err);
             }
+
+            console.log(res.text);
 
             res.text.should.containEql(0);
             done();

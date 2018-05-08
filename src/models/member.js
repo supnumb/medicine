@@ -10,14 +10,23 @@ function Member() {
         //根据电话号码查找
         _getByTel: "select * from Members where MobilPhone=:MobilPhone;",
 
+        //根据ID进行查找
+        _getByID: "select * from Members where ID=:ID;",
+
         //会员添加
         _add: "insert into Members (Name,PinYin,Telephone,City,Gender,Address,Remark,MobilPhone,WeiXinCode,IsWeixinFriend,FriendName,BirthYear,Diseases,RelationWithPatient,CreateTime) values (:Name,:PinYin,:Telephone,:City,:Gender,:Address,:Remark,:MobilPhone,WeiXinCode,IsWeixinFriend,FriendName,:BirthYear,:Diseases,:RelationWithPatient,now());",
+
+        //雇员添加
+        _addEmployee: "insert into Members (Name,MobilPhone,Password,Flag,CreateTime) values (:Name,:MobilPhone,:Password,1,Now());",
 
         //会员删除
         _delete: "update Members set Status=0 where ID=:ID;",
 
         //会员修改
         _update: "update Members set Name=:Name,PinYin=:PinYin,Telephone=:Telephone,City=:City,Gender=:Gender,Address=:Address,Remark=:Remark,MobilPhone=:MobilPhone,WeiXinCode=:WeiXinCode,IsWeixinFriend=:IsWeixinFriend,FriendName=:FriendName,BirthYear=:BirthYear,Diseases=:Diseases,RelationWithPatient=:RelationWithPatient where ID=:ID;",
+
+        //雇员修改密码
+        _alterpass: "update Members set PassWord=:Password where ID=:ID;",
 
         //会员列表
         _memberList: "select m.*,count(i.ID) as IntentionQuantity,count(v.ID) as VisitQuantity,count(o.ID) as OrderQuantity from Members m left join Intentions i on m.ID=i.MemberID left join Visits v on m.ID=v.MemberID left join Orders o on m.ID=o.MemberID where m.Flag=:Flag and m.Status=1 and m.MobilPhone like :MobilPhone and concat(m.Name,m.Address) like :KeyWord group by m.ID order by :OrderBy desc limit :Page,:Limit;",
@@ -43,6 +52,24 @@ Member.prototype.check = function(MobilPhone, callback) {
 
     this._getByTel({
         MobilPhone: MobilPhone
+    }, function(err, rows) {
+        if (err) {
+            return callback(err, null);
+        }
+        callback(null, rows[0]);
+    });
+};
+
+
+/**
+ * 根据ID查找
+ * @param  {Number} ID 雇员ID
+ * @param  {Function} callback 回调,返回单条用户信息
+ */
+Member.prototype.checkByID = function(ID, callback) {
+
+    this._getByID({
+        ID
     }, function(err, rows) {
         if (err) {
             return callback(err, null);
@@ -169,6 +196,42 @@ Member.prototype.memberInfo = function(ID, callback) {
         callback(null, rows[0]);
     });
 };
+
+
+/**
+ * 雇员添加
+ * @param  {Object} obj 会员信息
+ * @param  {Function} callback 回调
+ */
+Member.prototype.addEmployee = function(Obj, callback) {
+
+    this._addEmployee(Obj, function(err, rows) {
+        if (err) {
+            return callback(err, null);
+        }
+
+        callback(null, rows);
+    });
+};
+
+
+/**
+ * 雇员重置密码
+ * @param  {Number} MemberID 会员ID
+ * @param  {String} Password 密码
+ * @param  {Function} callback 回调
+ */
+Member.prototype.alterpass = function(ID, Password, callback) {
+
+    this._alterpass({ ID, Password }, function(err, rows) {
+        if (err) {
+            return callback(err, null);
+        }
+
+        callback(null, rows);
+    });
+};
+
 
 
 module.exports = new Member();

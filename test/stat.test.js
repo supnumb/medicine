@@ -5,7 +5,7 @@ var agent = supertest.agent(app);
 var should = require('should');
 describe("#数据统计模块测试", function() {
     before(function(done) {
-        agent.post('/api/employee/signin').send({ login_name: "13552085563", password: "sup340" }).expect(200).end(function(err, res) {
+        agent.post('/api/employee/signin').send({ login_name: "13511111111", password: "super1111" }).expect(200).end(function(err, res) {
             if (err) {
                 console.log(err);
             }
@@ -23,7 +23,7 @@ describe("#数据统计模块测试", function() {
                 return done(err);
             }
 
-            console.log(res.text);
+            //console.log(res.text);
             res.text.should.containEql("0");
             done();
         });
@@ -38,7 +38,7 @@ describe("#数据统计模块测试", function() {
                 return done(err);
             }
 
-            console.log(res.text);
+            //console.log(res.text);
             res.text.should.containEql("0");
             done();
         });
@@ -53,7 +53,7 @@ describe("#数据统计模块测试", function() {
                 return done(err);
             }
 
-            console.log(res.text);
+            //console.log(res.text);
             res.text.should.containEql("0");
             done();
         });
