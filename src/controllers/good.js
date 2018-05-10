@@ -193,7 +193,7 @@ exports.updateGood = (req, res, next) => {
  */
 exports.goodList = (req, res, next) => {
 
-    let { KeyWord = '', Page = 0, Limit = 10, StartTime = '', EndTime = '' } = req.body;
+    let { KeyWord = '', Page = 0, Limit = 10, StartTime = '2018-01-01', EndTime = '' } = req.body;
 
     let ep = new eventproxy();
 
@@ -206,13 +206,19 @@ exports.goodList = (req, res, next) => {
         Page = (Page - 1) * Limit;
     }
 
+    if (!EndTime) {
+        EndTime = moment(new Date()).format('YYYY-MM-DD 23:59:59');
+    }
+
     Good.goodList(KeyWord, Page, Limit, StartTime, EndTime, function(err, mem) {
 
         if (err) {
             return ep.emit('error', "数据库操作错误");
         };
 
-        return res.status(200).send({ code: 0, data: mem });
+        const { Quantity, rows } = mem;
+
+        return res.status(200).send({ code: 0, message: "success", Quantity, data: rows });
 
     });
 }

@@ -9,13 +9,19 @@ const async = require('async');
 function Receipt() {
     var _action = {
 
+        //总数
+        _receiptQuantity: "select count(r.ID) as Quantity from Receipts r,ReceiptGoods p,Goods g,Vendors v,Members m  where r.ID=p.ReceiptID and p.GoodID=g.ID and r.VendorID=v.ID and r.OperatorID=m.ID and r.Date>=:StartTime and r.Date<=:EndTime and concat(r.ID,g.Name) like :KeyWord;",
+
         //列表
-        _search: "select r.*,m.name as EmployeeName,g.Name,p.Amount,p.CostPrice,v.Contact,v.Telephone,v.Address from Receipts r,ReceiptGoods p,Goods g,Vendors v,Members m  where r.ID=p.ReceiptID and p.GoodID=g.ID and r.VendorID=v.ID and r.OperatorID=m.ID and concat(r.ID,g.Name) like :KeyWord group by r.ID order by r.ID desc limit :Page,:Limit;",
+        _search: "select r.*,m.name as EmployeeName,g.Name,p.Amount,p.CostPrice,v.Contact,v.Telephone,v.Address from Receipts r,ReceiptGoods p,Goods g,Vendors v,Members m  where r.ID=p.ReceiptID and p.GoodID=g.ID and r.VendorID=v.ID and r.OperatorID=m.ID and r.Date>=:StartTime and r.Date<=:EndTime and concat(r.ID,g.Name) like :KeyWord group by r.ID order by r.Date desc limit :Page,:Limit;",
 
         //详情
         _ReceiptInfo: "select * from Receipts where ID=:ID;",
 
-        _ReceiptGoodInfo: "select * from ReceiptGoods where ReceiptID=:ID;"
+        _ReceiptGoodInfo: "select * from ReceiptGoods where ReceiptID=:ID;",
+
+        //结算
+        _settle: "update Receipts set status=1 where ID=:ID "
 
     };
 
@@ -302,16 +308,57 @@ ReceiptTran.prototype.cancel = function(Obj, callback) {
  */
 Receipt.prototype.search = function(KeyWord, Page, Limit, StartTime, EndTime, callback) {
 
-    this._search({
-        KeyWord: `%${KeyWord}%`,
-        Page,
-        Limit,
-        StartTime,
-        EndTime
-    }, function(err, rows) {
+    const that = this;
+
+    async.parallel([
+
+        function(cb) {
+
+            that._receiptQuantity({
+                KeyWord: `%${KeyWord}%`,
+                StartTime,
+                EndTime,
+            }, function(err, db) {
+
+                if (err) {
+                    return cb(err, null);
+                }
+
+                cb(null, db[0]);
+
+            });
+
+        },
+
+        function(cb) {
+
+            that._search({
+                KeyWord: `%${KeyWord}%`,
+                Page,
+                Limit,
+                StartTime,
+                EndTime,
+            }, function(err, db) {
+
+                if (err) {
+                    return cb(err, null);
+                }
+
+                cb(null, db);
+
+            });
+
+        }
+
+    ], function(err, result) {
+
         if (err) {
             return callback(err, null);
         }
+
+        const Quantity = result[0].Quantity;
+
+        const rows = result[1];
 
         rows.forEach(function(element, index) {
 
@@ -321,7 +368,8 @@ Receipt.prototype.search = function(KeyWord, Page, Limit, StartTime, EndTime, ca
 
         });
 
-        callback(null, rows);
+        return callback(null, { Quantity, rows });
+
     });
 };
 
@@ -397,6 +445,28 @@ Receipt.prototype.receiptInfo = function(ID, callback) {
 
 
 };
+
+
+/**
+ * 入库单结算
+ * @param  {Number} ID 结算ID
+ */
+Receipt.prototype.settle = function(ID, callback) {
+
+    this._settle({
+        ID
+    }, function(err, rows) {
+
+        if (err) {
+            return callback(err, null);
+        }
+
+        callback(null, rows);
+
+    });
+
+};
+
 
 
 module.exports.Receipt = new Receipt();

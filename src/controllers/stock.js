@@ -29,7 +29,7 @@ const { Stock, StockTran } = require('../models/index');
  */
 exports.stockList = (req, res, next) => {
 
-    let { KeyWord = '', Page = 0, Limit = 10, StartTime = '', EndTime = '' } = req.body;
+    let { KeyWord = '', Page = 0, Limit = 10, StartTime = '2018-01-01', EndTime = '' } = req.body;
 
     let ep = new eventproxy();
 
@@ -42,13 +42,20 @@ exports.stockList = (req, res, next) => {
         Page = (Page - 1) * Limit;
     }
 
+    if (!EndTime) {
+        EndTime = moment(new Date()).format('YYYY-MM-DD 23:59:59');
+    }
+
     Stock.search(KeyWord, Page, Limit, StartTime, EndTime, function(err, mem) {
 
         if (err) {
-            return ep.emit('error', "数据库操作错误");
+            ep.emit('error', "数据库操作错误");
+            return res.status(403).send({ code: -1, message: "系统错误", data: error });
         };
 
-        return res.status(200).send({ code: 0, data: mem });
+        const { Quantity, rows } = mem;
+
+        return res.status(200).send({ code: 0, message: "success", Quantity, data: rows });
 
     });
 }
@@ -64,6 +71,8 @@ exports.revision = (req, res, next) => {
 
     let { StockGoods } = req.body;
 
+    console.log("aaa", StockGoods);
+
     let ep = new eventproxy();
 
     ep.fail(function(error) {
@@ -71,7 +80,7 @@ exports.revision = (req, res, next) => {
         return res.status(403).send({ code: -1, message: "系统错误", data: error });
     });
 
-    if (StockGood.length == 0) {
+    if (StockGoods.length == 0) {
         return res.status(200).send({ code: 2, message: "调整单商品参数不匹配!" });
     };
 

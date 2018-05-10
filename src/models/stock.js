@@ -9,8 +9,11 @@ const async = require('async');
 function Stock() {
     var _action = {
 
+        //库存总数
+        _stockQuantity: "select count(s.ID) as Quantity from Stocks s left join Goods g on s.GoodID=g.ID left join ReceiptGoods r on s.GoodID=r.GoodID where s.CreateTime>=:StartTime and s.CreateTime<=:EndTime and concat(g.Name,r.ReceiptID) like :KeyWord;",
+
         //库存查询
-        _search: "select s.*,g.Name,r,ReceiptID from Stocks s left join Goods g on s.GoodID=g.ID left join ReceiptGoods r on s.GoodID=r.GoodID where concat(g.Name,r.ReceiptID) like :KeyWord;",
+        _search: "select s.*,g.Name,r.ReceiptID from Stocks s left join Goods g on s.GoodID=g.ID left join ReceiptGoods r on s.GoodID=r.GoodID where s.CreateTime>=:StartTime and s.CreateTime<=:EndTime and concat(g.Name,r.ReceiptID) like :KeyWord order by s.CreateTime desc limit :Page,:Limit;",
 
     };
 
@@ -30,16 +33,69 @@ function StockTran() {
  * 库存查询
  * @param  {String} KeyWord (Name,ID)
  */
-Stock.prototype.search = function(KeyWord, callback) {
+Stock.prototype.search = function(KeyWord, Page, Limit, StartTime, EndTime, callback) {
 
-    this._search({
-        KeyWord: `%${KeyWord}%`
-    }, function(err, rows) {
+    const that = this;
+
+    async.parallel([
+
+        function(cb) {
+
+            that._stockQuantity({
+                KeyWord: `%${KeyWord}%`,
+                StartTime,
+                EndTime,
+            }, function(err, db) {
+
+                if (err) {
+                    return cb(err, null);
+                }
+
+                cb(null, db[0]);
+
+            });
+
+        },
+
+        function(cb) {
+
+            that._search({
+                KeyWord: `%${KeyWord}%`,
+                Page,
+                Limit,
+                StartTime,
+                EndTime,
+            }, function(err, db) {
+
+                if (err) {
+                    return cb(err, null);
+                }
+
+                cb(null, db);
+
+            });
+
+        }
+
+    ], function(err, result) {
+
         if (err) {
             return callback(err, null);
         }
 
-        callback(null, rows);
+        const Quantity = result[0].Quantity;
+
+        const rows = result[1];
+
+        rows.forEach(function(element, index) {
+
+            rows[index].CreateTime = moment(rows[index].CreateTime).format('YYYY-MM-DD HH:mm:ss');
+            rows[index].UpdateTime = moment(rows[index].UpdateTime).format('YYYY-MM-DD HH:mm:ss');
+
+        });
+
+        return callback(null, { Quantity, rows });
+
     });
 };
 
@@ -58,11 +114,12 @@ StockTran.prototype.revision = function(Obj, callback) {
 
         let { GoodID, DeltaQuantity, Remark } = item;
 
-        let Stock_update = 'update Stocks set TotalQuantity=TotalQuantity-:DeltaQuantity,ValiableQuantity=:ValiableQuantity-:DeltaQuantity where GoodID=:GoodID';
+        let Stock_update = 'update Stocks set TotalQuantity=TotalQuantity-:DeltaQuantity,ValiableQuantity=ValiableQuantity-:DeltaQuantity where GoodID=:GoodID';
 
-        let StockChange = 'insert into StockChangerecords (OperatorID,GoodID,DeltaQuantity,Remark,Type) values (:OperatorID,:GoodID,:DeltaQuantity,"调整单调整库存",5);';
+        let StockChange = 'insert into StockChangeRecords (OperatorID,GoodID,DeltaQuantity,Remark,Type) values (:OperatorID,:GoodID,:DeltaQuantity,"调整单调整库存",5);';
 
-        pool.query(Stock_update, {
+        tran.query(Stock_update, {
+            DeltaQuantity,
             GoodID
         }, function(err, rows) {
 
@@ -74,7 +131,7 @@ StockTran.prototype.revision = function(Obj, callback) {
                 return cb({ message: `${GoodID}商品库存不足!` }, null);
             }
 
-            pool.query(StockChange, {
+            tran.query(StockChange, {
                 OperatorID,
                 GoodID,
                 DeltaQuantity

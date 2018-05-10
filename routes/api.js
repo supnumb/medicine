@@ -105,14 +105,17 @@ router.post('/receipt/cancel', receipt.cancel);
 //入库单查询
 router.post('/receipt/search', receipt.receiptList);
 
+//入库单结算
+router.post('/receipt/settle', receipt.settle);
+
+//调整单录入
+router.post('/receipt/adjustmeno', stock.revision);
+
 //入库单详情
 router.post('/receipt/:ReceiptID', receipt.receiptInfo);
 
 //库存查询
 router.post('/stock/search', stock.stockList);
-
-//调整单录入
-router.post('/stock/revision', stock.revision);
 
 //收银统计
 router.get('/stat/cash', stat.cash);

@@ -178,7 +178,9 @@ exports.vendorList = (req, res, next) => {
             return ep.emit('error', "数据库操作错误");
         };
 
-        return res.status(200).send({ code: 0, data: mem });
+        const { Quantity, rows } = mem;
+
+        return res.status(200).send({ code: 0, message: 'success', Quantity, data: rows });
 
     });
 }

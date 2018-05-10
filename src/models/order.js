@@ -22,7 +22,7 @@ function Order() {
         _orderGood: "select * from OrderGoods where OrderID=:ID;",
 
         //订单列表总数
-        _orderQuantity: "select count(1) as Quantity from Orders o left join Members m on o.MemberID=m.ID where m.MobilPhone like :KeyWord ;",
+        _orderQuantity: "select count(1) as Quantity from Orders o left join Members m on o.MemberID=m.ID where m.MobilPhone like :KeyWord and o.Date>=:StartTime and o.Date<=:EndTime",
 
         //收银统计
         _cash: "select ID,EmployeeID,PayStyle,TotalAmount,ReceiptAmount,CreateTime,UpdateTime from Orders where date_format(CreateTime,'%Y-%m-%d')>=:StartTime and date_format(CreateTime,'%Y-%m-%d')<=:EndTime;",

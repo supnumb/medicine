@@ -3,6 +3,7 @@
  */
 const Base = require('./base');
 const moment = require('moment');
+const async = require('async');
 
 function Good() {
     var _action = {
@@ -16,8 +17,11 @@ function Good() {
         //修改
         _update: "update Goods set Name=:Name,PinYin=:PinYin,OfficalName=:OfficalName,Dimension=:Dimension,FormOfDrug=:FormOfDrug,Unit=:Unit,DefaultCostPrice=:DefaultCostPrice,DefaultPrice=:DefaultPrice,LimitPrice=:LimitPrice,BidPrice=:BidPrice,Manufacturer=:Manufacturer,Competion=:Competion,Medicare=:Medicare,PeriodTreatment=:PeriodTreatment,Translation=:Translation,UseWay=:UseWay,Remark=:Remark,IsForeign=:IsForeign,ApprovalNumber=:ApprovalNumber where ID=:ID;",
 
+        //总数
+        _goodQuantity: "select count(1) as Quantity from Goods g where g.Status=1  and g.CreateTime>=:StartTime and g.CreateTime<=:EndTime and concat(g.Name,g.OfficalName) like :KeyWord;",
+
         //列表
-        _goodList: "select g.*,ifnull(s.TotalQuantity,0) TotalQuantity,ifnull(s.ValiableQuantity,0) ValiableQuantity,ifnull(s.SaledQuantity,0) SaledQuantity from Goods g left join Stocks s on g.ID=s.GoodID where g.Status=1 and concat(g.Name,g.OfficalName) like :KeyWord group by g.ID order by g.ID desc limit :Page,:Limit;",
+        _goodList: "select g.*,ifnull(s.TotalQuantity,0) TotalQuantity,ifnull(s.ValiableQuantity,0) ValiableQuantity,ifnull(s.SaledQuantity,0) SaledQuantity from Goods g left join Stocks s on g.ID=s.GoodID where g.Status=1 and g.CreateTime>=:StartTime and g.CreateTime<=:EndTime and concat(g.Name,g.OfficalName) like :KeyWord group by g.ID order by g.ID desc limit :Page,:Limit;",
 
         //详情
         _goodInfo: "select g.*,ifnull(s.TotalQuantity,0) TotalQuantity,ifnull(s.ValiableQuantity,0) ValiableQuantity,ifnull(s.SaledQuantity,0) SaledQuantity from Goods g left join Stocks s on g.ID=s.GoodID where g.ID=:ID;",
@@ -92,16 +96,57 @@ Good.prototype.update = function(Obj, callback) {
  */
 Good.prototype.goodList = function(KeyWord, Page, Limit, StartTime, EndTime, callback) {
 
-    this._goodList({
-        KeyWord: `%${KeyWord}%`,
-        Page,
-        Limit,
-        StartTime,
-        EndTime
-    }, function(err, rows) {
+    const that = this;
+
+    async.parallel([
+
+        function(cb) {
+
+            that._goodQuantity({
+                KeyWord: `%${KeyWord}%`,
+                StartTime,
+                EndTime,
+            }, function(err, db) {
+
+                if (err) {
+                    return cb(err, null);
+                }
+
+                cb(null, db[0]);
+
+            });
+
+        },
+
+        function(cb) {
+
+            that._goodList({
+                KeyWord: `%${KeyWord}%`,
+                Page,
+                Limit,
+                StartTime,
+                EndTime,
+            }, function(err, db) {
+
+                if (err) {
+                    return cb(err, null);
+                }
+
+                cb(null, db);
+
+            });
+
+        }
+
+    ], function(err, result) {
+
         if (err) {
             return callback(err, null);
         }
+
+        const Quantity = result[0].Quantity;
+
+        const rows = result[1];
 
         rows.forEach(function(element, index) {
 
@@ -110,7 +155,8 @@ Good.prototype.goodList = function(KeyWord, Page, Limit, StartTime, EndTime, cal
 
         });
 
-        callback(null, rows);
+        return callback(null, { Quantity, rows });
+
     });
 };
 

@@ -3,6 +3,7 @@
  */
 const Base = require('./base');
 const moment = require('moment');
+const async = require('async');
 
 function Vendor() {
 
@@ -16,6 +17,9 @@ function Vendor() {
 
         //修改
         _update: "update Vendors set Name=:Name,Telephone=:Telephone,Address=:Address,Contact=:Contact,Remark=:Remark where ID=:ID;",
+
+        //总数
+        _vendorQuantity: "select count(1) as Quantity from Vendors where Name like :KeyWord;",
 
         //列表
         _vendorList: "select * from Vendors where Name like :KeyWord group by ID order by ID desc limit :Page,:Limit;",
@@ -88,14 +92,53 @@ Vendor.prototype.update = function(Obj, callback) {
  */
 Vendor.prototype.vendorList = function(KeyWord, Page, Limit, callback) {
 
-    this._vendorList({
-        KeyWord: `%${KeyWord}%`,
-        Page,
-        Limit
-    }, function(err, rows) {
+    const that = this;
+
+    async.parallel([
+
+        function(cb) {
+
+            that._vendorQuantity({
+                KeyWord: `%${KeyWord}%`,
+            }, function(err, db) {
+
+                if (err) {
+                    return cb(err, null);
+                }
+
+                cb(null, db[0]);
+
+            });
+
+        },
+
+        function(cb) {
+
+            that._vendorList({
+                KeyWord: `%${KeyWord}%`,
+                Page,
+                Limit,
+            }, function(err, db) {
+
+                if (err) {
+                    return cb(err, null);
+                }
+
+                cb(null, db);
+
+            });
+
+        }
+
+    ], function(err, result) {
+
         if (err) {
             return callback(err, null);
         }
+
+        const Quantity = result[0].Quantity;
+
+        const rows = result[1];
 
         rows.forEach(function(element, index) {
 
@@ -104,7 +147,8 @@ Vendor.prototype.vendorList = function(KeyWord, Page, Limit, callback) {
 
         });
 
-        callback(null, rows);
+        return callback(null, { Quantity, rows });
+
     });
 };
 

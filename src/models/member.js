@@ -3,6 +3,7 @@
  */
 const Base = require('./base');
 const moment = require('moment');
+const async = require('async');
 
 function Member() {
     var _action = {
@@ -28,8 +29,11 @@ function Member() {
         //雇员修改密码
         _alterpass: "update Members set PassWord=:Password where ID=:ID;",
 
+        //会员列表总数
+        _memberQuantity: "select count(m.ID) as Quantity from Members m  where m.Flag=:Flag and m.Status=1 and m.CreateTime>=:StartTime and m.CreateTime<=:EndTime and m.MobilPhone like :MobilPhone and concat(m.Name,m.Address) like :KeyWord;",
+
         //会员列表
-        _memberList: "select m.*,count(i.ID) as IntentionQuantity,count(v.ID) as VisitQuantity,count(o.ID) as OrderQuantity from Members m left join Intentions i on m.ID=i.MemberID left join Visits v on m.ID=v.MemberID left join Orders o on m.ID=o.MemberID where m.Flag=:Flag and m.Status=1 and m.MobilPhone like :MobilPhone and concat(m.Name,m.Address) like :KeyWord group by m.ID order by :OrderBy desc limit :Page,:Limit;",
+        _memberList: "select m.*,count(i.ID) as IntentionQuantity,count(v.ID) as VisitQuantity,count(o.ID) as OrderQuantity from Members m left join Intentions i on m.ID=i.MemberID left join Visits v on m.ID=v.MemberID left join Orders o on m.ID=o.MemberID where m.Flag=:Flag and m.Status=1 and m.CreateTime>=:StartTime and m.CreateTime<=:EndTime and m.MobilPhone like :MobilPhone and concat(m.Name,m.Address) like :KeyWord group by m.ID order by :OrderBy desc limit :Page,:Limit;",
 
         //会员详情
         _memberInfo: "select * from Members where ID=:ID;",
@@ -136,19 +140,67 @@ Member.prototype.updateMember = function(Obj, callback) {
  * @param  {Number} Limit 每页显示几条
  * @param  {Function} callback 回调
  */
-Member.prototype.memberList = function(KeyWord, MobilPhone, Page, Limit, OrderBy, callback) {
+Member.prototype.memberList = function(KeyWord, MobilPhone, Page, Limit, OrderBy, StartTime, EndTime, callback) {
 
-    this._memberList({
-        Flag: 0,
-        KeyWord: `%${KeyWord}%`,
-        MobilPhone: `%${MobilPhone}%`,
-        Page,
-        Limit,
-        OrderBy: ` m.${OrderBy}`,
-    }, function(err, rows) {
+    const that = this;
+
+    async.parallel([
+
+        function(cb) {
+
+            that._memberQuantity({
+                Flag: 0,
+                KeyWord: `%${KeyWord}%`,
+                MobilPhone: `%${MobilPhone}%`,
+                Page,
+                Limit,
+                OrderBy: ` m.${OrderBy}`,
+                StartTime,
+                EndTime,
+            }, function(err, db) {
+
+                if (err) {
+                    return cb(err, null);
+                }
+
+                cb(null, db[0]);
+
+            });
+
+        },
+
+        function(cb) {
+
+            that._memberList({
+                Flag: 0,
+                KeyWord: `%${KeyWord}%`,
+                MobilPhone: `%${MobilPhone}%`,
+                Page,
+                Limit,
+                OrderBy: ` m.${OrderBy}`,
+                StartTime,
+                EndTime,
+            }, function(err, db) {
+
+                if (err) {
+                    return cb(err, null);
+                }
+
+                cb(null, db);
+
+            });
+
+        }
+
+    ], function(err, result) {
+
         if (err) {
             return callback(err, null);
         }
+
+        const Quantity = result[0].Quantity;
+
+        const rows = result[1];
 
         rows.forEach(function(element, index) {
 
@@ -169,9 +221,10 @@ Member.prototype.memberList = function(KeyWord, MobilPhone, Page, Limit, OrderBy
 
         });
 
-        callback(null, rows);
+        callback(null, { Quantity, rows });
 
     });
+
 };
 
 /**

@@ -120,7 +120,7 @@ exports.cancel = (req, res, next) => {
  */
 exports.orderList = (req, res, next) => {
 
-    let { KeyWord = '', Page = 0, Limit = 10, StartTime = '', EndTime = '' } = req.body;
+    let { KeyWord = '', Page = 0, Limit = 10, StartTime = '2018-01-01', EndTime = '' } = req.body;
 
     let ep = new eventproxy();
 
@@ -131,6 +131,10 @@ exports.orderList = (req, res, next) => {
 
     if (Page > 0) {
         Page = (Page - 1) * Limit;
+    }
+
+    if (!EndTime) {
+        EndTime = moment(new Date()).format('YYYY-MM-DD 23:59:59');
     }
 
     Order.orderList(KeyWord, Page, Limit, StartTime, EndTime, function(err, mem) {

@@ -3,6 +3,7 @@
  */
 const Base = require('./base');
 const moment = require('moment');
+const async = require('async');
 
 function Visit() {
     var _action = {
@@ -16,8 +17,11 @@ function Visit() {
         //修改
         _update: "update Visits set Remarks=:Remarks where ID=:ID;",
 
+        //总数
+        _visitQuantity: "select count(1) as Quantity from Visits where CreateTime>=:StartTime and CreateTime<=:EndTime and Remarks like :KeyWord;",
+
         //列表
-        _visitList: "select * from Visits where Remarks like :KeyWord order by ID desc limit :Page,:Limit;",
+        _visitList: "select * from Visits where CreateTime>=:StartTime and CreateTime<=:EndTime and Remarks like :KeyWord order by CreateTime desc limit :Page,:Limit;",
 
         //详情
         _visitInfo: "select * from Visits where ID=:ID;",
@@ -95,16 +99,61 @@ Visit.prototype.update = function(ID, Remarks, callback) {
  * @param  {Number} Page 第几页
  * @param  {Number} Limit 每页显示几条
  */
-Visit.prototype.visitList = function(KeyWord, Page, Limit, callback) {
+Visit.prototype.visitList = function(KeyWord, Page, Limit, StartTime, EndTime, callback) {
 
-    this._visitList({
-        KeyWord: `%${KeyWord}%`,
-        Page,
-        Limit
-    }, function(err, rows) {
+    const that = this;
+
+    async.parallel([
+
+        function(cb) {
+
+            that._visitQuantity({
+                KeyWord: `%${KeyWord}%`,
+                Page,
+                Limit,
+                StartTime,
+                EndTime,
+            }, function(err, db) {
+
+                if (err) {
+                    return cb(err, null);
+                }
+
+                cb(null, db[0]);
+
+            });
+
+        },
+
+        function(cb) {
+
+            that._visitList({
+                KeyWord: `%${KeyWord}%`,
+                Page,
+                Limit,
+                StartTime,
+                EndTime,
+            }, function(err, db) {
+
+                if (err) {
+                    return cb(err, null);
+                }
+
+                cb(null, db);
+
+            });
+
+        }
+
+    ], function(err, result) {
+
         if (err) {
             return callback(err, null);
         }
+
+        const Quantity = result[0].Quantity;
+
+        const rows = result[1];
 
         rows.forEach(function(element, index) {
 
@@ -113,7 +162,8 @@ Visit.prototype.visitList = function(KeyWord, Page, Limit, callback) {
 
         });
 
-        callback(null, rows);
+        return callback(null, { Quantity, rows });
+
     });
 };
 

@@ -299,7 +299,7 @@ exports.updateMember = (req, res, next) => {
  */
 exports.memberList = (req, res, next) => {
 
-    let { KeyWord = '', MobilPhone = '', Page = 0, Limit = 10, OrderBy = 'ID' } = req.body;
+    let { KeyWord = '', MobilPhone = '', Page = 0, Limit = 10, OrderBy = 'ID', StartTime = '2018-01-01', EndTime = '' } = req.body;
 
     let ep = new eventproxy();
 
@@ -318,13 +318,19 @@ exports.memberList = (req, res, next) => {
         }
     }
 
-    Member.memberList(KeyWord, MobilPhone, Page, Limit, OrderBy, function(err, mem) {
+    if (!EndTime) {
+        EndTime = moment(new Date()).format('YYYY-MM-DD 23:59:59');
+    }
+
+    Member.memberList(KeyWord, MobilPhone, Page, Limit, OrderBy, StartTime, EndTime, function(err, mem) {
 
         if (err) {
             return ep.emit('error', "数据库操作错误");
         };
 
-        return res.status(200).send({ code: 0, message: "success", data: mem });
+        const { Quantity, rows } = mem
+
+        return res.status(200).send({ code: 0, message: "success", Quantity, data: rows });
 
     });
 }
@@ -478,11 +484,7 @@ exports.addVisit = (req, res, next) => {
  */
 exports.visitList = (req, res, next) => {
 
-    let {
-        KeyWord = '',
-            Page = 0,
-            Limit = 10
-    } = req.body;
+    let { KeyWord = '', Page = 0, Limit = 10, StartTime = '2018-01-01', EndTime = '' } = req.body;
 
     let ep = new eventproxy();
 
@@ -495,13 +497,19 @@ exports.visitList = (req, res, next) => {
         Page = (Page - 1) * Limit;
     }
 
-    Visit.visitList(KeyWord, Page, Limit, function(err, mem) {
+    if (!EndTime) {
+        EndTime = moment(new Date()).format('YYYY-MM-DD 23:59:59');
+    }
+
+    Visit.visitList(KeyWord, Page, Limit, StartTime, EndTime, function(err, mem) {
 
         if (err) {
             return ep.emit('error', "数据库操作错误");
         };
 
-        return res.status(200).send({ code: 0, message: "success", data: mem });
+        const { Quantity, rows } = mem;
+
+        return res.status(200).send({ code: 0, message: "success", Quantity, data: rows });
 
     });
 }
@@ -595,11 +603,7 @@ exports.updateIntention = (req, res, next) => {
  */
 exports.intentionList = (req, res, next) => {
 
-    let {
-        KeyWord = '',
-            Page = 0,
-            Limit = 10
-    } = req.body;
+    let { KeyWord = '', Page = 0, Limit = 10, StartTime = '2018-01-01', EndTime = '' } = req.body;
 
     let ep = new eventproxy();
 
@@ -612,13 +616,20 @@ exports.intentionList = (req, res, next) => {
         Page = (Page - 1) * Limit;
     }
 
-    Intention.intentionList(KeyWord, Page, Limit, function(err, mem) {
+    if (!EndTime) {
+        EndTime = moment(new Date()).format('YYYY-MM-DD 23:59:59');
+    }
+
+    Intention.intentionList(KeyWord, Page, Limit, StartTime, EndTime, function(err, mem) {
 
         if (err) {
-            return ep.emit('error', "数据库操作错误");
+            ep.emit('error', "数据库操作错误");
+            return res.status(200).send({ code: 2, message: "数据库操作错误" });
         };
 
-        return res.status(200).send({ code: 0, message: "success", data: mem });
+        const { Quantity, rows } = mem;
+
+        return res.status(200).send({ code: 0, message: "success", Quantity, data: rows });
 
     });
 }

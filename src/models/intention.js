@@ -3,6 +3,7 @@
  */
 const Base = require('./base');
 const moment = require('moment');
+const async = require('async');
 
 function Intention() {
     var _action = {
@@ -16,8 +17,11 @@ function Intention() {
         //修改
         _update: "update Intentions set Goods=:Goods,OperatorID=:OperatorID,Status=:Status where ID=:ID;",
 
+        //总数
+        _intentionQuantity: "select count(1) as Quantity from Intentions i where i.CreateTime>=:StartTime and i.CreateTime<=:EndTime and i.Goods like :KeyWord;",
+
         //列表
-        _intentionList: "select i.*,m.Name from Intentions i left Member m on i.MemberID=m.ID where i.Goods like :KeyWord order by i.ID desc limit :Page,:Limit;",
+        _intentionList: "select i.*,m.Name from Intentions i left join Members m on i.MemberID=m.ID where i.CreateTime>=:StartTime and i.CreateTime<=:EndTime and i.Goods like :KeyWord order by i.ID desc limit :Page,:Limit;",
 
         //详情
         _intentionInfo: "select * from Intentions where ID=:ID;",
@@ -99,15 +103,59 @@ Intention.prototype.update = function(ID, OperatorID, Goods, Status, callback) {
  * @param  {Number} Page 第几页
  * @param  {Number} Limit 每页几条
  */
-Intention.prototype.intentionList = function(KeyWord, Page, Limit, callback) {
+Intention.prototype.intentionList = function(KeyWord, Page, Limit, StartTime, EndTime, callback) {
 
-    this._intentionList({
-        Page,
-        Limit
-    }, function(err, rows) {
+    const that = this;
+
+    async.parallel([
+
+        function(cb) {
+
+            that._intentionQuantity({
+                KeyWord: `%${KeyWord}%`,
+                StartTime,
+                EndTime,
+            }, function(err, db) {
+
+                if (err) {
+                    return cb(err, null);
+                }
+
+                cb(null, db[0]);
+
+            });
+
+        },
+
+        function(cb) {
+
+            that._intentionList({
+                KeyWord: `%${KeyWord}%`,
+                Page,
+                Limit,
+                StartTime,
+                EndTime,
+            }, function(err, db) {
+
+                if (err) {
+                    return cb(err, null);
+                }
+
+                cb(null, db);
+
+            });
+
+        }
+
+    ], function(err, result) {
+
         if (err) {
             return callback(err, null);
         }
+
+        const Quantity = result[0].Quantity;
+
+        const rows = result[1];
 
         rows.forEach(function(element, index) {
 
@@ -116,7 +164,8 @@ Intention.prototype.intentionList = function(KeyWord, Page, Limit, callback) {
 
         });
 
-        callback(null, rows);
+        return callback(null, { Quantity, rows });
+
     });
 };
 

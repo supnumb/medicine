@@ -58,23 +58,22 @@ describe("# 进货单模块单元测试", function() {
     })
 
     it("###026.02 入库单结算，应该返回：Code=0", function(done) {
-        let receiptid = 0;
+        let ID = 13;
         let goods = [];
         agent.post(`/api/receipt/settle`).send({
-            receiptid,
+            ID,
             goods
         }).expect(200).end(function(err, res) {
             if (err) {
                 return done(err);
             }
 
-            console.log(res.text);
-            res.text.should.containEql(receiptid);
+            res.text.should.containEql(0);
             done();
         });
     })
 
-    it.only("###024 按药品名称、供应商名称查询入库单，应该返回：Code=0", function(done) {
+    it("###024 按药品名称、供应商名称查询入库单，应该返回：Code=0", function(done) {
         agent.post(`/api/receipt/search`).send({ KeyWord: "感冒灵" }).expect(200).end(function(err, res) {
             if (err) {
                 return done(err);
@@ -115,7 +114,15 @@ describe("# 进货单模块单元测试", function() {
     })
 
     it("##018 保存库存调整单单，应该返回成功：Code=0", function(done) {
-        let adjustmentData = {};
+        let adjustmentData = {
+            StockGoods: [{
+                GoodID: 1,
+                DeltaQuantity: 1,
+                Remark: "调整库存"
+            }]
+
+
+        };
         agent.post('/api/receipt/adjustmeno').send(adjustmentData).expect(200).end(function(err, res) {
             if (err) {
                 return done(err);
