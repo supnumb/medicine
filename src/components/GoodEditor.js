@@ -1,5 +1,5 @@
 import React from 'react';
-import Store from './Reducer'
+import Store from './Reducer';
 
 import {Form, Field, createFormControl} from 'form-lib';
 import {SchemaModel, StringType} from 'rsuite-schema';
@@ -65,7 +65,7 @@ class GoodEditor extends React.Component {
         let {good, action} = nextProps;
         let {good: oldGood} = this.props;
 
-        console.log({action, good});
+        // console.log({action, good});
 
         if (good && oldGood) {
             if (good.ID != oldGood.ID) {
@@ -100,7 +100,7 @@ class GoodEditor extends React.Component {
     render() {
         let {values, errors} = this.state;
 
-        return (<div id="GoodEditor">
+        return (<div id="GoodEditor" className="editor_zone">
             <Form className="form-horizontal" ref={ref => this.form = ref} values={values} id="form" model={model} onChange={(values) => {
                     this.setState({values});
                     this.form.cleanErrors();

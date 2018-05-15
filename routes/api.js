@@ -112,7 +112,7 @@ router.post('/receipt/settle', receipt.settle);
 router.post('/receipt/adjustmeno', stock.revision);
 
 //入库单详情
-router.post('/receipt/:ReceiptID', receipt.receiptInfo);
+router.post('/receipt/detail', receipt.receiptInfo);
 
 //库存查询
 router.post('/stock/search', stock.stockList);

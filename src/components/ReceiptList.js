@@ -4,6 +4,8 @@ import Store from './Reducer';
 import {Form, Field, createFormControl} from 'form-lib';
 import {SchemaModel, StringType} from 'rsuite-schema';
 
+import ReceiptEditor from './ReceiptEditor';
+
 class ReceiptList extends React.Component {
     constructor(props) {
         super(props);
@@ -33,7 +35,6 @@ class ReceiptList extends React.Component {
             mode: 'same-origin',
             credentials: 'same-origin'
         }).then(res => res.json()).then(json => {
-            console.log(json);
             if (json.code == 0) {
                 Store.dispatch({type: "FETCH_RECEIPTS_DONE", payload: json.data})
             } else {
@@ -62,52 +63,69 @@ class ReceiptList extends React.Component {
             }
         } = this.state;
 
-        let listJsx = receipts.map((r, index) => (<tr key={index}>
-            <td>{r.Name}</td>
-            <td>{r.Name}</td>
-            <td>{r.Name}</td>
-            <td>{r.Name}</td>
-            <td>{r.Name}</td>
-            <td>{r.Name}</td>
-            <td>{r.Name}</td>
-        </tr>));
+        let editorJsx = ("");
 
-        return (<div id="ReceiptList" className="col-md-10 col-md-offset-1 main">
-            <div id="page_title">
-                <h4>进货单管理</h4>
-                <div className="fun_zone">
-                    <Form className="form-inline" ref={ref => this.form = ref} id="form" onChange={(values) => {
-                            this.setState({role: values});
-                            this.form.cleanErrors();
-                        }} onCheck={(errors) => {
-                            this.setState({errors})
-                        }}>
-                        <div className="form-group">
-                            <Field name="Name" id="Name"/>
-                            &nbsp;&nbsp;
-                            <button onClick={this.submit} className="btn btn-default">
-                                查询
-                            </button>
-                        </div>
-                    </Form>
+        if (receipt) {
+            editorJsx = (<div className="col-md-5">
+                <ReceiptEditor receipt={receipt} onSaveCompleted={this.onSaveCompleted} onCanceled={this.onCanceled}/>
+            </div>);
+        }
+
+        let listJsx = receipts.map((r, index) => (<tr key={index}>
+            <td>{r.VendorName}</td>
+            <td>{r.Telephone}</td>
+            <td>{r.Contact}</td>
+            <td>{r.Date}</td>
+            <td>{r.Amount}</td>
+            <td>{r.EmployeeName}</td>
+            <td>
+                <a href="#" onClick={() => {
+                    this.props.history.push({
+                        pathname:"/receipt/editor",
+                        state:r
+                    })
+                        // Store.dispatch({type: "CHECKED_RECEIPT", payload: r})
+                    }}>编辑</a>
+            </td>
+        </tr>));
+        return (<div id="ReceiptList">
+            <div className="col-md-6 col-md-offset-1 main">
+                <div id="page_title">
+                    <h4>进货单管理</h4>
+                    <div className="fun_zone">
+                        <Form className="form-inline">
+                            <div className="form-group">
+                                <Field name="Keyword" id="Keyword"/>
+                                &nbsp;&nbsp;
+                                <button onClick={this.submit} className="btn btn-primary">
+                                    查询
+                                </button>
+                                &nbsp;&nbsp;
+                                <button onClick={() => Store.dispatch({type: "CHECKED_RECEIPT", payload: {}})} className="btn btn-default">
+                                    添加新进货单
+                                </button>
+                            </div>
+                        </Form>
+                    </div>
                 </div>
+                <table className="table">
+                    <thead>
+                        <tr>
+                            <th>供应商</th>
+                            <th>电话</th>
+                            <th>联系人</th>
+                            <th>日期</th>
+                            <th>金额</th>
+                            <th>药师</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {listJsx}
+                    </tbody>
+                </table>
             </div>
-            <table className="table">
-                <thead>
-                    <tr>
-                        <th>供应商</th>
-                        <th>电话</th>
-                        <th>联系人</th>
-                        <th>日期</th>
-                        <th>金额</th>
-                        <th>药师</th>
-                        <th>操作</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {listJsx}
-                </tbody>
-            </table>
+            {editorJsx}
         </div>)
     }
 }

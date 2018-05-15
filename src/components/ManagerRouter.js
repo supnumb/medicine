@@ -1,6 +1,6 @@
 import React from 'react';
 import {Route, BrowserRouter as Router, Switch, NavLink} from 'react-router-dom';
-import { hot } from 'react-hot-loader'
+import {hot} from 'react-hot-loader'
 
 import {
     GoodList,
@@ -11,8 +11,13 @@ import {
     VendorList,
     SiteIndex,
     Container,
-    MainMenu
+    MainMenu,
+    OrderEditor,
+    ReceiptEditor
 } from './index';
+
+
+
 
 const routes = [
     {
@@ -20,9 +25,17 @@ const routes = [
         extra: true,
         component: OrderList
     }, {
+        path: "/order/editor",
+        extra: true,
+        component: OrderEditor
+    }, {
         path: "/receipts/",
         extra: true,
         component: ReceiptList
+    }, {
+        path: "/receipt/editor",
+        extra: true,
+        component: ReceiptEditor
     }, {
         path: "/stats/",
         extra: true,
@@ -83,6 +96,7 @@ class ManagerRouter extends React.Component {
                     <h2>美信康年大药房</h2>
                 </div>
                 <div className="container-fluid">
+                    {/* <div className="container"> */}
                     <div className="row">
                         {/* 左侧菜单 */}
                         <div className="col-md-1 sidebar"><MainMenu/></div>
@@ -104,4 +118,3 @@ class ManagerRouter extends React.Component {
 // export default ManagerRouter;
 
 export default hot(module)(ManagerRouter)
-

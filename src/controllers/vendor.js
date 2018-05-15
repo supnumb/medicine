@@ -14,7 +14,7 @@
 const moment = require('moment');
 const eventproxy = require('eventproxy');
 
-const { Vendor } = require('../models/index');
+const {Vendor} = require('../models/index');
 
 /**
  * 添加供应商
@@ -29,30 +29,42 @@ const { Vendor } = require('../models/index');
  */
 exports.addVendor = (req, res, next) => {
 
-    let { ID, Name, Telephone, Address, Contact, Remark = '' } = req.body;
+    let {
+        ID,
+        Name,
+        Telephone,
+        Address,
+        Contact,
+        Remark = ''
+    } = req.body;
 
     let ep = new eventproxy();
 
     ep.fail(function(error) {
         console.error(error);
-        return res.status(403).send({ code: -1, message: "系统错误", data: error });
+        return res.status(403).send({code: -1, message: "系统错误", data: error});
     });
 
     if (!Name || !Telephone || !Address || !Contact) {
-        return res.status(200).send({ code: 2, message: "Name|Telephone|Address|Contact参数不匹配！" });
+        return res.status(200).send({code: 2, message: "Name|Telephone|Address|Contact参数不匹配！"});
     };
 
-    const vendorData = { ID, Name, Telephone, Address, Contact, Remark };
+    const vendorData = {
+        Name,
+        Telephone,
+        Address,
+        Contact,
+        Remark
+    };
 
     if (ID) {
-
         Vendor.update(VendorData, function(err, mem) {
 
             if (err) {
                 return ep.emit('error', "数据库操作错误");
             };
 
-            return res.status(200).send({ code: 0, data: mem });
+            return res.status(200).send({code: 0, data: mem});
 
         });
 
@@ -64,7 +76,7 @@ exports.addVendor = (req, res, next) => {
                 return ep.emit('error', "数据库操作错误");
             };
 
-            return res.status(200).send({ code: 0, message: "success", data: mem });
+            return res.status(200).send({code: 0, message: "success", data: mem});
 
         });
     }
@@ -80,17 +92,17 @@ exports.addVendor = (req, res, next) => {
  */
 exports.deleteVendor = (req, res, next) => {
 
-    let { ID } = req.body;
+    let {ID} = req.body;
 
     let ep = new eventproxy();
 
     ep.fail(function(error) {
         console.error(error);
-        return res.status(403).send({ code: -1, message: "系统错误", data: error });
+        return res.status(403).send({code: -1, message: "系统错误", data: error});
     });
 
     if (!ID) {
-        return res.status(200).send({ code: 2, message: "ID参数不匹配！" });
+        return res.status(200).send({code: 2, message: "ID参数不匹配！"});
     };
 
     Vendor.delete(ID, function(err, mem) {
@@ -100,10 +112,10 @@ exports.deleteVendor = (req, res, next) => {
         };
 
         if (mem.affectedRows == 0) {
-            return res.status(200).send({ code: 2, message: "未找到对应信息！" });
+            return res.status(200).send({code: 2, message: "未找到对应信息！"});
         }
 
-        return res.status(200).send({ code: 0, message: "success", data: mem });
+        return res.status(200).send({code: 0, message: "success", data: mem});
 
     });
 }
@@ -121,21 +133,36 @@ exports.deleteVendor = (req, res, next) => {
  * @param  {Function} next 管道操作，传递到下一步
  */
 exports.updateVendor = (req, res, next) => {
+    let {
+        ID,
+        Name,
+        Telephone,
+        Address,
+        Contact,
+        Remark = ''
+    } = req.body;
 
-    let { ID, Name, Telephone, Address, Contact, Remark = '' } = req.body;
+    console.log(req.body);
 
     let ep = new eventproxy();
 
     ep.fail(function(error) {
         console.error(error);
-        return res.status(403).send({ code: -1, message: "系统错误", data: error });
+        return res.status(403).send({code: -1, message: "系统错误", data: error});
     });
 
     if (!ID || !Name || !Telephone || !Address || !Contact) {
-        return res.status(200).send({ code: 2, message: "ID|Name|Telephone|Address|Contact参数不匹配！" });
+        return res.status(200).send({code: 2, message: "ID|Name|Telephone|Address|Contact参数不匹配！"});
     };
 
-    const VendorData = { ID, Name, Telephone, Address, Contact, Remark };
+    const VendorData = {
+        ID,
+        Name,
+        Telephone,
+        Address,
+        Contact,
+        Remark
+    };
 
     Vendor.update(VendorData, function(err, mem) {
 
@@ -143,7 +170,7 @@ exports.updateVendor = (req, res, next) => {
             return ep.emit('error', "数据库操作错误");
         };
 
-        return res.status(200).send({ code: 0, data: mem });
+        return res.status(200).send({code: 0, data: mem});
 
     });
 }
@@ -159,13 +186,17 @@ exports.updateVendor = (req, res, next) => {
  */
 exports.vendorList = (req, res, next) => {
 
-    let { KeyWord = '', Page = 0, Limit = 10 } = req.body;
+    let {
+        KeyWord = '',
+        Page = 0,
+        Limit = 10
+    } = req.body;
 
     let ep = new eventproxy();
 
     ep.fail(function(error) {
         console.error(error);
-        return res.status(403).send({ code: -1, message: "系统错误", data: error });
+        return res.status(403).send({code: -1, message: "系统错误", data: error});
     });
 
     if (Page > 0) {
@@ -181,7 +212,6 @@ exports.vendorList = (req, res, next) => {
         const { Quantity, rows } = mem;
 
         return res.status(200).send({ code: 0, message: 'success', Quantity, data: rows });
-
     });
 }
 
@@ -194,17 +224,19 @@ exports.vendorList = (req, res, next) => {
  */
 exports.vendorInfo = (req, res, next) => {
 
-    let { VendorID = '' } = req.params;
+    let {
+        VendorID = ''
+    } = req.params;
 
     let ep = new eventproxy();
 
     ep.fail(function(error) {
         console.error(error);
-        return res.status(403).send({ code: -1, message: "系统错误", data: error });
+        return res.status(403).send({code: -1, message: "系统错误", data: error});
     });
 
     if (!VendorID) {
-        return res.status(200).send({ code: 2, message: "ID参数不匹配！" });
+        return res.status(200).send({code: 2, message: "ID参数不匹配！"});
     };
 
     Vendor.vendorInfo(VendorID, function(err, mem) {
@@ -213,7 +245,7 @@ exports.vendorInfo = (req, res, next) => {
             return ep.emit('error', "数据库操作错误");
         };
 
-        return res.status(200).send({ code: 0, data: mem });
+        return res.status(200).send({code: 0, data: mem});
 
     });
 }

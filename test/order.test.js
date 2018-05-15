@@ -6,7 +6,7 @@ var should = require('should');
 describe("#药品基础数据模块测试", function() {
 
     before(function(done) {
-        agent.post('/api/employee/signin').send({ login_name: "13511111111", password: "super1111" }).expect(200).end(function(err, res) {
+        agent.post('/api/employee/signin').send({login_name: "13511111111", password: "super1111"}).expect(200).end(function(err, res) {
             if (err) {
                 console.log(err);
             }
@@ -34,8 +34,17 @@ describe("#药品基础数据模块测试", function() {
             Remark: '',
             Date: '2018-04-30',
             Goods: [
-                { GoodID: 1, GoodName: '感冒药', Quantity: 1, FinalPrice: 10 },
-                { GoodID: 17, GoodName: '退烧药', Quantity: 1, FinalPrice: 6 }
+                {
+                    GoodID: 1,
+                    GoodName: '感冒药',
+                    Quantity: 1,
+                    FinalPrice: 10
+                }, {
+                    GoodID: 17,
+                    GoodName: '退烧药',
+                    Quantity: 1,
+                    FinalPrice: 6
+                }
             ]
         };
 
@@ -71,8 +80,17 @@ describe("#药品基础数据模块测试", function() {
             Remark: '',
             Date: '2018-04-30',
             Goods: [
-                { GoodID: 1, GoodName: '感冒药', Quantity: 1, FinalPrice: 10 },
-                { GoodID: 17, GoodName: '退烧药', Quantity: 0, FinalPrice: 6 }
+                {
+                    GoodID: 1,
+                    GoodName: '感冒药',
+                    Quantity: 1,
+                    FinalPrice: 10
+                }, {
+                    GoodID: 17,
+                    GoodName: '退烧药',
+                    Quantity: 0,
+                    FinalPrice: 6
+                }
             ]
         };
 
@@ -93,7 +111,7 @@ describe("#药品基础数据模块测试", function() {
         let Page = 0,
             Limit = 10;
 
-        agent.post('/api/order/search').send({ KeyWord, Page, Limit }).expect(200).end(function(err, res) {
+        agent.post('/api/order/search').send({KeyWord, Page, Limit}).expect(200).end(function(err, res) {
             if (err) {
                 return done(err);
             }
@@ -105,7 +123,7 @@ describe("#药品基础数据模块测试", function() {
     it("##012 雇员设置销售单为退回 应该返回成功，Code=0", function(done) {
         ID = ID || 117;
 
-        agent.post('/api/order/cancel').send({ ID }).expect(200).end(function(err, res) {
+        agent.post('/api/order/cancel').send({ID}).expect(200).end(function(err, res) {
             if (err) {
                 return done(err);
             }
@@ -116,12 +134,15 @@ describe("#药品基础数据模块测试", function() {
     })
 
     it("##010.ADD 得到指定销售单详细信息：销售单信息、销售单药品信息 应该返回成功，Code=0", function(done) {
-        ID = ID || 117;
+        ID = ID || 123;
 
-        agent.post('/api/order/info').send({ ID }).expect(200).end(function(err, res) {
+        agent.post('/api/order/info').send({ID}).expect(200).end(function(err, res) {
             if (err) {
                 return done(err);
             }
+
+            console.log(res.text);
+
             res.text.should.containEql("0");
             done();
         });

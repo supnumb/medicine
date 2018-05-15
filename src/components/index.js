@@ -28,7 +28,6 @@ export {
 }
 from './VendorList';
 
-
 export {
     default as SiteIndex
 }
@@ -43,3 +42,13 @@ export {
     default as Container
 }
 from './Container';
+
+export {
+    default as OrderEditor
+}
+from './OrderEditor';
+
+export {
+    default as ReceiptEditor
+}
+from './ReceiptEditor';

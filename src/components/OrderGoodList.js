@@ -5,18 +5,16 @@ class OrderGoodList extends React.Component {
     constructor(props) {
         super(props);
 
-        this.unSubscribe = Store.subscribe(() => {
-            let s = Store.getState();
-            this.setState(s);
-        });
+        this.state = {
+            orderGood: null
 
-        this.state = Store.getState();
+        }
 
-        this.loadOrderGoodsFromDB() = this._loadOrderGoodsFromDB.bind(this);
+        this.loadOrderGoodsFromDB = this._loadOrderGoodsFromDB.bind(this);
     }
 
-    _loadOrderGoodsFromDB() {
-        let {order} = this.props;
+    _loadOrderGoodsFromDB(order) {
+        Store.dispatch({type: "FETCH_ORDER_GOODS"})
 
         let formData = new FormData();
         formData.append("orderid", order.ID);
@@ -31,44 +29,92 @@ class OrderGoodList extends React.Component {
             console.log({json});
 
             if (json.code == 0) {
-                Store.dispatch({type: "", payload: json.data});
+                Store.dispatch({type: "FETCH_ORDER_GOODS_DONE", payload: json.data});
             }
         }).catch(err => {
             console.error(err);
         })
     }
 
-    componentDidMount() {}
+    componentDidMount() {
+        let {order} = this.props;
+        console.log({order});
+        if (order) {
+            this.loadOrderGoodsFromDB(order);
+        }
+    }
 
     render() {
+        let {orderGoods} = this.props;
+        let {orderGood} = this.state;
+
+        let listJsx = orderGoods.map((og, index) => {
+
+            if (orderGood && orderGood.ID == og.ID) {
+                return (<tr key={index}>
+                    <td>{og.GoodName}</td>
+                    <td>{og.OfficalName}</td>
+                    <td>{og.Dimension}</td>
+                    <td>{og.Unit}</td>
+                    <td>
+                        <input id="Price" value={og.DefaultPrice}/>
+                    </td>
+                    <td>
+                        <input id="Quantity" value={og.Quantity}/>
+                    </td>
+                    <td>{og.TotalCostPrice}</td>
+                    <td>
+                        <a href="#" onClick={() => {
+                                this.setState({orderGood: null})
+                            }}>确定</a>
+                    </td>
+                </tr>);
+            } else {
+                return (<tr key={index}>
+                    <td>{og.GoodName}</td>
+                    <td>{og.OfficalName}</td>
+                    <td>{og.Dimension}</td>
+                    <td>{og.Unit}</td>
+                    <td>{og.DefaultPrice}</td>
+                    <td>{og.Quantity}</td>
+                    <td>{og.TotalCostPrice}</td>
+                    <td>
+                        <a href="#" onClick={() => {
+                                this.setState({orderGood: og})
+                            }}>编辑</a>
+                    </td>
+                </tr>);
+            }
+        })
 
         return (<div id="OrderGoodList">
             <table className="table">
-                <tbody>
+                <thead>
                     <tr>
                         <th>药品名</th>
                         <th>通用名</th>
                         <th>规格</th>
                         <th>单位</th>
-                        <th>成本</th>
                         <th>售价</th>
                         <th>数量</th>
                         <th>金额</th>
                         <th>操作</th>
                     </tr>
-                    <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
+                </thead>
+                <tbody>
+                    {listJsx}
                 </tbody>
+                <tfoot>
+                    <tr>
+                        <td colSpan="8" >
+                            <button style={{
+                                    "float" : "right"
+                                }}>添加药品</button>
+                        </td>
+                    </tr>
+                </tfoot>
             </table>
+
         </div>)
     }
 }

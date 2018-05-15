@@ -6,7 +6,7 @@ var should = require('should');
 describe("#药品数据模块测试", function() {
 
     before(function(done) {
-        agent.post('/api/employee/signin').send({ login_name: "13511111111", password: "super1111" }).expect(200).end(function(err, res) {
+        agent.post('/api/employee/signin').send({login_name: "13511111111", password: "super1111"}).expect(200).end(function(err, res) {
             if (err) {
                 console.log(err);
             }
@@ -46,6 +46,7 @@ describe("#药品数据模块测试", function() {
                 return done(err);
             }
 
+            console.log(res.text);
             ID = res.body.data.insertId;
 
             res.text.should.containEql("0");
@@ -55,7 +56,7 @@ describe("#药品数据模块测试", function() {
 
     it("##016.02 删除存在的药品、应该返回成功，Code=0", function(done) {
 
-        agent.post('/api/good/delete').send({ ID }).expect(200).end(function(err, res) {
+        agent.post('/api/good/delete').send({ID}).expect(200).end(function(err, res) {
             if (err) {
                 return done(err);
             }
@@ -68,7 +69,7 @@ describe("#药品数据模块测试", function() {
     it("##016.03 删除不存在的药品、应该返回成功，Code=2", function(done) {
         let ID = -1;
 
-        agent.post('/api/good/delete').send({ ID }).expect(200).end(function(err, res) {
+        agent.post('/api/good/delete').send({ID}).expect(200).end(function(err, res) {
             if (err) {
                 return done(err);
             }
@@ -85,12 +86,13 @@ describe("#药品数据模块测试", function() {
             StartTime = "",
             EndTime = "";
 
-        agent.post('/api/good/search').send({ KeyWord, Page, Limit, StartTime, EndTime }).expect(200).end(function(err, res) {
+        agent.post('/api/good/search').send({KeyWord, Page, Limit, StartTime, EndTime}).expect(200).end(function(err, res) {
             if (err) {
                 return done(err);
             }
 
-            //console.log(res.text);
+            console.log(res.text);
+
             res.text.should.containEql("0");
             done();
         });
@@ -107,7 +109,6 @@ describe("#药品数据模块测试", function() {
             res.text.should.containEql("0");
             done();
         });
-
 
     })
 })

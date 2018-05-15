@@ -17,6 +17,14 @@ const defaultState = {
         orders: [],
         order: null
     },
+    orderEditor: {
+        order: null,
+        orderGoods: [],
+        values: {},
+        errors: {},
+        isFetching: false,
+        message: ""
+    },
     memberList: {
         isFetching: false,
         members: [],
@@ -55,7 +63,11 @@ const defaultState = {
     receiptList: {
         receipts: [],
         isFetching: false,
-        receipt: {}
+        receipt: null
+    },
+    orderGoodList: {
+        orderGoods: [],
+        isFetching: false
     },
     xxxx: {}
 };
@@ -64,6 +76,20 @@ function XXXXReducer(state = defaultState.xxxx, action) {
     switch (action.type) {
         case "":
             break;
+        default:
+            return state;
+    }
+}
+
+function OrderGoodListReducer(state = defaultState.orderGoodList, action) {
+    switch (action.type) {
+        case "FETCH_ORDER_GOODS":
+            return Object.assign({}, state, {isFetching: true})
+        case "FETCH_ORDER_GOODS_DONE":
+            return Object.assign({}, state, {
+                isFetching: false,
+                orderGoods: action.payload
+            })
         default:
             return state;
     }
@@ -78,7 +104,7 @@ function ReceiptsListReducer(state = defaultState.receiptList, action) {
                 isFetching: false,
                 receipts: action.payload
             });
-        case "CHECKED_VENDOR":
+        case "CHECKED_RECEIPT":
             return Object.assign({}, state, {
                 isFetching: false,
                 receipt: action.payload
@@ -97,7 +123,10 @@ function ReceiptsListReducer(state = defaultState.receiptList, action) {
 function VendorListReducer(state = defaultState.vendorList, action) {
     switch (action.type) {
         case "FETCH_VENDORS":
-            return Object.assign({}, state, {isFetching: true});
+            return Object.assign({}, state, {
+                isFetching: true,
+                vendor: null
+            });
         case "FETCH_VENDORS_DONE":
             return Object.assign({}, state, {
                 isFetching: false,
@@ -221,6 +250,32 @@ function OrderListReducer(state = defaultState.orderList, action) {
     }
 }
 
+function OrderEditorReducer(state = defaultState.orderEditor, action) {
+    switch (action.type) {
+        case "FETCH_ORDER":
+            return Object.assign({}, state, {isFetching: true});
+        case "FETCH_ORDER_DONE":
+            return Object.assign({}, state, {
+                isFetching: false,
+                order: action.payload.data,
+                orderGoods: action.payload.goodsData
+            });
+        case "SET_CHECKED_ORDER":
+            return Object.assign({}, state, {
+                isFetching: false,
+                values: action.payload,
+                order: action.payload
+            });
+        case "FETCH_ORDERS_DONE":
+            return Object.assign({}, state, {
+                isFetching: false,
+                orders: action.payload
+            });
+        default:
+            return state;
+    }
+}
+
 function GoodListReducer(state = defaultState.goodList, action) {
     switch (action.type) {
         case "FETCH_GOODS":
@@ -282,7 +337,9 @@ const reducer = combineReducers({
     invistList: InvistListReducer,
     intentionList: IntentionsListReducer,
     vendorList: VendorListReducer,
-    receiptList: ReceiptsListReducer
+    receiptList: ReceiptsListReducer,
+    orderEditor: OrderEditorReducer,
+    orderGoodList: OrderGoodListReducer
     // vendorEditor: VendorEditorReducer
 });
 

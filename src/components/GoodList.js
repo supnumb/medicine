@@ -78,11 +78,11 @@ class GoodList extends React.Component {
 
         let editorJsx = ("");
         if (good && action == "update") {
-            editorJsx = (<div className="col-md-3">
+            editorJsx = (<div className="col-md-5">
                 <GoodEditor action={action} good={good} onCanceled={this.onCancel} onGoodSaveCompleted={this.onGoodSaveCompleted}/>
             </div>);
         } else if (action == "add") {
-            editorJsx = (<div className="col-md-3">
+            editorJsx = (<div className="col-md-5">
                 <GoodEditor action={action} good={null} onCanceled={this.onCancel} onGoodSaveCompleted={this.onGoodSaveCompleted}/>
             </div>);
         }
@@ -108,7 +108,7 @@ class GoodList extends React.Component {
         </tr>));
 
         return (<div id="GoodList">
-            <div className="col-md-11 col-md-offset-1 main">
+            <div className="col-md-6 col-md-offset-1 main">
                 <div id="page_title">
                     <h4>药品管理</h4>
                     <div className="fun_zone">
@@ -132,9 +132,7 @@ class GoodList extends React.Component {
                     </div>
 
                 </div>
-            </div>
 
-            <div className="col-md-8 col-md-offset-1 main">
                 <table className="table table-striped table-hover">
                     <thead>
                         <tr>
