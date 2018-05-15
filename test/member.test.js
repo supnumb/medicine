@@ -212,6 +212,17 @@ describe("#会员模块测试", function() {
         });
     })
 
+    it.only("## 列出公司所有正在使用的雇员 ", function(done) {
+        agent.post('/api/employee/search').expect(200).end(function(err, res) {
+            if (err) {
+                return done(err);
+            }
+
+            res.text.should.containEql("0");
+            done();
+        });
+    })
+
     it("## 公司雇员添加 ", function(done) {
         let employeeData = {
             Name: "张三",

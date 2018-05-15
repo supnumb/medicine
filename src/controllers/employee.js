@@ -4,6 +4,7 @@
  * 会员相关功能接口，主要实现功能有：
  *
  * <ol>
+ * <li>雇员列表</li>
  * <li>雇员添加</li>
  * <li>登录雇员详细信息</li>
  * <li>公司雇员修改密码</li>
@@ -19,6 +20,37 @@ const moment = require('moment');
 const eventproxy = require('eventproxy');
 
 const { Member } = require('../models/index');
+
+/**
+ * 雇员列表
+ * @param  {Object}   req  http 请求对象
+ * @param  {Object}   res  http 响应对象
+ * @param  {Function} next 管道操作，传递到下一步
+ * @param  {String}   req.body.KeyWord
+ */
+exports.search = (req, res, next) => {
+
+    const { KeyWord = '' } = req.body;
+
+    let ep = new eventproxy();
+
+    ep.fail(function(error) {
+        console.error(error);
+        return res.status(403).send({ code: -1, message: "系统错误", data: error });
+    });
+
+    Member.employeeList(KeyWord, function(err, mem) {
+
+        if (err) {
+            ep.emit('error', "数据库操作错误");
+            return res.send({ code: 2, message: "数据库出错" });
+        };
+
+        return res.status(200).send({ code: 0, message: "success", data: mem });
+
+    });
+}
+
 
 /**
  * 雇员添加

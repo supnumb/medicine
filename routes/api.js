@@ -15,6 +15,9 @@ router.post('/employee/signin', member.signIn);
 //管理员登出
 router.post('/employee/signout', member.signOut);
 
+//公司雇员列表
+router.post('/employee/search', employee.search);
+
 //添加雇员
 router.post('/employee/save', employee.addEmployee);
 
@@ -86,9 +89,6 @@ router.post('/vendor/save', vendor.addVendor);
 
 //供应商删除
 router.post('/vendor/delete', vendor.deleteVendor);
-
-//供应商修改
-router.post('/vendor/update', vendor.updateVendor);
 
 //供应商查询
 router.post('/vendor/search', vendor.vendorList);

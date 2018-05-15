@@ -38,6 +38,9 @@ function Member() {
         //会员详情
         _memberInfo: "select * from Members where ID=:ID;",
 
+        //雇员列表
+        _employeeList: "select * from Members where Flag!=0 and concat(Name,Telephone) like :KeyWord order by Flag desc",
+
     };
 
     var base = new Base();
@@ -248,6 +251,40 @@ Member.prototype.memberInfo = function(ID, callback) {
 
         callback(null, rows[0]);
     });
+};
+
+/**
+ * 雇员列表
+ * @param  {String} KeyWord 关键字
+ * @param  {Function} callback 回调
+ */
+Member.prototype.employeeList = function(KeyWord, callback) {
+
+    this._employeeList({
+        KeyWord: `%${KeyWord}%`,
+    }, function(err, rows) {
+
+        if (err) {
+            return callback(err, null);
+        }
+
+        rows.forEach(function(element, index) {
+
+            if (element.Gender == 1) {
+                rows[index].Gender = "男";
+            } else {
+                rows[index].Gender = "女";
+            }
+
+            rows[index].CreateTime = moment(rows[index].CreateTime).format('YYYY-MM-DD HH:mm:ss');
+            rows[index].UpdateTime = moment(rows[index].UpdateTime).format('YYYY-MM-DD HH:mm:ss');
+
+        });
+
+        return callback(null, rows);
+
+    });
+
 };
 
 
