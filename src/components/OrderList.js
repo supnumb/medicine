@@ -1,8 +1,8 @@
 import React from 'react';
 import Store from './Reducer';
 
-import {Form, Field, createFormControl} from 'form-lib';
-import {SchemaModel, StringType} from 'rsuite-schema';
+import { Form, Field, createFormControl } from 'form-lib';
+import { SchemaModel, StringType } from 'rsuite-schema';
 
 /**
  * 销售订单页面
@@ -28,7 +28,7 @@ class OrderList extends React.Component {
     }
 
     _loadOrderListFromDB() {
-        Store.dispatch({type: "FETCH_ORDERS"});
+        Store.dispatch({ type: "FETCH_ORDERS" });
 
         let formData = new FormData();
 
@@ -44,7 +44,7 @@ class OrderList extends React.Component {
         }).then(res => res.json()).then(json => {
             console.log(json);
             if (json.code == 0) {
-                Store.dispatch({type: "FETCH_ORDERS_DONE", payload: json.data})
+                Store.dispatch({ type: "FETCH_ORDERS_DONE", payload: json.data })
             } else {
                 alert(json.message);
             }
@@ -58,7 +58,7 @@ class OrderList extends React.Component {
     }
 
     _loadOrdersFromDB() {
-        Store.dispatch({type: "FETCH_ORDERS"});
+        Store.dispatch({ type: "FETCH_ORDERS" });
 
         let formData = new FormData();
         formData.append("keyword", "");
@@ -71,7 +71,7 @@ class OrderList extends React.Component {
         }).then(res => res.json()).then(json => {
             console.log(json);
             if (json.code == 0) {
-                Store.dispatch({type: "FETCH_ORDERS_DONE", payload: json.data})
+                Store.dispatch({ type: "FETCH_ORDERS_DONE", payload: json.data })
             } else {
                 alert(json.message);
             }
@@ -80,7 +80,7 @@ class OrderList extends React.Component {
         })
     }
 
-    componentUnMount() {
+    componentWillUnmount() {
         this.unSubscribe();
     }
 
@@ -94,7 +94,7 @@ class OrderList extends React.Component {
 
         let mListJsx = orders.map((o, index) => (<tr key={index}>
             <td>{o.Name}</td>
-            <td></td>
+            <td>{o.GoodNames}</td>
             <td>{o.ReceiptAmount}</td>
             <td>{o.PayStyleLabel}</td>
             <td>{o.DeliveryCompany}</td>
@@ -104,12 +104,12 @@ class OrderList extends React.Component {
             <td>{o.EmployeeName}</td>
 
             <td style={{
-                    "width" : "80px"
-                }}>
+                "width": "80px"
+            }}>
                 <button onClick={() => {
-                        this.props.history.push({pathname: "/order/editor", state: o})
-                        // Store.dispatch({type: "EDITOR_MEMBER", payload: o})
-                    }}>编辑</button>
+                    this.props.history.push({ pathname: "/order/editor", state: o })
+                    // Store.dispatch({type: "EDITOR_MEMBER", payload: o})
+                }}>编辑</button>
             </td>
         </tr>));
 
@@ -119,16 +119,22 @@ class OrderList extends React.Component {
                 <h4>销售订单管理</h4>
                 <div className="fun_zone">
                     <Form className="form-inline" ref={ref => this.form = ref} id="form" onChange={(values) => {
-                            this.setState({role: values});
-                            this.form.cleanErrors();
-                        }} onCheck={(errors) => {
-                            this.setState({errors})
-                        }}>
+                        this.setState({ role: values });
+                        this.form.cleanErrors();
+                    }} onCheck={(errors) => {
+                        this.setState({ errors })
+                    }}>
                         <div className="form-group">
-                            <Field name="Name" id="Name"/>
+                            <Field name="Name" id="Name" />
                             &nbsp;&nbsp;
                             <button onClick={this.submit} className="btn btn-default">
                                 查询
+                            </button>
+                            &nbsp;
+                            <button onClick={() => {
+                                this.props.history.push({ pathname: "/order/editor", state: null })
+                            }} className="btn btn-default">
+                                添加销售订单
                             </button>
                         </div>
                     </Form>

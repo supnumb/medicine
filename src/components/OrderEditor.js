@@ -4,7 +4,7 @@ import Store from './Reducer';
 import { Form, Field, createFormControl } from 'form-lib';
 import { SchemaModel, StringType } from 'rsuite-schema';
 
-import GoodList from './GoodList';
+import GoodSelector from './GoodSelector';
 import OrderGoodList from './OrderGoodList';
 
 
@@ -14,6 +14,8 @@ class OrderEditor extends React.Component {
     constructor({ location, props }) {
         super(props);
 
+        Store.dispatch({ type: "SWITCH_SELECTOR_SHOW", payload: false })
+
         this.unSubscribe = Store.subscribe(() => {
             let s = Store.getState();
             this.setState(s);
@@ -21,10 +23,11 @@ class OrderEditor extends React.Component {
 
         this.state = Store.getState();
 
-        this.loadOrderGoodsFromDB = this._loadOrderGoodsFromDB.bind(this);
+        this.loadOrderDetailFromDB = this._loadOrderDetailFromDB.bind(this);
+        this.onGoodSelectorChanged = this._onGoodSelectorChanged.bind(this);
     }
 
-    _loadOrderGoodsFromDB(order) {
+    _loadOrderDetailFromDB(order) {
         Store.dispatch({ type: "FETCH_ORDER" })
 
         fetch('/api/order/info', {
@@ -45,6 +48,23 @@ class OrderEditor extends React.Component {
         })
     }
 
+    componentUnMount(){
+        this.unSubscribe();
+    }
+
+    componentWillReceiveProps(nextProps){
+        let { order } = nextProps;
+        let { order: oldOrder } = this.props;
+
+        if (oldOrder) {
+            if (order && order.ID != oldOrder.ID) {
+                this.loadOrderDetailFromDB(order);
+            }
+        } else if (order) {
+            this.loadOrderDetailFromDB(order);
+        }
+    }
+
     componentDidMount() {
         let { order } = this.props;
 
@@ -52,13 +72,31 @@ class OrderEditor extends React.Component {
             state
         } } = this.props;
 
-        console.log({ state });
+        Store.dispatch({ type: "SWITCH_SELECTOR_SHOW", payload: false })
 
         if (state) {
-            this.loadOrderGoodsFromDB(state);
+            this.loadOrderDetailFromDB(state);
             Store.dispatch({ type: "SET_CHECKED_ORDER", payload: state })
-            console.log(state);
         }
+    }
+
+    _onGoodSelectorChanged(selected) {
+        let { orderEditor: { orderGoods } } = this.state;
+
+        selected.forEach(g => {
+            let isHas = false;
+
+            orderGoods.forEach((og) => {
+                if (og.ID == g.ID) {
+                    isHas = true;
+                }
+            });
+
+            if (!isHas) {
+                orderGoods.push(g);
+                Store.dispatch({ type: "GOOD_SELECTOR_CHANGED", payload: orderGoods });
+            }
+        })
     }
 
     render() {
@@ -72,19 +110,16 @@ class OrderEditor extends React.Component {
             }
         } = this.state;
 
-        console.log({ isShowGoodSearchZone });
-
-
         let goodSelector = ("");
         if (isShowGoodSearchZone) {
             goodSelector = (<div className="col-md-5">
-                <GoodList />
+                <GoodSelector onCheckChanged={this.onGoodSelectorChanged} />
             </div>);
         }
 
         return (<div id="OrderEditor">
 
-            <div className="col-md-7 col-md-offset-1 main">
+            <div className="col-md-6 col-md-offset-1 main">
                 <h4>销售订单编辑</h4>
 
                 <Form className="form-horizontal" ref={ref => this.form = ref} values={values} id="form" model={model} onChange={(values) => {
@@ -140,23 +175,23 @@ class OrderEditor extends React.Component {
                             付款方式&nbsp;<span className="red">*</span>
                         </label>
                         <div className="col-md-8">
-                            <label class="radio-inline">
+                            <label className="radio-inline">
                                 <input type="radio" name="PayStyle" id="PayStyle" value="1" />
                                 微信
                             </label>
-                            <label class="radio-inline">
+                            <label className="radio-inline">
                                 <input type="radio" name="PayStyle" id="PayStyle" value="2" />
                                 支付宝
                             </label>
-                            <label class="radio-inline">
+                            <label className="radio-inline">
                                 <input type="radio" name="PayStyle" id="PayStyle" value="3" />
                                 现金
                             </label>
-                            <label class="radio-inline">
+                            <label className="radio-inline">
                                 <input type="radio" name="PayStyle" id="PayStyle" value="4" />
                                 货到付款
                             </label>
-                            <label class="radio-inline">
+                            <label className="radio-inline">
                                 <input type="radio" name="PayStyle" id="PayStyle" value="5" />
                                 二维码
                             </label>

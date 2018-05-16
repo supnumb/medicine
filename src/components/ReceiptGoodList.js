@@ -5,19 +5,54 @@ class ReceiptGoodList extends React.Component {
     constructor(props) {
         super(props);
 
+        let { goods } = props;
+
         this.state = {
-            receiptGood: null
+            receiptGood: null,
+            goods: goods || [],
         }
+
+        this.onTextChanged = this._onTextChanged.bind(this);
     }
 
-    componentDidMount() { }
+    _onTextChanged(event, g) {
+        const target = event.target;
+        const value = target.type === 'checkbox'
+            ? target.checked
+            : target.value;
+        const id = target.id;
+
+        g[id] = value;
+
+        let { goods } = this.props;
+
+        goods.forEach(good => {
+            if (good.ID == g.ID) {
+                good[id] = value;
+            }
+        })
+
+        console.log({ id, value })
+
+        this.setState({ goods });
+    }
+
+    componentWillReceiveProps(nextProps) {
+        let { goods } = nextProps;
+        console.log({ goods });
+        this.setState({ goods: goods || [] });
+    }
+
+    componentDidMount() {
+        let { goods } = this.props;
+        console.log({ goods });
+
+        this.setState({ goods: goods || [] });
+    }
 
     render() {
-        let { goods } = this.props;
-        let { receiptGood } = this.state;
-
-        console.log(goods);
-        
+        let { receiptGood, goods } = this.state;
+        console.log({ receiptGood, goods });
 
         let jsx = goods.map((g, index) => {
 
@@ -25,11 +60,19 @@ class ReceiptGoodList extends React.Component {
                 return (<tr key={index}>
                     <td>{g.Name}</td>
                     <td>{g.OfficalName}</td>
-                    <td><input style={{ "width": "80px" }} type="text" id="ExpiredDate" value={g.ExpiryDate} placeholder="有效期" />
+                    <td><input style={{ "width": "80px" }} type="text" id="ExpiredDate" value={g.ExpiryDate} onChange={(event) => {
+                        this.onTextChanged(event, g);
+                    }} placeholder="有效期" />
                     </td>
-                    <td><input style={{ "width": "60px" }} type="text" id="CostPrice" value={g.DefaultCostPrice} placeholder="成本价" /></td>
-                    <td><input style={{ "width": "60px" }} type="text" id="Amount" value={g.Amount} placeholder="金额" /></td>
-                    <td><input style={{ "width": "80px" }} type="text" id="BatchNo" value={g.BatchNo} placeholder="批号" /></td>
+                    <td><input onChange={(event) => {
+                        this.onTextChanged(event, g);
+                    }} style={{ "width": "60px" }} type="text" id="CostPrice" value={g.DefaultCostPrice} placeholder="成本价" /></td>
+                    <td><input onChange={(event) => {
+                        this.onTextChanged(event, g);
+                    }} style={{ "width": "60px" }} type="text" id="Amount" value={g.Amount} placeholder="金额" /></td>
+                    <td><input onChange={(event) => {
+                        this.onTextChanged(event, g);
+                    }} style={{ "width": "80px" }} type="text" id="BatchNo" value={g.BatchNo} placeholder="批号" /></td>
                     <td>
                         <a href="#" onClick={() => { }}>保存</a>
                     </td>
@@ -69,12 +112,17 @@ class ReceiptGoodList extends React.Component {
                 <tbody>
                     {jsx}
                 </tbody>
+                <tfoot>
+                    <tr>
+                        <td colSpan="7"> <button style={{ "float": "right" }} onClick={() => {
+                            if (this.props.onAddGood) {
+                                this.props.onAddGood();
+                            }
+                        }}>添加药品</button></td>
+                    </tr>
+                </tfoot>
             </table>
-            <button onClick={() => {
-                if (this.props.onAddGood) {
-                    this.props.onAddGood();
-                }
-            }}>添加药品</button>
+
         </div>);
     }
 }

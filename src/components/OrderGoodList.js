@@ -5,12 +5,34 @@ class OrderGoodList extends React.Component {
     constructor(props) {
         super(props);
 
+        let { orderGoods } = props;
         this.state = {
-            orderGood: null
-
+            orderGood: null,
+            orderGoods: orderGoods || []
         }
 
         this.loadOrderGoodsFromDB = this._loadOrderGoodsFromDB.bind(this);
+        this.onTextChanged = this._onTextChanged.bind(this);
+    }
+
+    _onTextChanged(event, g) {
+        const target = event.target;
+        const value = target.type === 'checkbox'
+            ? target.checked
+            : target.value;
+        const id = target.id;
+
+        g[id] = value;
+
+        let { goods } = this.props;
+
+        goods.forEach(good => {
+            if (good.ID == g.ID) {
+                good[id] = value;
+            }
+        })
+
+        this.setState({ goods });
     }
 
     _loadOrderGoodsFromDB(order) {
@@ -36,6 +58,19 @@ class OrderGoodList extends React.Component {
         })
     }
 
+    componentWillReceiveProps(nextProps) {
+        let { order } = nextProps;
+        let { order: oldOrder } = this.props;
+
+        if (oldOrder) {
+            if (order && order.ID != oldOrder.ID) {
+                this.loadOrderGoodsFromDB(order);
+            }
+        } else if (order) {
+            this.loadOrderGoodsFromDB(order);
+        }
+    }
+
     componentDidMount() {
         let { order } = this.props;
         console.log({ order });
@@ -45,22 +80,21 @@ class OrderGoodList extends React.Component {
     }
 
     render() {
-        let { orderGoods } = this.props;
-        let { orderGood } = this.state;
+
+        let { orderGood, orderGoods } = this.state;
 
         let listJsx = orderGoods.map((og, index) => {
 
             if (orderGood && orderGood.ID == og.ID) {
                 return (<tr key={index}>
-                    <td>{og.GoodName}</td>
-                    <td>{og.OfficalName}</td>
+                    <td>{og.GoodName || og.Name}</td>
                     <td>{og.Dimension}</td>
                     <td>{og.Unit}</td>
                     <td>
-                        <input style={{ "width": "60px" }} id="Price" value={og.DefaultPrice} />
+                        <input style={{ "width": "60px" }} id="Price" value={og.DefaultPrice || og.FinalPrice} onChange={(event) => { this.onTextChanged(event, og); }} />
                     </td>
                     <td>
-                        <input style={{ "width": "60px" }} id="Quantity" value={og.Quantity} />
+                        <input style={{ "width": "60px" }} id="Quantity" value={og.Quantity} onChange={(event) => { this.onTextChanged(event, og); }} />
                     </td>
                     <td>{og.TotalCostPrice}</td>
                     <td>
@@ -71,11 +105,10 @@ class OrderGoodList extends React.Component {
                 </tr>);
             } else {
                 return (<tr key={index}>
-                    <td>{og.GoodName}</td>
-                    <td>{og.OfficalName}</td>
+                    <td>{og.GoodName || og.Name}</td>
                     <td>{og.Dimension}</td>
                     <td>{og.Unit}</td>
-                    <td>{og.DefaultPrice}</td>
+                    <td>{og.DefaultPrice || og.FinalPrice}</td>
                     <td>{og.Quantity}</td>
                     <td>{og.TotalCostPrice}</td>
                     <td>
@@ -92,7 +125,6 @@ class OrderGoodList extends React.Component {
                 <thead>
                     <tr>
                         <th>药品名</th>
-                        <th>通用名</th>
                         <th>规格</th>
                         <th>单位</th>
                         <th>售价</th>

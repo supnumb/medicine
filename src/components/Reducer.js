@@ -261,6 +261,10 @@ function OrderEditorReducer(state = defaultState.orderEditor, action) {
                 order: action.payload.data,
                 orderGoods: action.payload.goodsData
             });
+        case "GOOD_SELECTOR_CHANGED":
+            return Object.assign({}, state, {
+                orderGoods: action.payload
+            });
         case "SET_CHECKED_ORDER":
             return Object.assign({}, state, {
                 isFetching: false,

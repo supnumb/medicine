@@ -133,6 +133,8 @@ class ReceiptEditor extends React.Component {
                 'Content-Type': 'application/json'
             }
         }).then(res => res.json()).then(json => {
+            console.log(json);
+
             if (json.code == 0) {
                 this.setState({ receipt: json.data, values: json.data, receiptGoods: json.ReceiptGoodData });
             } else {
@@ -174,6 +176,8 @@ class ReceiptEditor extends React.Component {
             }
         } = this.props;
 
+        console.log(receipt);
+
         if (receipt) {
             this.loadReceiptDetailFromDB(receipt);
         }
@@ -208,6 +212,8 @@ class ReceiptEditor extends React.Component {
     render() {
         let { receipt, values, errors, receiptGoods, employees, vendors, isShowGoodSelector, isFetching } = this.state;
 
+        console.log({ values, receiptGoods,receipt });
+
         let goodSelectorJsx = ("");
 
         if (isShowGoodSelector) {
@@ -228,8 +234,7 @@ class ReceiptEditor extends React.Component {
                             供应商&nbsp;<span className="red">*</span>
                         </label>
                         <div className="col-md-4">
-
-                            <AsyncTypeahead inputProps={{
+                            <AsyncTypeahead id="VendorName" name="VendorName"  inputProps={{
                                 name: "Name",
                                 id: "ID"
                             }} onSearch={this.loadVendorListFromDB} labelKey="label" onChange={this.onSelectVendor} isLoading={isFetching} options={vendors} />
@@ -276,11 +281,16 @@ class ReceiptEditor extends React.Component {
                     <ReceiptGoodList goods={receiptGoods} onAddGood={() => {
                         this.setState({ isShowGoodSelector: true })
                     }} />
+
+                    <button className="btn btn-primary"> 保存进货单</button>
                 </Form>
+
             </div>
             <div className="col-md-5">
                 {goodSelectorJsx}
             </div>
+
+
         </div>)
     }
 }
