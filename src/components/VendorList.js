@@ -1,8 +1,8 @@
 import React from 'react';
 import Store from './Reducer';
 
-import {Form, Field, createFormControl} from 'form-lib';
-import {SchemaModel, StringType} from 'rsuite-schema';
+import { Form, Field, createFormControl } from 'form-lib';
+import { SchemaModel, StringType } from 'rsuite-schema';
 
 import VendorEditor from './VendorEditor';
 
@@ -23,7 +23,7 @@ class VendorList extends React.Component {
     }
 
     _onCancel() {
-        Store.dispatch({type: "CHECKED_NONE"});
+        Store.dispatch({ type: "CHECKED_NONE" });
     }
 
     _onSaveCompleted() {
@@ -31,7 +31,7 @@ class VendorList extends React.Component {
     }
 
     _loadVendorsFromDB() {
-        Store.dispatch({type: "FETCH_VENDORS"});
+        Store.dispatch({ type: "FETCH_VENDORS" });
 
         let formData = new FormData();
 
@@ -47,7 +47,7 @@ class VendorList extends React.Component {
         }).then(res => res.json()).then(json => {
             console.log(json);
             if (json.code == 0) {
-                Store.dispatch({type: "FETCH_VENDORS_DONE", payload: json.data})
+                Store.dispatch({ type: "FETCH_VENDORS_DONE", payload: json.data })
             } else {
                 alert(json.message);
             }
@@ -76,7 +76,7 @@ class VendorList extends React.Component {
         let editorJsx = ("");
         if (vendor) {
             editorJsx = (<div className="col-md-5">
-                <VendorEditor vendor={vendor} onSaveCompleted={this.onSaveCompleted} onCancel={this.onCancel}/>
+                <VendorEditor vendor={vendor} onSaveCompleted={this.onSaveCompleted} onCancel={this.onCancel} />
             </div>)
         }
 
@@ -90,8 +90,8 @@ class VendorList extends React.Component {
                 <td>{v.UpdateTime}</td>
                 <td>
                     <a href="#" onClick={() => {
-                            Store.dispatch({type: "CHECKED_VENDOR", payload: v})
-                        }}>编辑</a>
+                        Store.dispatch({ type: "CHECKED_VENDOR", payload: v })
+                    }}>编辑</a>
                 </td>
             </tr>);
         })
@@ -102,19 +102,19 @@ class VendorList extends React.Component {
                     <h4>供应商管理</h4>
                     <div className="fun_zone">
                         <Form className="form-inline" ref={ref => this.form = ref} id="form" onChange={(values) => {
-                                this.setState({role: values});
-                                this.form.cleanErrors();
-                            }} onCheck={(errors) => {
-                                this.setState({errors})
-                            }}>
+                            this.setState({ role: values });
+                            this.form.cleanErrors();
+                        }} onCheck={(errors) => {
+                            this.setState({ errors })
+                        }}>
                             <div className="form-group">
-                                <Field name="Name" id="Name"/>
+                                <Field name="Name" id="Name" />
                                 &nbsp;&nbsp;
                                 <button onClick={this.submit} className="btn btn-primary">
                                     查询
                                 </button>
                                 &nbsp;&nbsp;
-                                <button className="btn btn-default">添加供应商</button>
+                                <button className="btn btn-default" onClick={()=>{Store.dispatch({ type: "CHECKED_VENDOR", payload: {ID:-1}})}}>添加供应商</button>
                             </div>
                         </Form>
                     </div>
@@ -138,7 +138,7 @@ class VendorList extends React.Component {
                 </table>
 
                 <nav aria-label="Page navigation">
-                    <ul class="pagination">
+                    <ul className="pagination">
                         <li>
                             <a href="#" aria-label="Previous">
                                 <span aria-hidden="true">&laquo;</span>

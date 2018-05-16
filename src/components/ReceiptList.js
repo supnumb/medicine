@@ -1,8 +1,8 @@
 import React from 'react';
 import Store from './Reducer';
 
-import {Form, Field, createFormControl} from 'form-lib';
-import {SchemaModel, StringType} from 'rsuite-schema';
+import { Form, Field, createFormControl } from 'form-lib';
+import { SchemaModel, StringType } from 'rsuite-schema';
 
 import ReceiptEditor from './ReceiptEditor';
 
@@ -21,7 +21,7 @@ class ReceiptList extends React.Component {
     }
 
     _loadReceiptsFromDB() {
-        Store.dispatch({type: "FETCH_RECEIPTS"});
+        Store.dispatch({ type: "FETCH_RECEIPTS" });
 
         let formData = new FormData();
 
@@ -36,7 +36,7 @@ class ReceiptList extends React.Component {
             credentials: 'same-origin'
         }).then(res => res.json()).then(json => {
             if (json.code == 0) {
-                Store.dispatch({type: "FETCH_RECEIPTS_DONE", payload: json.data})
+                Store.dispatch({ type: "FETCH_RECEIPTS_DONE", payload: json.data })
             } else {
                 alert(json.message);
             }
@@ -67,7 +67,7 @@ class ReceiptList extends React.Component {
 
         if (receipt) {
             editorJsx = (<div className="col-md-5">
-                <ReceiptEditor receipt={receipt} onSaveCompleted={this.onSaveCompleted} onCanceled={this.onCanceled}/>
+                <ReceiptEditor receipt={receipt} onSaveCompleted={this.onSaveCompleted} onCanceled={this.onCanceled} />
             </div>);
         }
 
@@ -81,11 +81,11 @@ class ReceiptList extends React.Component {
             <td>
                 <a href="#" onClick={() => {
                     this.props.history.push({
-                        pathname:"/receipt/editor",
-                        state:r
+                        pathname: "/receipt/editor",
+                        state: r
                     })
-                        // Store.dispatch({type: "CHECKED_RECEIPT", payload: r})
-                    }}>编辑</a>
+                    // Store.dispatch({type: "CHECKED_RECEIPT", payload: r})
+                }}>编辑</a>
             </td>
         </tr>));
         return (<div id="ReceiptList">
@@ -95,13 +95,18 @@ class ReceiptList extends React.Component {
                     <div className="fun_zone">
                         <Form className="form-inline">
                             <div className="form-group">
-                                <Field name="Keyword" id="Keyword"/>
+                                <Field name="Keyword" id="Keyword" />
                                 &nbsp;&nbsp;
                                 <button onClick={this.submit} className="btn btn-primary">
                                     查询
                                 </button>
                                 &nbsp;&nbsp;
-                                <button onClick={() => Store.dispatch({type: "CHECKED_RECEIPT", payload: {}})} className="btn btn-default">
+                                <button onClick={() => {
+                                    this.props.history.push({
+                                        pathname: "/receipt/editor",
+                                        state: { ID: 0 }
+                                    })
+                                }} className="btn btn-default">
                                     添加新进货单
                                 </button>
                             </div>

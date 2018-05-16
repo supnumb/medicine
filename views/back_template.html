@@ -15,7 +15,7 @@
     <link href="/stylesheets/dashboard.css" rel="stylesheet">
     <link href="http://127.0.0.1:8080/assets/css/main.min.css" rel="stylesheet">
 
-    <script type="javascript/text" src="http://127.0.0.1:8080/assets/js/vendr.js"></script>
+    <script type="text/javascript" src="http://127.0.0.1:8080/assets/js/vendor.js"></script>
 
     <script type="text/javascript" src="http://127.0.0.1:8080/assets/js/lib.js"></script>
 
@@ -29,8 +29,6 @@
     <% for (var chunk in htmlWebpackPlugin.files.chunks) { %>
         <script type="text/javascript" src="<%=htmlWebpackPlugin.files.chunks[chunk].entry %>"></script>
         <% } %>
-
-            <script src="/assets/js/vendor/holder.min.js"></script>
 </body>
 
 </html>

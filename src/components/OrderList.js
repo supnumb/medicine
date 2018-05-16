@@ -101,6 +101,7 @@ class OrderList extends React.Component {
             <td>{o.DeliveryFee}</td>
             <td>{o.DeliverCode}</td>
             <td>{o.DeliverReceiptFee}</td>
+            <td>{o.EmployeeName}</td>
 
             <td style={{
                     "width" : "80px"

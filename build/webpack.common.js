@@ -53,6 +53,20 @@ module.exports = {
                     presets: ['es2015', 'stage-0', 'react']
                 }
             }, {
+                test: /\.less$/,
+                use: [
+                    'style-loader', {
+                        loader: 'css-loader', options: { importLoaders: 1 }
+                    },
+                    {
+                        loader: 'less-loader',
+                        options: {
+                            javascriptEnabled: true
+                        }
+                    }
+
+                ]
+            }, {
                 test: /\.scss$/,
                 loader: 'style-loader!css-loader!sass-loader'
             }
@@ -64,6 +78,6 @@ module.exports = {
     output: {
         path: path.resolve(__dirname, '../public/assets/'),
         filename: 'js/[name].bundle.js',
-        publicPath:'http://localhost:8080/assets/'
+        publicPath: 'http://localhost:8080/assets/'
     }
 };

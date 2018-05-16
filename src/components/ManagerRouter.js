@@ -16,8 +16,7 @@ import {
     ReceiptEditor
 } from './index';
 
-
-
+import '../../public/stylesheets/rsuite.less';
 
 const routes = [
     {

@@ -1,8 +1,8 @@
 import React from 'react';
 import Store from './Reducer';
 
-import {Form, Field, createFormControl} from 'form-lib';
-import {SchemaModel, StringType} from 'rsuite-schema';
+import { Form, Field, createFormControl } from 'form-lib';
+import { SchemaModel, StringType } from 'rsuite-schema';
 
 import GoodEditor from './GoodEditor';
 
@@ -26,15 +26,15 @@ class GoodList extends React.Component {
     }
 
     _onCancel() {
-        Store.dispatch({type: "GOOD_EDITOR_CANCEL"});
+        Store.dispatch({ type: "GOOD_EDITOR_CANCEL" });
     }
 
     _onSaveCompleted() {
-        Store.dispatch({type: "GOOD_EDITOR_DONE"});
+        Store.dispatch({ type: "GOOD_EDITOR_DONE" });
     }
 
     _loadGoodListFromDB() {
-        Store.dispatch({type: "FETCH_GOODS"});
+        Store.dispatch({ type: "FETCH_GOODS" });
 
         let formData = new FormData();
 
@@ -50,7 +50,7 @@ class GoodList extends React.Component {
         }).then(res => res.json()).then(json => {
             console.log(json);
             if (json.code == 0) {
-                Store.dispatch({type: "FETCH_GOODS_DONE", payload: json.data})
+                Store.dispatch({ type: "FETCH_GOODS_DONE", payload: json.data })
             } else {
                 alert(json.message);
             }
@@ -79,15 +79,15 @@ class GoodList extends React.Component {
         let editorJsx = ("");
         if (good && action == "update") {
             editorJsx = (<div className="col-md-5">
-                <GoodEditor action={action} good={good} onCanceled={this.onCancel} onGoodSaveCompleted={this.onGoodSaveCompleted}/>
+                <GoodEditor action={action} good={good} onCanceled={this.onCancel} onGoodSaveCompleted={this.onGoodSaveCompleted} />
             </div>);
         } else if (action == "add") {
             editorJsx = (<div className="col-md-5">
-                <GoodEditor action={action} good={null} onCanceled={this.onCancel} onGoodSaveCompleted={this.onGoodSaveCompleted}/>
+                <GoodEditor action={action} good={null} onCanceled={this.onCancel} onGoodSaveCompleted={this.onGoodSaveCompleted} />
             </div>);
         }
 
-        let mListJsx = goods.map((g, index) => (<tr>
+        let mListJsx = goods.map((g, index) => (<tr key={index}>
             <td>{g.Name}</td>
             <td>{g.OfficalName}</td>
             <td>{g.Dimension}</td>
@@ -99,11 +99,11 @@ class GoodList extends React.Component {
             <td>{g.UseWay}</td>
 
             <td style={{
-                    "width" : "80px"
-                }}>
+                "width": "80px"
+            }}>
                 <button onClick={() => {
-                        Store.dispatch({type: "EDITOR_GOOD", payload: g})
-                    }}>编辑</button>
+                    Store.dispatch({ type: "EDITOR_GOOD", payload: g })
+                }}>编辑</button>
             </td>
         </tr>));
 
@@ -113,13 +113,13 @@ class GoodList extends React.Component {
                     <h4>药品管理</h4>
                     <div className="fun_zone">
                         <Form className="form-inline" ref={ref => this.form = ref} id="form" onChange={(values) => {
-                                this.setState({role: values});
-                                this.form.cleanErrors();
-                            }} onCheck={(errors) => {
-                                this.setState({errors})
-                            }}>
+                            this.setState({ role: values });
+                            this.form.cleanErrors();
+                        }} onCheck={(errors) => {
+                            this.setState({ errors })
+                        }}>
                             <div className="form-group">
-                                <Field name="Name" id="Name"/>
+                                <Field name="Name" id="Name" />
                                 &nbsp;&nbsp;
                                 <button onClick={this.submit} className="btn btn-default">
                                     查询
@@ -127,8 +127,8 @@ class GoodList extends React.Component {
                             </div>
                         </Form>
                         <button onClick={() => {
-                                Store.dispatch({type: "SET_ADD_MODE"})
-                            }}>添加</button>
+                            Store.dispatch({ type: "SET_ADD_MODE" })
+                        }}>添加</button>
                     </div>
 
                 </div>

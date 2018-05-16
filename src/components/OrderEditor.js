@@ -1,16 +1,17 @@
 import React from 'react';
 import Store from './Reducer';
 
-import {Form, Field, createFormControl} from 'form-lib';
-import {SchemaModel, StringType} from 'rsuite-schema';
+import { Form, Field, createFormControl } from 'form-lib';
+import { SchemaModel, StringType } from 'rsuite-schema';
 
 import GoodList from './GoodList';
 import OrderGoodList from './OrderGoodList';
 
-const model = SchemaModel({Name: StringType().isRequired('角色名不能为空')});
+
+const model = SchemaModel({ Name: StringType().isRequired('角色名不能为空') });
 
 class OrderEditor extends React.Component {
-    constructor({location, props}) {
+    constructor({ location, props }) {
         super(props);
 
         this.unSubscribe = Store.subscribe(() => {
@@ -24,10 +25,10 @@ class OrderEditor extends React.Component {
     }
 
     _loadOrderGoodsFromDB(order) {
-        Store.dispatch({type: "FETCH_ORDER"})
+        Store.dispatch({ type: "FETCH_ORDER" })
 
         fetch('/api/order/info', {
-            body: JSON.stringify({ID: order.ID}),
+            body: JSON.stringify({ ID: order.ID }),
             method: 'POST',
             mode: 'same-origin',
             credentials: 'same-origin',
@@ -37,7 +38,7 @@ class OrderEditor extends React.Component {
         }).then(res => res.json()).then(json => {
 
             if (json.code == 0) {
-                Store.dispatch({type: "FETCH_ORDER_DONE", payload: json});
+                Store.dispatch({ type: "FETCH_ORDER_DONE", payload: json });
             }
         }).catch(err => {
             console.error(err);
@@ -45,17 +46,17 @@ class OrderEditor extends React.Component {
     }
 
     componentDidMount() {
-        let {order} = this.props;
+        let { order } = this.props;
 
-        let {location: {
-                state
-            }} = this.props;
+        let { location: {
+            state
+        } } = this.props;
 
-        console.log({state});
+        console.log({ state });
 
         if (state) {
             this.loadOrderGoodsFromDB(state);
-            Store.dispatch({type: "SET_CHECKED_ORDER", payload: state})
+            Store.dispatch({ type: "SET_CHECKED_ORDER", payload: state })
             console.log(state);
         }
     }
@@ -66,9 +67,20 @@ class OrderEditor extends React.Component {
                 values,
                 errors,
                 order,
-                orderGoods
+                orderGoods,
+                isShowGoodSearchZone
             }
         } = this.state;
+
+        console.log({ isShowGoodSearchZone });
+
+
+        let goodSelector = ("");
+        if (isShowGoodSearchZone) {
+            goodSelector = (<div className="col-md-5">
+                <GoodList />
+            </div>);
+        }
 
         return (<div id="OrderEditor">
 
@@ -76,18 +88,18 @@ class OrderEditor extends React.Component {
                 <h4>销售订单编辑</h4>
 
                 <Form className="form-horizontal" ref={ref => this.form = ref} values={values} id="form" model={model} onChange={(values) => {
-                        this.setState({values});
-                        this.form.cleanErrors();
-                    }} onCheck={(errors) => {
-                        this.setState({errors})
-                    }}>
+                    this.setState({ values });
+                    this.form.cleanErrors();
+                }} onCheck={(errors) => {
+                    this.setState({ errors })
+                }}>
 
                     <div className="form-group">
                         <label className="control-label col-md-2">
                             客户&nbsp;<span className="red">*</span>
                         </label>
                         <div className="col-md-4">
-                            <Field name="Name" id="Name"/>
+                            <Field name="Name" id="Name" />
                         </div>
                         <p className="text-danger">{errors.Name}</p>
                     </div>
@@ -97,7 +109,7 @@ class OrderEditor extends React.Component {
                             电话&nbsp;<span className="red">*</span>
                         </label>
                         <div className="col-md-4">
-                            <Field name="MobilPhone" type="tel" placeholder="电话" id="MobilPhone"/>
+                            <Field name="MobilPhone" type="tel" placeholder="电话" id="MobilPhone" />
                         </div>
                         <p className="text-danger">{errors.MobilPhone}</p>
                     </div>
@@ -107,7 +119,7 @@ class OrderEditor extends React.Component {
                             地址&nbsp;<span className="red">*</span>
                         </label>
                         <div className="col-md-4">
-                            <Field name="Address" id="Address" placeholder="地址"/>
+                            <Field name="Address" id="Address" placeholder="地址" />
                         </div>
                         <p className="text-danger">{errors.Address}</p>
                     </div>
@@ -129,23 +141,23 @@ class OrderEditor extends React.Component {
                         </label>
                         <div className="col-md-8">
                             <label class="radio-inline">
-                                <input type="radio" name="PayStyle" id="PayStyle" value="1"/>
+                                <input type="radio" name="PayStyle" id="PayStyle" value="1" />
                                 微信
                             </label>
                             <label class="radio-inline">
-                                <input type="radio" name="PayStyle" id="PayStyle" value="2"/>
+                                <input type="radio" name="PayStyle" id="PayStyle" value="2" />
                                 支付宝
                             </label>
                             <label class="radio-inline">
-                                <input type="radio" name="PayStyle" id="PayStyle" value="3"/>
+                                <input type="radio" name="PayStyle" id="PayStyle" value="3" />
                                 现金
                             </label>
                             <label class="radio-inline">
-                                <input type="radio" name="PayStyle" id="PayStyle" value="4"/>
+                                <input type="radio" name="PayStyle" id="PayStyle" value="4" />
                                 货到付款
                             </label>
                             <label class="radio-inline">
-                                <input type="radio" name="PayStyle" id="PayStyle" value="5"/>
+                                <input type="radio" name="PayStyle" id="PayStyle" value="5" />
                                 二维码
                             </label>
                         </div>
@@ -156,7 +168,7 @@ class OrderEditor extends React.Component {
                             快递公司
                         </label>
                         <div className="col-md-4">
-                            <Field name="DeliveryCompany" id="DeliveryCompany"/>
+                            <Field name="DeliveryCompany" id="DeliveryCompany" />
                         </div>
                         <p className="text-danger">{errors.DeliveryCompany}</p>
                     </div>
@@ -166,7 +178,7 @@ class OrderEditor extends React.Component {
                             快递费用
                         </label>
                         <div className="col-md-4 ">
-                            <Field name="DeliveryFee" id="DeliveryFee"/>
+                            <Field name="DeliveryFee" id="DeliveryFee" />
                         </div>
                         <Field type="hidden" className="" name="ID"></Field>
                         <p className="text-danger">{errors.DeliveryFee}</p>
@@ -177,7 +189,7 @@ class OrderEditor extends React.Component {
                             销售员
                         </label>
                         <div className="col-md-4">
-                            <Field name="Name" id="Name"/>
+                            <Field name="Name" id="Name" />
                         </div>
                         <p className="text-danger">{errors.Name}</p>
                     </div>
@@ -191,10 +203,10 @@ class OrderEditor extends React.Component {
                         </div>
                     </div>
 
-                    <hr/>
-                    <OrderGoodList orderGoods={orderGoods}/>
+                    <hr />
+                    <OrderGoodList orderGoods={orderGoods} onShowSelectorZone={() => { Store.dispatch({ type: "SWITCH_SELECTOR_SHOW", payload: true }) }} />
 
-                    <hr/>
+                    <hr />
                     <div className="form-group">
                         <div className="col-md-4">
                             <button className="btn btn-primary">保存销售单</button>
@@ -205,6 +217,9 @@ class OrderEditor extends React.Component {
                 </Form>
 
             </div>
+
+            {goodSelector}
+
         </div>);
     }
 }

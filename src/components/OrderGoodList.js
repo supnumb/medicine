@@ -14,7 +14,7 @@ class OrderGoodList extends React.Component {
     }
 
     _loadOrderGoodsFromDB(order) {
-        Store.dispatch({type: "FETCH_ORDER_GOODS"})
+        Store.dispatch({ type: "FETCH_ORDER_GOODS" })
 
         let formData = new FormData();
         formData.append("orderid", order.ID);
@@ -26,10 +26,10 @@ class OrderGoodList extends React.Component {
             credentials: 'same-origin'
         }).then(res => res.json()).then(json => {
 
-            console.log({json});
+            console.log({ json });
 
             if (json.code == 0) {
-                Store.dispatch({type: "FETCH_ORDER_GOODS_DONE", payload: json.data});
+                Store.dispatch({ type: "FETCH_ORDER_GOODS_DONE", payload: json.data });
             }
         }).catch(err => {
             console.error(err);
@@ -37,16 +37,16 @@ class OrderGoodList extends React.Component {
     }
 
     componentDidMount() {
-        let {order} = this.props;
-        console.log({order});
+        let { order } = this.props;
+        console.log({ order });
         if (order) {
             this.loadOrderGoodsFromDB(order);
         }
     }
 
     render() {
-        let {orderGoods} = this.props;
-        let {orderGood} = this.state;
+        let { orderGoods } = this.props;
+        let { orderGood } = this.state;
 
         let listJsx = orderGoods.map((og, index) => {
 
@@ -57,16 +57,16 @@ class OrderGoodList extends React.Component {
                     <td>{og.Dimension}</td>
                     <td>{og.Unit}</td>
                     <td>
-                        <input id="Price" value={og.DefaultPrice}/>
+                        <input style={{ "width": "60px" }} id="Price" value={og.DefaultPrice} />
                     </td>
                     <td>
-                        <input id="Quantity" value={og.Quantity}/>
+                        <input style={{ "width": "60px" }} id="Quantity" value={og.Quantity} />
                     </td>
                     <td>{og.TotalCostPrice}</td>
                     <td>
                         <a href="#" onClick={() => {
-                                this.setState({orderGood: null})
-                            }}>确定</a>
+                            this.setState({ orderGood: null })
+                        }}>确定</a>
                     </td>
                 </tr>);
             } else {
@@ -80,8 +80,8 @@ class OrderGoodList extends React.Component {
                     <td>{og.TotalCostPrice}</td>
                     <td>
                         <a href="#" onClick={() => {
-                                this.setState({orderGood: og})
-                            }}>编辑</a>
+                            this.setState({ orderGood: og })
+                        }}>编辑</a>
                     </td>
                 </tr>);
             }
@@ -108,8 +108,8 @@ class OrderGoodList extends React.Component {
                     <tr>
                         <td colSpan="8" >
                             <button style={{
-                                    "float" : "right"
-                                }}>添加药品</button>
+                                "float": "right"
+                            }} onClick={this.props.onShowSelectorZone}>添加药品</button>
                         </td>
                     </tr>
                 </tfoot>
