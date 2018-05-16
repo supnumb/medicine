@@ -53,6 +53,10 @@
 4、订单编辑，增加销售员字段，订单列表增加PayStyleLabel。
 
 
+### 2018-05-16
+1、/api/order/search接口增加字段：EmployeeID销售员ID,EmployeeName销售员名称,GoodNames本次销售商品。
+
+
 ### 2018-05-06
 1、完成入库单魔窟
 2、完成库存模块
