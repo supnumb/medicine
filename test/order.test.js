@@ -17,10 +17,10 @@ describe("#药品基础数据模块测试", function() {
 
     let ID = 0;
 
-    it("##009 雇员保存销售单 应该返回成功，Code=0", function(done) {
+    it.only("##009 雇员保存销售单 应该返回成功，Code=0", function(done) {
         let orderData = {
-            MemberID: 34,
-            EmployeeID: 50,
+            MemberID: 84,
+            EmployeeID: 1,
             Address: '北京',
             Connact: '测试',
             Telephone: '10086',
