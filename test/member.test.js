@@ -7,13 +7,13 @@ var should = require('should');
 let memberData = {
     "Name": "测试会员" + Math.random(),
     "PinYin": "test Member",
-    "Telephone": "13511111111",
+    "Telephone": "13511111112",
     "Password": "super1111",
     "City": "北京市",
     "Gender": "男",
     "Address": "",
     "Remark": "注释",
-    "MobilPhone": "13511111111",
+    "MobilPhone": "13511111112",
     "WeiXinCode": "111111",
     "IsWeixinFriend": 1,
     "FriendName": "张三",
@@ -146,9 +146,6 @@ describe("#会员模块测试", function() {
 
             let json = JSON.parse(res.text);
 
-            console.log(json);
-            console.log(json.data.length);
-
             res.text.should.containEql(KeyWord);
             done();
         });
@@ -160,8 +157,6 @@ describe("#会员模块测试", function() {
             if (err) {
                 return done(err);
             }
-
-            console.log(res.text);
 
             res.text.should.containEql("0");
             done();
@@ -199,7 +194,7 @@ describe("#会员模块测试", function() {
 
     it("##004 保存会员购买意向记录；返回Code=0", function(done) {
         let intention = {
-            MemberID: 2,
+            MemberID: 84,
             Goods: "意向商品"
         };
         agent.post('/api/intention/save').send(intention).expect(200).end(function(err, res) {
@@ -256,7 +251,7 @@ describe("#会员模块测试", function() {
     it("## 公司雇员修改密码 ", function(done) {
         let OldPass = "123";
         let NewPass = "123";
-        let MemberID = 50;
+        let MemberID = 90;
 
         agent.post('/api/employee/alterpass').send({ OldPass, NewPass, MemberID }).expect(200).end(function(err, res) {
             if (err) {
@@ -270,7 +265,7 @@ describe("#会员模块测试", function() {
 
     it("## 管理员重置雇员密码 ", function(done) {
         let NewPass = "123";
-        let MemberID = 50;
+        let MemberID = 90;
 
         agent.post('/api/employee/alterpass').send({ MemberID, NewPass }).expect(200).end(function(err, res) {
             if (err) {
