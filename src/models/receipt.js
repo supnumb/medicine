@@ -16,9 +16,9 @@ function Receipt() {
         _search: "select r.*,m.name as EmployeeName,g.Name,p.Amount,p.CostPrice,v.Contact,v.Telephone,v.Address from Receipts r,ReceiptGoods p,Goods g,Vendors v,Members m  where r.ID=p.ReceiptID and p.GoodID=g.ID and r.VendorID=v.ID and r.OperatorID=m.ID and r.Date>=:StartTime and r.Date<=:EndTime and concat(r.ID,g.Name) like :KeyWord group by r.ID order by r.Date desc limit :Page,:Limit;",
 
         //详情
-        _ReceiptInfo: "select * from Receipts where ID=:ID;",
+        _ReceiptInfo: "select r.*,v.Name,v.Telephone,v.Address,v.Contact,v.Remark from Receipts r left join Vendors v on r.VendorID=v.ID where r.ID=:ID;",
 
-        _ReceiptGoodInfo: "select * from ReceiptGoods where ReceiptID=:ID;",
+        _ReceiptGoodInfo: "select r.*,g.* from ReceiptGoods r left join Goods g on r.GoodID=g.ID where r.ReceiptID=:ID;",
 
         //结算
         _settle: "update Receipts set status=1 where ID=:ID "

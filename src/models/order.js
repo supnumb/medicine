@@ -19,7 +19,7 @@ function Order() {
         _orderInfo: "select * from Orders where ID=:ID;",
 
         //订单商品
-        _orderGood: "select * from OrderGoods where OrderID=:ID;",
+        _orderGood: "select o.*,g.Name,g.OfficalName,g.Dimension,g.FormOfDrug,g.Unit,g.Manufacturer from OrderGoods o left join Goods g on o.GoodID=g.ID where o.OrderID=:ID;",
 
         //订单列表总数
         _orderQuantity: "select count(1) as Quantity from Orders o left join Members m on o.MemberID=m.ID where m.MobilPhone like :KeyWord and o.Date>=:StartTime and o.Date<=:EndTime",

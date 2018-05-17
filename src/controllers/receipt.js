@@ -176,7 +176,8 @@ exports.receiptInfo = (req, res, next) => {
     Receipt.receiptInfo(ID, function(err, mem) {
 
         if (err) {
-            return ep.emit('error', "数据库操作错误");
+            ep.emit('error', "数据库操作错误");
+            return res.status(200).send({ code: 2, message: "数据库操作错误！" });
         };
 
         const { data, ReceiptGood } = mem;
