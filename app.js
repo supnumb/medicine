@@ -3,6 +3,7 @@ var express = require('express');
 var path = require('path');
 var ejs = require('ejs');
 var cookieParser = require('cookie-parser');
+var session = require('express-session');
 var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
@@ -25,6 +26,15 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+
+app.use(session({
+    secret: 'medicineWeb',
+    name: 'medicine',
+    cookie: { maxAge: 1000 * 60 * 60 * 24 * 30 },
+    resave: false,
+    saveUninitialized: true,
+}));
+
 
 app.use(express.static(path.join(__dirname, 'public')));
 

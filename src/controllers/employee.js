@@ -76,9 +76,9 @@ exports.addEmployee = (req, res, next) => {
         return res.send({ code: 2, message: "Name|MobilPhone|Password参数不完整" });
     };
 
-    const flag = req.session ? req.session.user.flag : 2;
+    const Flag = req.session ? req.session.user.Flag : 2;
 
-    if (flag != 2) {
+    if (Flag != 2) {
         return res.send({ code: 2, message: "权限不足！" })
     }
 

@@ -25,6 +25,16 @@ const eventproxy = require('eventproxy');
 
 const { Member, Intention, Order, Visit } = require('../models/index');
 
+exports.checkUser = (req, res, next) => {
+
+    if (req.session.user) {
+        next();
+    } else {
+        return res.send({ code: 2, message: "未找到用户信息！" });
+    }
+
+}
+
 /**
  * 管理员登录
  * @param  {Object}   req  http 请求对象
@@ -46,8 +56,6 @@ exports.signIn = (req, res, next) => {
         res.status(422);
         return res.send({ code: 2, message: "电话、密码参数不完整" });
     };
-
-    req.session = {};
 
     Member.check(login_name, function(err, mem) {
         if (err) {

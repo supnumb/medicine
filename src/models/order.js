@@ -278,9 +278,7 @@ OrderTran.prototype.edit = function(Obj, callback) {
             tran.query(Order_add, Obj, function(err, rows) {
 
                 if (err) {
-                    tran.rollback(() => {
-                        return callback(err, null);
-                    });
+                    return callback(err, null);
                 }
 
                 const OrderID = rows.insertId;

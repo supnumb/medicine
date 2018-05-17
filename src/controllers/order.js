@@ -64,7 +64,8 @@ exports.edit = (req, res, next) => {
         }
 
         if (err) {
-            return ep.emit('error', "数据库操作错误");
+            ep.emit('error', "数据库操作错误");
+            return res.status(200).send({ code: 2, message: "数据库操作有误！" });
         };
 
         return res.status(200).send({ code: 0, message: "success", data: mem });
