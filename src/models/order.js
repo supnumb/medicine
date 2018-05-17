@@ -283,11 +283,13 @@ OrderTran.prototype.edit = function(Obj, callback) {
 
                 const OrderID = rows.insertId;
 
+                console.log("OrderID", OrderID);
+
                 let ReceiptGoodIDs = '';
 
                 async.eachSeries(Goods, function(item, cb) {
 
-                    let { GoodID, GoodName, Quantity, FinalPrice } = item;
+                    let { GoodID, Name, Quantity, FinalPrice } = item;
 
                     let Quantity_num = Quantity;
 
@@ -327,10 +329,10 @@ OrderTran.prototype.edit = function(Obj, callback) {
                         }
 
                         if (Quantity_num > 0) {
-                            return cb({ message: GoodName + "商品库存不足!" }, null);
+                            return cb({ message: Name + "商品库存不足!" }, null);
                         }
 
-                        OrderGood_add += `(${GoodID},${OrderID},'${GoodName}', ${Quantity}, ${FinalPrice},${TotalCostPrice},'${ReceiptGoodID}','${ReceiptQuantity}'),`;
+                        OrderGood_add += `(${GoodID},${OrderID},'${Name}', ${Quantity}, ${FinalPrice},${TotalCostPrice},'${ReceiptGoodID}','${ReceiptQuantity}'),`;
 
                         Stock_update += ` when ${GoodID} then ValiableQuantity-${Quantity} `;
 
@@ -445,6 +447,7 @@ OrderTran.prototype.edit = function(Obj, callback) {
                                     return callback(err, null);
                                 }
 
+                                console.log("aaaa", OrderID);
                                 return callback(null, { ID: OrderID });
 
                             });
@@ -645,7 +648,7 @@ OrderTran.prototype.edit = function(Obj, callback) {
 
                             async.eachSeries(Goods, function(item, cb) {
 
-                                let { GoodID, GoodName, Quantity, FinalPrice } = item;
+                                let { GoodID, Name, Quantity, FinalPrice } = item;
 
                                 let Quantity_num = Quantity;
 
@@ -685,10 +688,10 @@ OrderTran.prototype.edit = function(Obj, callback) {
                                     }
 
                                     if (Quantity_num > 0) {
-                                        return cb({ message: GoodName + "商品库存不足!" }, null);
+                                        return cb({ message: Name + "商品库存不足!" }, null);
                                     }
 
-                                    OrderGood_add += `(${GoodID},${OrderID},'${GoodName}', ${Quantity}, ${FinalPrice},${TotalCostPrice},'${ReceiptGoodID}','${ReceiptQuantity}'),`;
+                                    OrderGood_add += `(${GoodID},${OrderID},'${Name}', ${Quantity}, ${FinalPrice},${TotalCostPrice},'${ReceiptGoodID}','${ReceiptQuantity}'),`;
 
                                     Stock_update += ` when ${GoodID} then ValiableQuantity-${Quantity} `;
 
@@ -1049,8 +1052,8 @@ module.exports.OrderTran = new OrderTran();
 //     Remark: '',
 //     Date: '2018-04-30',
 //     Goods: [
-//         { GoodID: 1, GoodName: '感冒药', Quantity: 5, FinalPrice: 10 },
-//         { GoodID: 2, GoodName: '退烧药', Quantity: 5, FinalPrice: 6 }
+//         { GoodID: 1, Name: '感冒药', Quantity: 5, FinalPrice: 10 },
+//         { GoodID: 2, Name: '退烧药', Quantity: 5, FinalPrice: 6 }
 //     ]
 // };
 
