@@ -30,7 +30,7 @@ exports.checkUser = (req, res, next) => {
     if (req.session.user) {
         next();
     } else {
-        return res.send({ code: 2, message: "未找到用户信息！" });
+        return res.status(422) send({ code: 99, message: "该操作需要您先进行登录！" });
     }
 
 }

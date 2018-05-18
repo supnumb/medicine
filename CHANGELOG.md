@@ -66,3 +66,4 @@
 1、/api/order/search接口增加字段：EmployeeID销售员ID,EmployeeName销售员名称,GoodNames本次销售商品。
 
 ### 2018-05-18
+/member/add 接口，/member/update 接口合并为/member/save接口。
