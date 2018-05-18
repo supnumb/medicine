@@ -7,7 +7,6 @@ var should = require('should');
 let memberData = {
     "Name": "测试会员" + Math.random(),
     "PinYin": "test Member",
-    "Telephone": "13511111112",
     "Password": "super1111",
     "City": "北京市",
     "Gender": "男",
@@ -35,8 +34,8 @@ describe("#会员模块测试", function() {
         });
     })
 
-    it("##005.01 会员添加", function(done) {
-        agent.post('/api/member/add').send(memberData).expect(200).end(function(err, res) {
+    it.only("##005.01 会员添加", function(done) {
+        agent.post('/api/member/save').send(memberData).expect(200).end(function(err, res) {
             if (err) {
                 return done(err);
             }
@@ -60,11 +59,11 @@ describe("#会员模块测试", function() {
         });
     })
 
-    it("##005.03 修改存在的会员，应该返回Code=0", function(done) {
+    it.only("##005.03 修改存在的会员，应该返回Code=0", function(done) {
 
         memberData.ID = MemberID;
 
-        agent.post('/api/member/update').send(memberData).expect(200).end(function(err, res) {
+        agent.post('/api/member/save').send(memberData).expect(200).end(function(err, res) {
             if (err) {
                 return done(err);
             }

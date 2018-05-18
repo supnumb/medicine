@@ -104,7 +104,6 @@ exports.signOut = (req, res, next) => {
  * @param  {Number}   req.body.ID 会员ID
  * @param  {String}   req.body.Name 姓名
  * @param  {String}   req.body.PinYin 姓名拼音
- * @param  {String}   req.body.Telephone 座机
  * @param  {String}   req.body.City 城市
  * @param  {Nember}   req.body.Gender 行别  1是男，2是女
  * @param  {String}   req.body.Address 地址
@@ -117,12 +116,12 @@ exports.signOut = (req, res, next) => {
  * @param  {String}   req.body.Diseases 疾病
  * @param  {String}   req.body.RelationWithPatient 与患者关系
  */
-exports.addMember = (req, res, next) => {
+exports.save = (req, res, next) => {
 
     const {
+        ID,
         Name,
         PinYin = '',
-        Telephone,
         City,
         Gender,
         Address = '',
@@ -143,15 +142,14 @@ exports.addMember = (req, res, next) => {
         return res.status(403).send({ code: -1, message: "系统错误", data: error });
     });
 
-    if (!Name || !Telephone || !City || !Gender || !MobilPhone) {
-        res.status(422);
-        return res.send({ code: 2, message: "参数不完整" });
+    if (!Name || !City || !Gender || !MobilPhone) {
+        return res.send({ code: 2, message: "Name|City|Gender|MobilPhone参数不完整" });
     };
 
     let memberData = {
+        ID,
         Name,
         PinYin,
-        Telephone,
         City,
         Gender,
         Address,
@@ -165,15 +163,37 @@ exports.addMember = (req, res, next) => {
         RelationWithPatient
     };
 
-    Member.addMember(memberData, function(err, mem) {
+    if (ID && ID > 0) {
 
-        if (err) {
-            return ep.emit('error', "数据库操作错误");
-        };
+        Member.updateMember(memberData, function(err, mem) {
 
-        return res.status(200).send({ code: 0, message: "success", data: mem });
+            if (err) {
+                ep.emit('error', "数据库操作错误");
+                return res.status(200).send({ code: -1, message: "数据库连接失败！" });
+            };
 
-    });
+            if (mem.affectedRows == 0) {
+                return res.status(200).send({ code: 2, message: "未找到对应信息！", data: mem });
+            }
+
+            return res.status(200).send({ code: 0, message: "success", data: mem });
+
+        });
+
+    } else {
+
+        Member.addMember(memberData, function(err, mem) {
+
+            if (err) {
+                return ep.emit('error', "数据库操作错误");
+            };
+
+            return res.status(200).send({ code: 0, message: "success", data: mem });
+
+        });
+
+    }
+
 }
 
 /**
@@ -204,90 +224,6 @@ exports.deleteMember = (req, res, next) => {
         if (err) {
             return ep.emit('error', "数据库操作错误");
         };
-
-        return res.status(200).send({ code: 0, message: "success", data: mem });
-
-    });
-}
-
-/**
- * 修改会员
- * @param  {Object}   req  http 请求对象
- * @param  {Object}   res  http 响应对象
- * @param  {Function} next 管道操作，传递到下一步
- * @param  {Int}      req.body.ID 会员ID
- * @param  {String}   req.body.Name 姓名
- * @param  {String}   req.body.PinYin 姓名拼音
- * @param  {String}   req.body.Telephone 座机
- * @param  {String}   req.body.City 城市
- * @param  {Int}      req.body.Gender 行别
- * @param  {String}   req.body.Address 地址
- * @param  {String}   req.body.Remark 备注
- * @param  {String}   req.body.MobilPhone 移动电话
- * @param  {String}   req.body.BirthYear 出生年代
- * @param  {String}   req.body.Diseases 疾病
- * @param  {String}   req.body.RelationWithPatient 与患者关系
- */
-exports.updateMember = (req, res, next) => {
-
-    const {
-        ID,
-        Name,
-        PinYin = '',
-        Telephone,
-        City,
-        Gender,
-        Address = '',
-        Remark = '',
-        MobilPhone,
-        WeiXinCode = '',
-        IsWeixinFriend = '',
-        FriendName = '',
-        BirthYear = '',
-        Diseases = '',
-        RelationWithPatient = ''
-    } = req.body;
-
-    let ep = new eventproxy();
-
-    ep.fail(function(error) {
-        console.error(error);
-        return res.status(403).send({ code: -1, message: "系统错误", data: error });
-    });
-
-    if (!ID || !Name || !Telephone || !City || !Gender || !MobilPhone) {
-        res.status(422);
-        return res.send({ code: 2, message: "参数不完整" });
-    };
-
-    let memberData = {
-        ID,
-        Name,
-        PinYin,
-        Telephone,
-        City,
-        Gender,
-        Address,
-        Remark,
-        MobilPhone,
-        WeiXinCode,
-        IsWeixinFriend,
-        FriendName,
-        BirthYear,
-        Diseases,
-        RelationWithPatient
-    };
-
-    Member.updateMember(memberData, function(err, mem) {
-
-        if (err) {
-            return ep.emit('error', "数据库操作错误");
-            //return res.status(200).send({ code: -1, message: "数据库连接失败！" });
-        };
-
-        if (mem.affectedRows == 0) {
-            return res.status(200).send({ code: 2, message: "未找到对应信息！", data: mem });
-        }
 
         return res.status(200).send({ code: 0, message: "success", data: mem });
 

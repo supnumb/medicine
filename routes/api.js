@@ -28,13 +28,10 @@ router.post('/employee/profile', member.checkUser, employee.profile);
 router.post('/employee/alterpass', member.checkUser, employee.alterpass);
 
 //添加会员
-router.post('/member/add', member.addMember);
+router.post('/member/save', member.checkUser, member.save);
 
 //删除会员
 router.post('/member/delete', member.checkUser, member.deleteMember);
-
-//修改会员
-router.post('/member/update', member.checkUser, member.updateMember);
 
 //会员列表(会员信息、意向单数量、回访记录数量、成单数量)
 router.post('/member/search', member.checkUser, member.memberList);

@@ -22,7 +22,7 @@ function Vendor() {
         _vendorQuantity: "select count(1) as Quantity from Vendors where Name like :KeyWord;",
 
         //列表
-        _vendorList: "select * from Vendors where Name like :KeyWord group by ID order by ID desc limit :Page,:Limit;",
+        _vendorList: "select * from Vendors where concat(Name,Telephone,Address,Contact) like :KeyWord group by ID order by ID desc limit :Page,:Limit;",
 
         //详情
         _vendorInfo: "select * from Vendors where ID=:ID;",

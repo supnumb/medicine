@@ -64,3 +64,5 @@
 
 ### 2018-05-16
 1、/api/order/search接口增加字段：EmployeeID销售员ID,EmployeeName销售员名称,GoodNames本次销售商品。
+
+### 2018-05-18

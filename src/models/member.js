@@ -15,7 +15,7 @@ function Member() {
         _getByID: "select * from Members where ID=:ID;",
 
         //会员添加
-        _add: "insert into Members (Name,PinYin,Telephone,City,Gender,Address,Remark,MobilPhone,WeiXinCode,IsWeixinFriend,FriendName,BirthYear,Diseases,RelationWithPatient,CreateTime) values (:Name,:PinYin,:Telephone,:City,:Gender,:Address,:Remark,:MobilPhone,WeiXinCode,IsWeixinFriend,FriendName,:BirthYear,:Diseases,:RelationWithPatient,now());",
+        _add: "insert into Members (Name,PinYin,City,Gender,Address,Remark,MobilPhone,WeiXinCode,IsWeixinFriend,FriendName,BirthYear,Diseases,RelationWithPatient,CreateTime) values (:Name,:PinYin,:City,:Gender,:Address,:Remark,:MobilPhone,WeiXinCode,IsWeixinFriend,FriendName,:BirthYear,:Diseases,:RelationWithPatient,now());",
 
         //雇员添加
         _addEmployee: "insert into Members (Name,MobilPhone,Password,Flag,CreateTime) values (:Name,:MobilPhone,:Password,1,Now());",
@@ -24,7 +24,7 @@ function Member() {
         _delete: "update Members set Status=0 where ID=:ID;",
 
         //会员修改
-        _update: "update Members set Name=:Name,PinYin=:PinYin,Telephone=:Telephone,City=:City,Gender=:Gender,Address=:Address,Remark=:Remark,MobilPhone=:MobilPhone,WeiXinCode=:WeiXinCode,IsWeixinFriend=:IsWeixinFriend,FriendName=:FriendName,BirthYear=:BirthYear,Diseases=:Diseases,RelationWithPatient=:RelationWithPatient where ID=:ID;",
+        _update: "update Members set Name=:Name,PinYin=:PinYin,City=:City,Gender=:Gender,Address=:Address,Remark=:Remark,MobilPhone=:MobilPhone,WeiXinCode=:WeiXinCode,IsWeixinFriend=:IsWeixinFriend,FriendName=:FriendName,BirthYear=:BirthYear,Diseases=:Diseases,RelationWithPatient=:RelationWithPatient where ID=:ID;",
 
         //雇员修改密码
         _alterpass: "update Members set PassWord=:Password where ID=:ID;",
@@ -39,7 +39,7 @@ function Member() {
         _memberInfo: "select * from Members where ID=:ID;",
 
         //雇员列表
-        _employeeList: "select * from Members where Flag!=0 and concat(Name,Telephone) like :KeyWord order by Flag desc",
+        _employeeList: "select * from Members where Flag!=0 and concat(Name,MobilPhone) like :KeyWord order by Flag desc",
 
     };
 
