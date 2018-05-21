@@ -34,7 +34,7 @@ describe("#会员模块测试", function() {
         });
     })
 
-    it.only("##005.01 会员添加", function(done) {
+    it("##005.01 会员添加", function(done) {
         agent.post('/api/member/save').send(memberData).expect(200).end(function(err, res) {
             if (err) {
                 return done(err);
@@ -59,7 +59,7 @@ describe("#会员模块测试", function() {
         });
     })
 
-    it.only("##005.03 修改存在的会员，应该返回Code=0", function(done) {
+    it("##005.03 修改存在的会员，应该返回Code=0", function(done) {
 
         memberData.ID = MemberID;
 
