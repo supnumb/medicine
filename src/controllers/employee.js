@@ -118,7 +118,7 @@ exports.profile = (req, res, next) => {
     });
 
     if (!MemberID) {
-        return res.send({ code: 2, message: "雇员ID参数不匹配" });
+        MemberID = req.session.user.ID;
     };
 
     Member.memberInfo(MemberID, function(err, mem) {
