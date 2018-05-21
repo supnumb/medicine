@@ -3,7 +3,14 @@ var router = express.Router();
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-    res.render('orderList');
+
+    var user = {};
+
+    if (req.session && req.session.user) {
+        user = req.session.user
+    }
+
+    res.render('a', { user: user });
 });
 
 router.get('/memberList', function(req, res, next) {
