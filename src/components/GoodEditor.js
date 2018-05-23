@@ -1,10 +1,11 @@
 import React from 'react';
 import Store from './Reducer';
 
-import {Form, Field, createFormControl} from 'form-lib';
-import {SchemaModel, StringType} from 'rsuite-schema';
+import { Form, Field, createFormControl } from 'form-lib';
+import { SchemaModel, StringType } from 'rsuite-schema';
+import { Icon, RadioGroup, Radio } from 'rsuite';
 
-const model = SchemaModel({Name: StringType().isRequired('角色名不能为空')});
+const model = SchemaModel({ Name: StringType().isRequired('请输入药品名') });
 
 /**
  * 药品基础数据编辑组件
@@ -31,48 +32,62 @@ class GoodEditor extends React.Component {
     }
 
     _submitGood() {
+
         if (!this.form.check()) {
             this.setState({ message: "数据格式有错误" })
             return;
         }
 
-        let formData = new FormData(document.getElementById('form'));
+        let { values } = this.state;
+
+        let postData = values;
+
+        console.log(postData);
 
         fetch('/api/good/save', {
-            body: formData,
+            body: JSON.stringify(postData),
             method: 'POST',
             mode: 'same-origin',
-            credentials: 'same-origin'
-        }).then(res => res.json()).then(json => {
-            if (json.code == 0) {
-                this.props.onGoodSaveCompleted();
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json'
             }
-            //TODO
+        }).then(res => res.json()).then(json => {
+            console.log(json);
+
+            if (json.code == 0) {
+                if (this.props.onGoodSaveCompleted) {
+                    this.props.onGoodSaveCompleted(json);
+                }
+                alert(json.message);
+            } else {
+                alert(json.message);
+            }
         }).catch(err => {
             console.error(err);
         })
     }
 
     componentDidMount() {
-        let {good} = this.props;
+        let { good } = this.props;
 
         if (good) {
-            this.setState({values: good});
+            this.setState({ values: good });
         }
     }
 
     componentWillReceiveProps(nextProps) {
-        let {good, action} = nextProps;
-        let {good: oldGood} = this.props;
+        let { good, action } = nextProps;
+        let { good: oldGood } = this.props;
 
         // console.log({action, good});
 
         if (good && oldGood) {
             if (good.ID != oldGood.ID) {
-                this.setState({values: good});
+                this.setState({ values: good });
             }
         } else if (good) {
-            this.setState({values: good});
+            this.setState({ values: good });
         } else if (action == "add") {
             //添加会员
             this.setState({
@@ -98,22 +113,23 @@ class GoodEditor extends React.Component {
     }
 
     render() {
-        let {values, errors} = this.state;
+        let { values, errors } = this.state;
 
         return (<div id="GoodEditor" className="editor_zone">
+            <h4>药品编辑</h4>
             <Form className="form-horizontal" ref={ref => this.form = ref} values={values} id="form" model={model} onChange={(values) => {
-                    this.setState({values});
-                    this.form.cleanErrors();
-                }} onCheck={(errors) => {
-                    this.setState({errors})
-                }}>
+                this.setState({ values });
+                this.form.cleanErrors();
+            }} onCheck={(errors) => {
+                this.setState({ errors })
+            }}>
 
                 <div className="form-group">
                     <label className="control-label col-sm-3">
                         <span className="red">*</span>名称
                     </label>
                     <div className="col-sm-6">
-                        <Field name="Name" id="Name"/>
+                        <Field name="Name" id="Name" />
                     </div>
                     <Field type="hidden" className="" name="ID"></Field>
                     <p className="text-danger">{errors.Name}</p>
@@ -124,9 +140,9 @@ class GoodEditor extends React.Component {
                         <span className="red">*</span>拼音
                     </label>
                     <div className="col-sm-6">
-                        <Field name="NamePinYin" id="NamePinYin"/>
+                        <Field name="PinYin" id="PinYin" />
                     </div>
-                    <p className="text-danger">{errors.NamePinYin}</p>
+                    <p className="text-danger">{errors.PinYin}</p>
                 </div>
 
                 <div className="form-group">
@@ -134,7 +150,7 @@ class GoodEditor extends React.Component {
                         <span className="red">*</span>通用名
                     </label>
                     <div className="col-sm-6">
-                        <Field name="OfficalName" id="OfficalName"/>
+                        <Field name="OfficalName" id="OfficalName" />
                     </div>
                     <p className="text-danger">{errors.OfficalName}</p>
                 </div>
@@ -144,7 +160,7 @@ class GoodEditor extends React.Component {
                         <span className="red">*</span>规格
                     </label>
                     <div className="col-sm-6">
-                        <Field name="Dimension" id="Dimension"/>
+                        <Field name="Dimension" id="Dimension" />
                     </div>
                     <p className="text-danger">{errors.Dimension}</p>
                 </div>
@@ -154,7 +170,7 @@ class GoodEditor extends React.Component {
                         <span className="red">*</span>剂型
                     </label>
                     <div className="col-sm-6">
-                        <Field name="FormOfDrug" id="FormOfDrug"/>
+                        <Field name="FormOfDrug" id="FormOfDrug" />
                     </div>
                     <p className="text-danger">{errors.FormOfDrug}</p>
                 </div>
@@ -164,7 +180,7 @@ class GoodEditor extends React.Component {
                         <span className="red">*</span>单位
                     </label>
                     <div className="col-sm-6">
-                        <Field name="Unit" id="Unit"/>
+                        <Field name="Unit" id="Unit" />
                     </div>
                     <p className="text-danger">{errors.Unit}</p>
                 </div>
@@ -175,7 +191,7 @@ class GoodEditor extends React.Component {
                     </label>
 
                     <div className="col-sm-6">
-                        <Field name="UseWay" id="UseWay"/>
+                        <Field name="UseWay" id="UseWay" />
                     </div>
 
                     <p className="text-danger">{errors.UseWay}</p>
@@ -183,116 +199,118 @@ class GoodEditor extends React.Component {
 
                 <div className="form-group">
                     <label className="control-label col-sm-3">
-                        中标价:
+                    <span className="red">*</span>中标价:
                     </label>
                     <div className="col-sm-6">
-                        <Field name="BidPrice" id="BidPrice"/>
+                        <Field name="BidPrice" id="BidPrice" />
                     </div>
                     <p className="text-danger">{errors.BidPrice}</p>
                 </div>
 
                 <div className="form-group">
                     <label className="control-label col-sm-3">
-                        竞争情况:
+                    <span className="red">*</span>竞争情况:
                     </label>
                     <div className="col-sm-6">
-                        <Field name="Competion" id="Competion"/>
+                        <Field name="Competion" id="Competion" />
                     </div>
                     <p className="text-danger">{errors.Competion}</p>
                 </div>
 
                 <div className="form-group">
                     <label className="control-label col-sm-3">
-                        医保情况:
+                    <span className="red">*</span>医保情况:
                     </label>
                     <div className="col-sm-6">
-                        <Field name="Medicare" id="Medicare"/>
+                        <Field name="Medicare" id="Medicare" />
                     </div>
                     <p className="text-danger">{errors.Medicare}</p>
                 </div>
 
                 <div className="form-group">
                     <label className="control-label col-sm-3">
-                        疗程:
+                    <span className="red">*</span> 疗程:
                     </label>
                     <div className="col-sm-6">
-                        <Field name="PeriodTreatment" id="PeriodTreatment"/>
+                        <Field name="PeriodTreatment" id="PeriodTreatment" />
                     </div>
                     <p className="text-danger">{errors.PeriodTreatment}</p>
                 </div>
 
                 <div className="form-group">
                     <label className="control-label col-sm-3">
-                        适应症:
+                    <span className="red">*</span>适应症:
                     </label>
                     <div className="col-sm-6">
-                        <Field name="Translation" id="Translation"/>
+                        <Field name="Translation" id="Translation" />
                     </div>
                     <p className="text-danger">{errors.Translation}</p>
                 </div>
 
                 <div className="form-group">
                     <label className="control-label col-sm-3">
-                        是否进口:
+                    <span className="red">*</span>是否进口:
                     </label>
                     <div className="col-sm-6">
-                        <label class="radio-inline">
-                            <input type="radio" name="IsForeign" id="IsForeign" value="0"/>
-                            非进口
-                        </label>
-                        <label class="radio-inline">
-                            <input type="radio" name="IsForeign" id="IsForeign" value="1"/>
-                            进口
-                        </label>
+                        <RadioGroup name="IsForeign" inline={true} value={values.IsForeign} onChange={
+                            (value) => {
+                                let { values } = this.state;
+                                values.IsForeign = value;
+                                this.setState({ values })
+                            }
+                        }>
+                            <Radio value="0">非进口</Radio>
+                            <Radio value="1">进口</Radio>
+                        </RadioGroup>
                     </div>
                 </div>
 
                 <div className="form-group">
                     <label className="control-label col-sm-3">
-                        批准文号:
+                    <span className="red">*</span>批准文号:
                     </label>
                     <div className="col-sm-6">
-                        <Field name="ApprovalNumber" id="ApprovalNumber"/>
+                        <Field name="ApprovalNumber" id="ApprovalNumber" />
                     </div>
                     <p className="text-danger">{errors.ApprovalNumber}</p>
                 </div>
 
                 <div className="form-group">
                     <label className="control-label col-sm-3">
-                        默认成本
+                    <span className="red">*</span>默认成本
                     </label>
                     <div className="col-sm-6">
-                        <Field name="DefaultCostPrice" id="DefaultCostPrice"/>
+                        <Field name="DefaultCostPrice" id="DefaultCostPrice" />
                     </div>
                     <p className="text-danger">{errors.DefaultCostPrice}</p>
                 </div>
 
                 <div className="form-group">
                     <label className="control-label col-sm-3">
-                        默认价格
+                    <span className="red">*</span>默认价格
                     </label>
                     <div className="col-sm-6">
-                        <Field name="DefaultPrice" id="DefaultPrice"/>
+                        <Field name="DefaultPrice" id="DefaultPrice" />
                     </div>
                     <p className="text-danger">{errors.DefaultPrice}</p>
                 </div>
 
                 <div className="form-group">
                     <label className="control-label col-sm-3">
-                        权限价格
+                    <span className="red">*</span>权限价格
                     </label>
                     <div className="col-sm-6">
-                        <Field name="LimitPrice" id="LimitPrice"/>
+                        <Field name="LimitPrice" id="LimitPrice" />
                     </div>
                     <p className="text-danger">{errors.LimitPrice}</p>
                 </div>
 
                 <div className="form-group">
                     <label className="control-label col-sm-3">
-                        生产厂商
+                    <span className="red">*</span>生产厂商
                     </label>
                     <div className="col-sm-6">
-                        <Field name="Manufacturer" id="Manufacturer"/>
+                        <Field name="Manufacturer" id="Manufacturer" />
                     </div>
                     <p className="text-danger">{errors.Manufacturer}</p>
                 </div>
@@ -300,7 +318,7 @@ class GoodEditor extends React.Component {
                 <div className="form-group">
                     <label className="control-label col-sm-3"></label>
 
-                    <button onClick={this.submit} className="btn btn-primary">
+                    <button onClick={this.submitGood} className="btn btn-primary">
                         保存
                     </button>
                     &nbsp;&nbsp;

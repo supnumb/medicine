@@ -16,111 +16,111 @@ router.post('/employee/signin', member.signIn);
 router.post('/employee/signout', member.signOut);
 
 //公司雇员列表
-router.post('/employee/search', member.checkUser, employee.search);
+router.post('/employee/search', employee.search);
 
 //添加雇员
-router.post('/employee/save', member.checkUser, employee.addEmployee);
+router.post('/employee/save', employee.addEmployee);
 
 // 雇员详情
-router.post('/employee/profile', member.checkUser, employee.profile);
+router.get('/employee/profile', member.checkUser, employee.profile);
 
 //管理员重置密码
-router.post('/employee/alterpass', member.checkUser, employee.alterpass);
+router.post('/employee/alterpass', employee.alterpass);
 
 //添加会员
-router.post('/member/save', member.checkUser, member.save);
+router.post('/member/save', member.save);
 
 //删除会员
-router.post('/member/delete', member.checkUser, member.deleteMember);
+router.post('/member/delete', member.deleteMember);
 
 //会员列表(会员信息、意向单数量、回访记录数量、成单数量)
-router.post('/member/search', member.checkUser, member.memberList);
+router.post('/member/search', member.memberList);
 
 //会员详情(会员信息、意向记录、回访记录、、成单记录)
-router.post('/member/:MemberID', member.checkUser, member.memberInfo);
+router.post('/member/:MemberID', member.memberInfo);
 
 //回访记录添加
-router.post('/visit/save', member.checkUser, member.addVisit);
+router.post('/visit/save', member.addVisit);
 
 //回访记录列表,回访记录搜索
-router.post('/visit/list', member.checkUser, member.visitList);
+router.post('/visit/list', member.visitList);
 
 //意向记录添加
-router.post('/intention/save', member.checkUser, member.addIntention);
+router.post('/intention/save', member.addIntention);
 
 //意向单修改
-router.post('/intention/update', member.checkUser, member.updateIntention);
+router.post('/intention/update', member.updateIntention);
 
 //意向记录列表
-router.post('/intention/list', member.checkUser, member.intentionList);
+router.post('/intention/list', member.intentionList);
 
 //药品添加
-router.post('/good/save', member.checkUser, good.addGood);
+router.post('/good/save', good.addGood);
 
 //药品删除
-router.post('/good/delete', member.checkUser, good.deleteGood);
+router.post('/good/delete', good.deleteGood);
 
 //药品修改
-router.post('/good/update', member.checkUser, good.updateGood);
+router.post('/good/update', good.updateGood);
 
 //药品查询
-router.post('/good/search', member.checkUser, good.goodList);
+router.post('/good/search', good.goodList);
 
 //药品详情
-router.post('/good/:GoodID', member.checkUser, good.goodInfo);
+router.post('/good/:GoodID', good.goodInfo);
 
 //销售单添加、修改
-router.post('/order/submit', member.checkUser, order.edit);
+router.post('/order/submit', order.edit);
 
 //销售单退回
-router.post('/order/cancel', member.checkUser, order.cancel);
+router.post('/order/cancel', order.cancel);
 
 //销售单列表
-router.post('/order/search', member.checkUser, order.orderList);
+router.post('/order/search', order.orderList);
 
 //销售订单详情
-router.post('/order/info', member.checkUser, order.orderInfo);
+router.post('/order/info', order.orderInfo);
 
 //供应商添加
-router.post('/vendor/save', member.checkUser, vendor.addVendor);
+router.post('/vendor/save', vendor.addVendor);
 
 //供应商删除
-router.post('/vendor/delete', member.checkUser, vendor.deleteVendor);
+router.post('/vendor/delete', vendor.deleteVendor);
 
 //供应商查询
-router.post('/vendor/search', member.checkUser, vendor.vendorList);
+router.post('/vendor/search', vendor.vendorList);
 
 //供应商详情
-router.post('/vendor/:VendorID', member.checkUser, vendor.vendorInfo);
+router.post('/vendor/:VendorID', vendor.vendorInfo);
 
 //入库单添加
-router.post('/receipt/save', member.checkUser, receipt.add);
+router.post('/receipt/save', receipt.add);
 
 //入库单修改、退回
-router.post('/receipt/cancel', member.checkUser, receipt.cancel);
+router.post('/receipt/cancel', receipt.cancel);
 
 //入库单查询
-router.post('/receipt/search', member.checkUser, receipt.receiptList);
+router.post('/receipt/search', receipt.receiptList);
 
 //入库单结算
-router.post('/receipt/settle', member.checkUser, receipt.settle);
+router.post('/receipt/settle', receipt.settle);
 
 //调整单录入
-router.post('/receipt/adjustmeno', member.checkUser, stock.revision);
+router.post('/receipt/adjustmeno', stock.revision);
 
 //入库单详情
-router.post('/receipt/detail', member.checkUser, receipt.receiptInfo);
+router.post('/receipt/detail', receipt.receiptInfo);
 
 //库存查询
-router.post('/stock/search', member.checkUser, stock.stockList);
+router.post('/stock/search', stock.stockList);
 
 //收银统计
-router.get('/stat/cash', member.checkUser, stat.cash);
+router.get('/stat/cash', stat.cash);
 
 //销售员毛利率统计
-router.get('/stat/rate', member.checkUser, stat.rate);
+router.get('/stat/rate', stat.rate);
 
 //品类统计
-router.get('/stat/good', member.checkUser, stat.good);
+router.get('/stat/good', stat.good);
 
 module.exports = router;

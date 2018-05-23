@@ -20,6 +20,7 @@ class VendorList extends React.Component {
         this.loadVendorsFromDB = this._loadVendorsFromDB.bind(this);
         this.onCancel = this._onCancel.bind(this);
         this.onSaveCompleted = this._onSaveCompleted.bind(this);
+
     }
 
     _onCancel() {
@@ -30,20 +31,32 @@ class VendorList extends React.Component {
         this.loadVendorsFromDB();
     }
 
-    _loadVendorsFromDB() {
-        Store.dispatch({ type: "FETCH_VENDORS" });
+    _loadVendorsFromDB(event) {
 
-        let formData = new FormData();
+        let {
+            vendorList: {
+                KeyWord,
+                Page,
+                Limit
+            }
+        } = this.state;
 
-        formData.append("KeyWord", "");
-        formData.append("Page", 0);
-        formData.append("Limit", 10);
+        if (event) {
+            KeyWord = $("#Keyword").val();
+            Page = 0;
+            Limit = 10;
+        }
+
+        Store.dispatch({ type: "FETCH_VENDORS", payload: { KeyWord, Page, Limit } });
 
         fetch('/api/vendor/search', {
-            body: formData,
+            body: JSON.stringify({ KeyWord, Page, Limit }),
             method: 'POST',
             mode: 'same-origin',
-            credentials: 'same-origin'
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json'
+            }
         }).then(res => res.json()).then(json => {
             console.log(json);
             if (json.code == 0) {
@@ -108,19 +121,19 @@ class VendorList extends React.Component {
                             this.setState({ errors })
                         }}>
                             <div className="form-group">
-                                <Field name="Name" id="Name" />
+                                <Field name="Keyword" id="Keyword" />
                                 &nbsp;&nbsp;
-                                <button onClick={this.submit} className="btn btn-primary">
+                                <button onClick={this.loadVendorsFromDB} className="btn btn-primary">
                                     查询
                                 </button>
                                 &nbsp;&nbsp;
-                                <button className="btn btn-default" onClick={()=>{Store.dispatch({ type: "CHECKED_VENDOR", payload: {ID:-1}})}}>添加供应商</button>
+                                <button className="btn btn-default" onClick={() => { Store.dispatch({ type: "CHECKED_VENDOR", payload: { ID: -1 } }) }}>添加供应商</button>
                             </div>
                         </Form>
                     </div>
                 </div>
 
-                <table className="table">
+                <table className="table table-striped table-hover">
                     <thead>
                         <tr>
                             <th>供应商名</th>

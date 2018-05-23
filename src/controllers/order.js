@@ -46,18 +46,18 @@ exports.edit = (req, res, next) => {
 
     let ep = new eventproxy();
 
-    ep.fail(function(error) {
+    ep.fail(function (error) {
         console.error(error);
         return res.status(403).send({ code: -1, message: "系统错误", data: error });
     });
 
-    if (!MemberID || !EmployeeID || !Address || !Connact || !Telephone || !TotalAmount || !ReceiptAmount || !PayStyle || Goods.length == 0) {
+    if (!MemberID || !EmployeeID || !Address || !Connact || !Telephone || !ReceiptAmount || !PayStyle || Goods.length == 0) {
         return res.send({ code: 2, message: "参数不完整" });
     };
 
     const orderData = { ID, MemberID, EmployeeID, OperatorID, Address, Connact, Telephone, TotalAmount, ReceiptAmount, PayStyle, DeliveryCompany, DeliveryFee, DeliverCode, DeliverReceiptFee, Remark, Date, Goods };
 
-    OrderTran.edit(orderData, function(err, mem) {
+    OrderTran.edit(orderData, function (err, mem) {
 
         if (err && err.message) {
             console.log(err.message);
@@ -91,7 +91,7 @@ exports.cancel = (req, res, next) => {
 
     let ep = new eventproxy();
 
-    ep.fail(function(error) {
+    ep.fail(function (error) {
         console.error(error);
         return res.status(403).send({ code: -1, message: "系统错误", data: error });
     });
@@ -101,7 +101,7 @@ exports.cancel = (req, res, next) => {
         return res.status(200).send({ code: 2, message: "订单ID参数不匹配!" });
     };
 
-    OrderTran.cancel(ID, function(err, mem) {
+    OrderTran.cancel(ID, function (err, mem) {
 
         if (err) {
             return ep.emit('error', "数据库操作错误");
@@ -130,7 +130,7 @@ exports.orderList = (req, res, next) => {
 
     let ep = new eventproxy();
 
-    ep.fail(function(error) {
+    ep.fail(function (error) {
         console.error(error);
         return res.status(403).send({ code: -1, message: "系统错误", data: error });
     });
@@ -143,7 +143,7 @@ exports.orderList = (req, res, next) => {
         EndTime = moment(new Date()).format('YYYY-MM-DD 23:59:59');
     }
 
-    Order.orderList(KeyWord, Page, Limit, StartTime, EndTime, function(err, mem) {
+    Order.orderList(KeyWord, Page, Limit, StartTime, EndTime, function (err, mem) {
 
         if (err) {
             return ep.emit('error', "数据库操作错误");
@@ -169,7 +169,7 @@ exports.orderInfo = (req, res, next) => {
 
     let ep = new eventproxy();
 
-    ep.fail(function(error) {
+    ep.fail(function (error) {
         console.error(error);
         return res.status(403).send({ code: -1, message: "系统错误", data: error });
     });
@@ -179,7 +179,7 @@ exports.orderInfo = (req, res, next) => {
         return res.status(200).send({ code: 2, message: "订单ID参数不匹配!" });
     };
 
-    Order.orderInfo(ID, function(err, mem) {
+    Order.orderInfo(ID, function (err, mem) {
 
         if (err) {
             return ep.emit('error', "数据库操作错误");

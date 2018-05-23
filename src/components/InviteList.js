@@ -44,9 +44,25 @@ class InviteList extends React.Component {
         }
     }
 
+    componentWillReceiveProps(nextProps){
+        let { updateInvite, member } = nextProps;
+        let { updateInvite: oldUpdate, member: oldMember } = this.props;
+
+        if (oldUpdate) {
+            if (updateInvite.insertId != oldUpdate.insertId) {
+                this.loadVistsFromDB(member);
+            }else if(oldMember.ID != member.ID){
+                this.loadVistsFromDB(member);
+            }
+        } else if (oldMember.ID != member.ID) {
+            this.loadVistsFromDB(member);
+        } else if (updateInvite) {
+            this.loadVistsFromDB(member);
+        }
+    }
+
     componentDidMount() {
         let {member} = this.props;
-        console.log({member});
         if (member) {
             this.loadVistsFromDB(member);
         }
@@ -61,22 +77,20 @@ class InviteList extends React.Component {
         } = this.state;
 
         let listJsx = invists.map((i, index) => (<tr key={index}>
-            <td>{i.MemberID}</td>
-            <td>{i.Name}</td>
-            <td>{i.Name}</td>
-            <td>{i.Name}</td>
-            <td>{i.Name}</td>
+            <td>{i.ID}</td>
+            <td>{i.Remarks}</td>
+            <td>{i.OperatorID}</td>
+            <td>{i.UpdateTime}</td>
         </tr>));
 
         return (<div id="InviteList">
             <table className="table">
                 <thead>
                     <tr>
-                        <th>客人姓名</th>
+                        <th>ID</th>
                         <th>回访记录</th>
-                        <th>时间</th>
                         <th>药师</th>
-                        <th>操作</th>
+                        <th>时间</th>
                     </tr>
                 </thead>
                 <tbody>

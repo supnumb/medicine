@@ -33,7 +33,10 @@ var jsFiles = isDebug
 jsFiles.push('!public/javascripts/*.min.js');
 
 gulp.task('vendor', function() {
-    return gulp.src(['bower_components/jquery/dist/jquery.js', 'bower_components/bootstrap/dist/js/bootstrap.js']).pipe(concat('vendor.js')).pipe(gulpif(!isDebug, uglify({mangle: false}))).pipe(gulp.dest('public/assets/js'));
+    return gulp.src(['bower_components/jquery/dist/jquery.js', 'bower_components/bootstrap/dist/js/bootstrap.js'])
+    .pipe(concat('vendor.js'))
+    .pipe(gulpif(!isDebug, uglify({mangle: false})))
+    .pipe(gulp.dest('public/assets/js'));
 });
 
 gulp.task('styles', function() {

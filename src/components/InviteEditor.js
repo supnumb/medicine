@@ -3,10 +3,12 @@ import Store from './Reducer'
 
 import InviteList from './InviteList';
 
-import {Form, Field, createFormControl} from 'form-lib';
-import {SchemaModel, StringType} from 'rsuite-schema';
+import { Form, Field, createFormControl } from 'form-lib';
+import { SchemaModel, StringType } from 'rsuite-schema';
 
-const model = SchemaModel({Name: StringType().isRequired('角色名不能为空')});
+const TextareaField = createFormControl('textarea');
+
+const model = SchemaModel({ Name: StringType().isRequired('请输入回访内容') });
 
 /**
  * 客户回访编辑组件
@@ -19,31 +21,41 @@ class InviteEditor extends React.Component {
         this.state = {
             values: {},
             errors: {},
-            isFetching: false
+            isFetching: false,
+            updateInvite: null
         };
 
         this.submitInvite = this._submitInvite.bind(this);
     }
 
     _submitInvite() {
-        let {member} = this.props;
-        let formData = new FormData();
 
-        let {values: {
-                Remarks
-            }} = this.state;
+        if (!this.form.check()) {
+            this.setState({ message: "请输入回访内容" });
+            return;
+        }
 
-        formData.append("MemberID", member.ID);
-        formData.append("Remarks", Remarks);
+        this.setState({ isFetching: true })
+
+        let { member } = this.props;
+        let { values } = this.state;
+
+        let postData = {
+            MemberID: member.ID,
+            Remarks: values.Remarks
+        }
 
         fetch('/api/visit/save', {
-            body: formData,
+            body: JSON.stringify(postData),
             method: 'POST',
             mode: 'same-origin',
-            credentials: 'same-origin'
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json'
+            }
         }).then(res => res.json()).then(json => {
             if (json.code == 0) {
-                console.log(json);
+                this.setState({ updateInvite: json.data, values: { Remarks: "" }, isFetching: false });
             } else {
                 alert(json.message);
             }
@@ -54,9 +66,9 @@ class InviteEditor extends React.Component {
     }
 
     componentDidMount() {
-        let {member} = this.props;
+        let { member } = this.props;
         if (member) {
-            this.setState({values: member});
+            this.setState({ values: member });
         }
     }
 
@@ -65,28 +77,27 @@ class InviteEditor extends React.Component {
     }
 
     render() {
-        let {values, errors, isFetching} = this.state;
-        let {member} = this.props;
-        console.log({member});
+        let { values, errors, isFetching, updateInvite } = this.state;
+        let { member } = this.props;
+
         return (<div id="InviteEditor">
-            <h4>客户回访记录</h4>
-            <InviteList member={member}/>
+            <h4>{member.Name}--回访记录</h4>
+            <InviteList member={member} updateInvite={updateInvite} />
             <Form ref={ref => this.form = ref} values={values} id="form" model={model} onChange={(values) => {
-                    this.setState({values});
-                    this.form.cleanErrors();
-                }} onCheck={(errors) => {
-                    this.setState({errors})
-                }}>
+                this.setState({ values });
+                this.form.cleanErrors();
+            }} onCheck={(errors) => {
+                this.setState({ errors })
+            }}>
 
                 <div className="form-group">
                     <label >
                         回访
                     </label>
-                    <Field name="Remarks" id="Remarks"/>
-                    <p className="text-danger">{errors.Remarks}</p>
+                    <Field name="Remarks" id="Remarks" accepter={TextareaField} />
                 </div>
                 <div className="form-group">
-                    <button onClick={this.submitInvite} className="btn btn-primary">
+                    <button onClick={this.submitInvite} className="btn btn-primary" disabled={isFetching}>
                         保存
                     </button>
                     &nbsp;&nbsp;

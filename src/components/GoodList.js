@@ -22,31 +22,51 @@ class GoodList extends React.Component {
         this.state = Store.getState();
         this.loadGoodListFromDB = this._loadGoodListFromDB.bind(this);
         this.onCancel = this._onCancel.bind(this);
-        this.onSaveCompleted = this._onSaveCompleted.bind(this);
+        this.onGoodSaveCompleted = this._onSaveCompleted.bind(this);
     }
 
     _onCancel() {
         Store.dispatch({ type: "GOOD_EDITOR_CANCEL" });
     }
 
-    _onSaveCompleted() {
-        Store.dispatch({ type: "GOOD_EDITOR_DONE" });
+    _onSaveCompleted(data) {
+        if (data.code == 0) {
+            this.loadGoodListFromDB();
+            Store.dispatch({ type: "GOOD_EDITOR_DONE" });
+        }
     }
 
-    _loadGoodListFromDB() {
-        Store.dispatch({ type: "FETCH_GOODS" });
+    _loadGoodListFromDB(event) {
+        let {
+            goodList: {
+                KeyWord,
+                Page,
+                Limit
+            }
+        } = this.state;
 
-        let formData = new FormData();
+        console.log(event);
 
-        formData.append("KeyWord", "");
-        formData.append("Page", 0);
-        formData.append("Limit", 10);
+        if (event) {
+            KeyWord = $("#Keyword").val();
+            Page = 0;
+            Limit = 10;
+        }
+
+        let params = { KeyWord, Page, Limit };
+
+        console.log(params);
+
+        Store.dispatch({ type: "FETCH_GOODS", payload: params });
 
         fetch('/api/good/search', {
-            body: formData,
+            body: JSON.stringify(params),
             method: 'POST',
             mode: 'same-origin',
-            credentials: 'same-origin'
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json'
+            }
         }).then(res => res.json()).then(json => {
             console.log(json);
             if (json.code == 0) {
@@ -88,6 +108,7 @@ class GoodList extends React.Component {
         }
 
         let mListJsx = goods.map((g, index) => (<tr key={index}>
+            <td>{g.ID}</td>
             <td>{g.Name}</td>
             <td>{g.OfficalName}</td>
             <td>{g.Dimension}</td>
@@ -101,9 +122,9 @@ class GoodList extends React.Component {
             <td style={{
                 "width": "80px"
             }}>
-                <button onClick={() => {
+                <a href="#" onClick={() => {
                     Store.dispatch({ type: "EDITOR_GOOD", payload: g })
-                }}>编辑</button>
+                }}>编辑</a>
             </td>
         </tr>));
 
@@ -119,16 +140,18 @@ class GoodList extends React.Component {
                             this.setState({ errors })
                         }}>
                             <div className="form-group">
-                                <Field name="Name" id="Name" />
+                                <Field name="Keyword" id="Keyword" />
                                 &nbsp;&nbsp;
-                                <button onClick={this.submit} className="btn btn-default">
+                                <button onClick={this.loadGoodListFromDB} className="btn btn-primary">
                                     查询
                                 </button>
                             </div>
+                            &nbsp;&nbsp;
+                            <button className="btn btn-default" onClick={() => {
+                                Store.dispatch({ type: "SET_ADD_MODE" })
+                            }}>添加</button>
                         </Form>
-                        <button onClick={() => {
-                            Store.dispatch({ type: "SET_ADD_MODE" })
-                        }}>添加</button>
+
                     </div>
 
                 </div>
@@ -136,6 +159,7 @@ class GoodList extends React.Component {
                 <table className="table table-striped table-hover">
                     <thead>
                         <tr>
+                            <th>ID</th>
                             <th>药品名</th>
                             <th>通用名</th>
                             <th>规格</th>

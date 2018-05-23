@@ -3,8 +3,14 @@ import Store from './Reducer'
 
 import { Form, Field, createFormControl } from 'form-lib';
 import { SchemaModel, StringType } from 'rsuite-schema';
+import { Icon, RadioGroup, Radio } from 'rsuite';
+import { WSAENETUNREACH } from 'constants';
 
-const model = SchemaModel({ Name: StringType().isRequired('角色名不能为空') });
+const model = SchemaModel({
+    Name: StringType().isRequired('请输入姓名'),
+    PinYin: StringType().isRequired('请输入拼音'),
+
+});
 
 /**
  * 会员基础数据编辑组件
@@ -14,15 +20,10 @@ class MemberEditor extends React.Component {
     constructor(props) {
         super(props);
 
-        // this.unSubscribe = Store.subscribe(() => {
-        //     let s = Store.getState();
-        //     this.setState(s);
-        // });
-
-        // this.state = Store.getState();
         this.state = {
             values: {},
-            errors: {}
+            errors: {},
+            message: ""
         };
 
         this.loadObjectDetail = this._loadObjectDetail.bind(this);
@@ -44,23 +45,26 @@ class MemberEditor extends React.Component {
             return;
         }
 
-        let formData = new FormData(document.getElementById('form'));
-        let { action } = this.props;
+        let { values } = this.state;
 
-        let url = "/api/member/add";
-        if (action == "update") {
-            url = "/api/member/update";
-        }
+        let postData = values;
 
-        fetch(url, {
-            body: formData,
+        console.log(postData);
+
+        fetch('/api/member/save', {
+            body: JSON.stringify(postData),
             method: 'POST',
             mode: 'same-origin',
-            credentials: 'same-origin'
+            credentials: 'same-origin',
+            headers:{
+                'Content-Type': 'application/json'
+            }
         }).then(res => res.json()).then(json => {
+            console.log(json);
+            
             if (json.code == 0) {
-                if (this.props.onMemberDetailSaveCompleted) {
-                    this.props.onMemberDetailSaveCompleted(json.data);
+                if (this.props.onSaveCompleted) {
+                    this.props.onSaveCompleted(json);
                 }
             } else {
                 alert(json.message);
@@ -82,16 +86,16 @@ class MemberEditor extends React.Component {
             }
         } else if (member) {
             this.setState({ values: member });
-        } else if (action == "add") {
+        } else if (action == "add_member") {
             //添加会员
             this.setState({
                 values: {
                     Name: "",
                     PinYin: "",
-                    Gender: "",
-                    Telephone: "",
-                    "City": "",
-                    "Address": "",
+                    Gender: "0",
+                    MobilPhone: "",
+                    City: "",
+                    Address: "",
                     Diseases: "",
                     Remark: "",
                     RelationWithPatient: ""
@@ -113,7 +117,7 @@ class MemberEditor extends React.Component {
     }
 
     render() {
-        let { values, errors } = this.state;
+        let { values, errors, message } = this.state;
         let { action } = this.props;
 
         let header = "添加新会员";
@@ -156,16 +160,20 @@ class MemberEditor extends React.Component {
                         <span className="red">*</span>性别
                     </label>
                     <div className="col-sm-6">
-                        <label className="radio-inline">
-                            <input type="radio" name="IsForeign" id="IsForeign" value="1" />
-                            男生
-                        </label>
-                        <label className="radio-inline">
-                            <input type="radio" name="IsForeign" id="IsForeign" value="2" />
-                            女生
-                        </label>
+                        <RadioGroup name="Gender" inline={true} value={values.Gender} onChange={
+                            (value) => {
+                                let { values } = this.state;
+
+                                values.Gender = value;
+
+                                this.setState({ values });
+                            }
+                        }>
+                            <Radio value="0" >未选择</Radio>
+                            <Radio value="1">男生</Radio>
+                            <Radio value="2">女生</Radio>
+                        </RadioGroup>
                     </div>
-                    <p className="text-danger">{errors.Gender}</p>
                 </div>
 
                 <div className="form-group">
@@ -173,9 +181,9 @@ class MemberEditor extends React.Component {
                         <span className="red">*</span>电话
                     </label>
                     <div className="col-sm-6">
-                        <Field name="Telephone" id="Telephone" />
+                        <Field name="MobilPhone" id="MobilPhone" />
                     </div>
-                    <p className="text-danger">{errors.Telephone}</p>
+                    <p className="text-danger">{errors.MobilPhone}</p>
                 </div>
 
                 <div className="form-group">
@@ -259,30 +267,21 @@ class MemberEditor extends React.Component {
                 </div>
 
                 <div className="form-group">
-                    <label className="control-label col-sm-3"></label>
-                    <Field name="Name" id="Name" />
+                    <label className="control-label col-sm-3">
+
+                    </label>
+                    <p className="text-danger">
+                        {message}
+                    </p>
                 </div>
 
                 <div className="form-group">
-                    &nbsp;&nbsp;
-                    <button onClick={this.submit} className="btn btn-default">
+
+                    <label className="control-label col-sm-3">
+
+                    </label>
+                    <button onClick={this.submit} className="btn btn-primary">
                         保存
-                    </button>
-                    &nbsp;&nbsp;
-                    <button className="btn" onClick={this.cancel}>取消</button>
-                </div>
-                <div className="form-group">
-                    <Field name="Name" id="Name" />
-                    &nbsp;&nbsp;
-                    <button onClick={this.submit} className="btn btn-default">
-                        查询
-                    </button>
-                </div>
-                <div className="form-group">
-                    <Field name="Name" id="Name" />
-                    &nbsp;&nbsp;
-                    <button onClick={this.submit} className="btn btn-default">
-                        查询
                     </button>
                 </div>
 

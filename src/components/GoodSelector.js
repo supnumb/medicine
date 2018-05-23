@@ -1,5 +1,6 @@
 import React from 'react';
 import index from 'rsuite/lib/IntlProvider';
+import { Icon } from 'rsuite';
 
 /**
  * 药品选择器
@@ -18,20 +19,18 @@ class GoodSelector extends React.Component {
     }
 
     _onCheckChanged() {
-        var aa = [];
-        $("input[type=checkbox]:checked").each((index, ele) => {
-            aa.push($(ele).val())
-        });
 
         let { goods } = this.state;
         let checkedGoods = [];
-
-        goods.forEach(g => {
-            aa.forEach(a => {
-                if (g.ID == parseInt(aa))
-                    checkedGoods.push(g);
-            })
+        
+        $("input[type=checkbox]:checked").each((index, ele) => {
+            goods.forEach(g => {
+                if (g.ID == parseInt($(ele).val()))
+                checkedGoods.push(g);
+            });
         });
+
+        console.log(checkedGoods);
 
         if (this.props.onCheckChanged) {
             this.props.onCheckChanged(checkedGoods);
@@ -39,6 +38,7 @@ class GoodSelector extends React.Component {
     }
 
     _loadGoodsFromDB(keyword) {
+        this.setState({ isFetching: true });
         let data = { KeyWord: keyword };
 
         fetch('/api/good/search', {
@@ -53,12 +53,14 @@ class GoodSelector extends React.Component {
             if (json.code == 0) {
                 console.log(json.data);
 
-                this.setState({ goods: json.data });
+                this.setState({ goods: json.data, isFetching: false });
             } else {
                 alert(json.message);
+                this.setState({ isFetching: false })
             }
         }).catch(err => {
             console.error(err);
+            this.setState({ isFetching: false })
         })
     }
 
@@ -69,10 +71,16 @@ class GoodSelector extends React.Component {
     render() {
         let { goods, isFetching } = this.state;
 
+        let loading = isFetching ? (<Icon icon='spinner' spin />) : ("");
+
         let listJsx = goods.map((g, index) => {
             return (<tr key={index}>
                 <td>
-                    <input type="checkbox" name="glist" onChange={this.onCheckChanged} value={g.ID} />
+                    <label>
+                        <input type="checkbox" name="glist" onChange={this.onCheckChanged} value={g.ID} />
+                        &nbsp;
+                        {g.ID}
+                    </label>
                 </td>
                 <td>{g.Name}</td>
                 <td>{g.FormOfDrug}</td>
@@ -103,7 +111,7 @@ class GoodSelector extends React.Component {
                     {listJsx}
                 </tbody>
             </table>
-
+            {loading}
         </div>)
     }
 }

@@ -40,7 +40,7 @@ exports.addVendor = (req, res, next) => {
 
     let ep = new eventproxy();
 
-    ep.fail(function(error) {
+    ep.fail(function (error) {
         console.error(error);
         return res.status(403).send({ code: -1, message: "系统错误", data: error });
     });
@@ -59,7 +59,7 @@ exports.addVendor = (req, res, next) => {
     };
 
     if (ID && ID > 0) {
-        Vendor.update(vendorData, function(err, mem) {
+        Vendor.update(vendorData, function (err, mem) {
 
             if (err) {
                 return ep.emit('error', "数据库操作错误");
@@ -71,7 +71,7 @@ exports.addVendor = (req, res, next) => {
 
     } else {
 
-        Vendor.add(vendorData, function(err, mem) {
+        Vendor.add(vendorData, function (err, mem) {
 
             if (err) {
                 return ep.emit('error', "数据库操作错误");
@@ -97,7 +97,7 @@ exports.deleteVendor = (req, res, next) => {
 
     let ep = new eventproxy();
 
-    ep.fail(function(error) {
+    ep.fail(function (error) {
         console.error(error);
         return res.status(403).send({ code: -1, message: "系统错误", data: error });
     });
@@ -106,7 +106,7 @@ exports.deleteVendor = (req, res, next) => {
         return res.status(200).send({ code: 2, message: "ID参数不匹配！" });
     };
 
-    Vendor.delete(ID, function(err, mem) {
+    Vendor.delete(ID, function (err, mem) {
 
         if (err) {
             return ep.emit('error', "数据库操作错误");
@@ -132,15 +132,17 @@ exports.deleteVendor = (req, res, next) => {
  */
 exports.vendorList = (req, res, next) => {
 
+    console.log(req.body);
+
     let {
         KeyWord = '',
-            Page = 0,
-            Limit = 10
+        Page = 0,
+        Limit = 10
     } = req.body;
 
     let ep = new eventproxy();
 
-    ep.fail(function(error) {
+    ep.fail(function (error) {
         console.error(error);
         return res.status(403).send({ code: -1, message: "系统错误", data: error });
     });
@@ -149,7 +151,7 @@ exports.vendorList = (req, res, next) => {
         Page = (Page - 1) * Limit;
     }
 
-    Vendor.vendorList(KeyWord, Page, Limit, function(err, mem) {
+    Vendor.vendorList(KeyWord, Page, Limit, function (err, mem) {
 
         if (err) {
             return ep.emit('error', "数据库操作错误");
@@ -176,7 +178,7 @@ exports.vendorInfo = (req, res, next) => {
 
     let ep = new eventproxy();
 
-    ep.fail(function(error) {
+    ep.fail(function (error) {
         console.error(error);
         return res.status(403).send({ code: -1, message: "系统错误", data: error });
     });
@@ -185,7 +187,7 @@ exports.vendorInfo = (req, res, next) => {
         return res.status(200).send({ code: 2, message: "ID参数不匹配！" });
     };
 
-    Vendor.vendorInfo(VendorID, function(err, mem) {
+    Vendor.vendorInfo(VendorID, function (err, mem) {
 
         if (err) {
             return ep.emit('error', "数据库操作错误");

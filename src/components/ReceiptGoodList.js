@@ -45,31 +45,32 @@ class ReceiptGoodList extends React.Component {
 
     componentDidMount() {
         let { goods } = this.props;
-        console.log({ goods });
+        // console.log({ goods });
 
         this.setState({ goods: goods || [] });
     }
 
     render() {
         let { receiptGood, goods } = this.state;
-        console.log({ receiptGood, goods });
+        // console.log({ receiptGood, goods });
 
         let jsx = goods.map((g, index) => {
 
-            if (receiptGood && receiptGood.ID == g.ID) {
+            if (receiptGood && receiptGood.GoodID == g.GoodID) {
                 return (<tr key={index}>
+                    <td>{g.GoodID} </td>
                     <td>{g.Name}</td>
                     <td>{g.OfficalName}</td>
-                    <td><input style={{ "width": "80px" }} type="text" id="ExpiredDate" value={g.ExpiryDate} onChange={(event) => {
+                    <td><input style={{ "width": "70px" }} type="text" id="ExpiredDate" value={g.ExpiryDate} onChange={(event) => {
                         this.onTextChanged(event, g);
                     }} placeholder="有效期" />
                     </td>
                     <td><input onChange={(event) => {
                         this.onTextChanged(event, g);
-                    }} style={{ "width": "60px" }} type="text" id="CostPrice" value={g.DefaultCostPrice} placeholder="成本价" /></td>
+                    }} style={{ "width": "40px" }} type="text" id="CostPrice" value={g.CostPrice} placeholder="成本价" /></td>
                     <td><input onChange={(event) => {
                         this.onTextChanged(event, g);
-                    }} style={{ "width": "60px" }} type="text" id="Amount" value={g.Amount} placeholder="金额" /></td>
+                    }} style={{ "width": "40px" }} type="text" id="Quentity" value={g.Quentity} placeholder="数量" /></td>
                     <td><input onChange={(event) => {
                         this.onTextChanged(event, g);
                     }} style={{ "width": "80px" }} type="text" id="BatchNo" value={g.BatchNo} placeholder="批号" /></td>
@@ -80,11 +81,12 @@ class ReceiptGoodList extends React.Component {
 
             } else {
                 return (<tr key={index}>
+                    <td>{g.GoodID} </td>
                     <td>{g.Name}</td>
                     <td>{g.OfficalName}</td>
                     <td>{g.ExpiryDate}</td>
-                    <td>{g.DefaultCostPrice}</td>
-                    <td>{g.Amount}</td>
+                    <td>{g.CostPrice}</td>
+                    <td>{g.Quantity}</td>
                     <td>{g.BatchNo}</td>
                     <td>
                         <a href="#" onClick={() => {
@@ -100,6 +102,7 @@ class ReceiptGoodList extends React.Component {
             <table className="table">
                 <thead>
                     <tr>
+                        <th>ID</th>
                         <th>药品名</th>
                         <th>通用名</th>
                         <th>有效期</th>

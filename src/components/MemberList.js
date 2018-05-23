@@ -1,12 +1,13 @@
 import React from 'react';
 import Store from './Reducer';
 
-import {Form, Field, createFormControl} from 'form-lib';
-import {SchemaModel, StringType} from 'rsuite-schema';
+import { Form, Field, createFormControl } from 'form-lib';
+import { SchemaModel, StringType } from 'rsuite-schema';
 
 import MemberEditor from './MemberEditor';
 import InviteEditor from './InviteEditor';
 import IntentionEditor from './IntentionEditor';
+import { Icon } from 'rsuite';
 
 class MemberList extends React.Component {
     constructor(props) {
@@ -23,25 +24,41 @@ class MemberList extends React.Component {
         this.onMemberDetailCancel = this._onMemberDetailCancel.bind(this);
     }
 
-    _loadMemberList() {
-        Store.dispatch({type: "FETCH_MEMBER"});
+    _loadMemberList(event) {
 
-        let formData = new FormData();
+        let {
+            memberList: {
+                KeyWord,
+                Page,
+                Limit,
+            }
+        } = this.state;
 
-        formData.append("KeyWord", "测试");
-        formData.append("MobilPhone", "");
-        formData.append("Page", 0);
-        formData.append("Limit", 20);
+        if (event) {
+            KeyWord = $("#KeyWord").val();
+            Page: 0
+        }
+
+        let data = {
+            KeyWord,
+            Page,
+            Limit
+        };
+
+        Store.dispatch({ type: "FETCH_MEMBER", payload: data });
 
         fetch('/api/member/search', {
-            body: formData,
+            body: JSON.stringify(data),
             method: "POST",
             mode: 'same-origin',
-            credentials: 'same-origin'
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json'
+            }
         }).then(res => res.json()).then(json => {
             if (json.code == 0) {
                 console.log(json);
-                Store.dispatch({type: "FETCH_MEMBER_DONE", payload: json.data})
+                Store.dispatch({ type: "FETCH_MEMBER_DONE", payload: json.data })
             } else {
                 alert(json.message);
             }
@@ -54,12 +71,23 @@ class MemberList extends React.Component {
         this.unSubscribe();
     }
 
-    _onMemberDetailSaveCompleted(newMember) {
-        Store.dispatch({type: "MEMBER_EDITOR_DONE"});
+    _onMemberDetailSaveCompleted(data) {
+        Store.dispatch({ type: "MEMBER_EDITOR_DONE" });
+
+        if (data.code == 0) {
+            this.loadMemberList();
+            alert("保存成功");
+        }
     }
 
     _onMemberDetailCancel() {
-        Store.dispatch({type: "MEMBER_EDITOR_CANCEL"});
+        Store.dispatch({ type: "MEMBER_EDITOR_CANCEL" });
+    }
+
+    _onIntentionOrInviteSaveCompleted(data){
+if(data.code==0){
+    
+}
     }
 
     componentDidMount() {
@@ -71,41 +99,44 @@ class MemberList extends React.Component {
             memberList: {
                 members,
                 member,
-                action
+                action,
+                isFetching
             }
         } = this.state;
 
         let editorJsx = ("");
 
-        // console.log({action, member});
+        let loading = isFetching ? (<Icon icon='spinner' spin />) : ("");
 
         switch (action) {
             case "update_member":
                 editorJsx = (<div className="col-md-5">
-                    <MemberEditor action={action} member={member} onCanceled={this.onMemberDetailCancel} onSaveCompleted={this.onMemberDetailSaveCompleted}/>
+                    <MemberEditor action={action} member={member} onCanceled={this.onMemberDetailCancel} onSaveCompleted={this.onMemberDetailSaveCompleted} />
                 </div>);
                 break;
             case "add_member":
                 editorJsx = (<div className="col-md-5">
-                    <MemberEditor action={action} member={null} onCanceled={this.onMemberDetailCancel} onSaveCompleted={this.onMemberDetailSaveCompleted}/>
+                    <MemberEditor action={action} member={null} onCanceled={this.onMemberDetailCancel} onSaveCompleted={this.onMemberDetailSaveCompleted} />
                 </div>);
                 break;
             case "add_visit":
                 editorJsx = (<div className="col-md-5">
-                    <InviteEditor action={action} member={member} onCanceled={this.onMemberDetailCancel} onSaveCompleted={this.onMemberDetailSaveCompleted}/>
+                    <InviteEditor action={action} member={member} onCanceled={this.onMemberDetailCancel} onSaveCompleted={this.onMemberDetailSaveCompleted} />
                 </div>);
                 break;
             case "add_intention":
                 editorJsx = (<div className="col-md-5">
-                    <IntentionEditor action={action} member={member} onCanceled={this.onMemberDetailCancel} onSaveCompleted={this.onMemberDetailSaveCompleted}/>
+                    <IntentionEditor action={action} member={member} onCanceled={this.onMemberDetailCancel} onSaveCompleted={this.onMemberDetailSaveCompleted} />
                 </div>);
                 break;
         }
 
         let mListJsx = members.map((m, index) => (<tr key={index}>
+            <td>{m.ID}</td>
             <td style={{
-                    "width" : "60px"
-                }}>{m.Name}</td>
+                "width": "60px"
+            }}>{m.Name}</td>
+
             <td>{m.City}</td>
             <td>{m.MobilPhone}</td>
             <td>{m.IntentionGoods}</td>
@@ -113,18 +144,18 @@ class MemberList extends React.Component {
             <td>{m.VisitQuantity}</td>
             <td>{m.OrderQuantity}</td>
             <td style={{
-                    "width" : "120px"
-                }}>
+                "width": "108px"
+            }}>
                 <a href="#" onClick={() => {
-                        Store.dispatch({type: "EDITOR_MEMBER", payload: m})
-                    }}>编辑</a>&nbsp;
+                    Store.dispatch({ type: "EDITOR_MEMBER", payload: m })
+                }}>编辑</a>&nbsp;
                 <a href="#" onClick={() => {
-                        Store.dispatch({type: "EDITOR_MEMBER_INTENTIONS", payload: m})
-                    }}>意向</a>
+                    Store.dispatch({ type: "EDITOR_MEMBER_INTENTIONS", payload: m })
+                }}>意向</a>
                 &nbsp;
                 <a href="#" onClick={() => {
-                        Store.dispatch({type: "EDITOR_MEMBER_VISIT", payload: m})
-                    }}>回访</a>
+                    Store.dispatch({ type: "EDITOR_MEMBER_VISIT", payload: m })
+                }}>回访</a>
 
             </td>
         </tr>));
@@ -135,31 +166,31 @@ class MemberList extends React.Component {
                     <h4>会员管理</h4>
                     <div className="fun_zone">
                         <Form className="form-inline" ref={ref => this.form = ref} id="form" onChange={(values) => {
-                                this.setState({role: values});
-                                this.form.cleanErrors();
-                            }} onCheck={(errors) => {
-                                this.setState({errors})
-                            }}>
+                            this.setState({ role: values });
+                            this.form.cleanErrors();
+                        }} onCheck={(errors) => {
+                            this.setState({ errors })
+                        }}>
                             <div className="form-group">
-                                <Field name="Name" id="Name"/>
+                                <Field name="KeyWord" id="KeyWord" />
                                 &nbsp;&nbsp;
-                                <button onClick={this.submit} className="btn btn-primary">
+                                <button onClick={this.loadMemberList} className="btn btn-primary">
                                     查询
                                 </button>
                             </div>
-
                             &nbsp;&nbsp;
                             <button className="btn btn-default" onClick={() => {
-                                    Store.dispatch({type: "SET_ADD_MODE"})
-                                }}>添加新会员</button>
+                                Store.dispatch({ type: "SET_ADD_MODE" })
+                            }}>添加新会员</button>
                         </Form>
 
                     </div>
                 </div>
 
-                <table className="table">
+                <table className="table table-striped table-hover">
                     <thead>
                         <tr>
+                            <th>ID</th>
                             <th>客人姓名</th>
                             <th>城市</th>
                             <th>电话</th>
@@ -175,6 +206,7 @@ class MemberList extends React.Component {
                         {mListJsx}
                     </tbody>
                 </table>
+                {loading}
             </div>
             {editorJsx}
         </div>)

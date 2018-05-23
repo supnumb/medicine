@@ -128,7 +128,7 @@ describe("#药品基础数据模块测试", function() {
                 return done(err);
             }
 
-            console.log(res.text);
+            //console.log(res.text);
 
             res.text.should.containEql("0");
             done();

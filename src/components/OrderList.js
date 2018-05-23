@@ -3,6 +3,7 @@ import Store from './Reducer';
 
 import { Form, Field, createFormControl } from 'form-lib';
 import { SchemaModel, StringType } from 'rsuite-schema';
+import { Icon } from 'rsuite';
 
 /**
  * 销售订单页面
@@ -28,16 +29,27 @@ class OrderList extends React.Component {
     }
 
     _loadOrderListFromDB() {
-        Store.dispatch({ type: "FETCH_ORDERS" });
 
-        let formData = new FormData();
+        let {
+            orderList: {
+                KeyWord,
+                Page,
+                Limit
+            }
+        } = this.state;
 
-        formData.append("keyword", "");
-        formData.append("start", 0);
-        formData.append("length", 10);
+        if (event) {
+            KeyWord = $("#Keyword").val();
+            Page = 3;
+            Limit = 10;
+        }
+
+        let postData = { KeyWord, Page, Limit }
+
+        Store.dispatch({ type: "FETCH_ORDERS", payload: postData });
 
         fetch('/api/order/search', {
-            body: formData,
+            body: JSON.stringify(postData),
             method: 'POST',
             mode: 'same-origin',
             credentials: 'same-origin'
@@ -57,17 +69,38 @@ class OrderList extends React.Component {
         this.loadOrderListFromDB();
     }
 
-    _loadOrdersFromDB() {
-        Store.dispatch({ type: "FETCH_ORDERS" });
+    _loadOrdersFromDB(event) {
+        let {
+            orderList: {
+                KeyWord,
+                Page,
+                Limit,
+            }
+        } = this.state;
 
-        let formData = new FormData();
-        formData.append("keyword", "");
+        if (event) {
+            KeyWord = $("#KeyWord").val();
+            Page: 0
+        }
+
+        let data = {
+            KeyWord,
+            Page,
+            Limit
+        };
+
+        Store.dispatch({ type: "FETCH_ORDERS", payload: data });
 
         fetch('/api/order/search', {
-            body: formData,
+            body: JSON.stringify(data),
             method: 'POST',
             mode: 'same-origin',
             credentials: 'same-origin'
+            ,
+            headers: {
+                'Content-Type': 'application/json'
+            }
+
         }).then(res => res.json()).then(json => {
             console.log(json);
             if (json.code == 0) {
@@ -88,12 +121,17 @@ class OrderList extends React.Component {
         let {
             orderList: {
                 orders,
-                order
+                order,
+                isFetching
             }
         } = this.state;
 
+        let loading = isFetching ? (<Icon icon='spinner' spin />) : ("");
+
         let mListJsx = orders.map((o, index) => (<tr key={index}>
+            <td>{o.ID}</td>
             <td>{o.Name}</td>
+            <td>{o.MobilePhone}</td>
             <td>{o.GoodNames}</td>
             <td>{o.ReceiptAmount}</td>
             <td>{o.PayStyleLabel}</td>
@@ -106,10 +144,10 @@ class OrderList extends React.Component {
             <td style={{
                 "width": "80px"
             }}>
-                <button onClick={() => {
+                <a href="#" onClick={() => {
                     this.props.history.push({ pathname: "/order/editor", state: o })
                     // Store.dispatch({type: "EDITOR_MEMBER", payload: o})
-                }}>编辑</button>
+                }}>编辑</a>
             </td>
         </tr>));
 
@@ -125,11 +163,12 @@ class OrderList extends React.Component {
                         this.setState({ errors })
                     }}>
                         <div className="form-group">
-                            <Field name="Name" id="Name" />
+                            <Field name="KeyWord" id="KeyWord" />
                             &nbsp;&nbsp;
-                            <button onClick={this.submit} className="btn btn-default">
+                            <button onClick={this.loadOrdersFromDB} className="btn btn-primary">
                                 查询
                             </button>
+                            &nbsp;
                             &nbsp;
                             <button onClick={() => {
                                 this.props.history.push({ pathname: "/order/editor", state: null })
@@ -141,10 +180,12 @@ class OrderList extends React.Component {
                 </div>
             </div>
 
-            <table className="table">
+            <table className="table table-striped table-hover">
                 <thead>
                     <tr>
+                        <th>ID</th>
                         <th>客人姓名</th>
+                        <th>电话</th>
                         <th>药品</th>
                         <th>金额</th>
                         <th>付款方式</th>
@@ -160,7 +201,7 @@ class OrderList extends React.Component {
                     {mListJsx}
                 </tbody>
             </table>
-
+            {loading}
         </div>)
     }
 }

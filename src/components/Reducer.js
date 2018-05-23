@@ -6,7 +6,10 @@ const defaultState = {
         goods: [],
         isFetching: false,
         good: null,
-        action: "hidden"
+        action: "hidden",
+        KeyWord: "",
+        Page: 0,
+        Limit: 10
     },
     goodEdit: {
         good: null,
@@ -15,22 +18,30 @@ const defaultState = {
     orderList: {
         isFetching: false,
         orders: [],
-        order: null
+        order: null,
+        KeyWord: "",
+        Page: 1,
+        Limit: 10
     },
     orderEditor: {
-        order: null,
+        order: {},
         orderGoods: [],
         values: {},
         errors: {},
         isFetching: false,
         message: "",
         isShowGoodSearchZone: false,
+        employees: [],
+        members: []
     },
     memberList: {
         isFetching: false,
         members: [],
         member: null,
-        action: "hidden"
+        action: "hidden",
+        KeyWord: "",
+        Page: 0,
+        Limit: 10
     },
     memberEditor: {
         isFetching: false,
@@ -51,20 +62,22 @@ const defaultState = {
         values: {},
         errors: {}
     },
-    memberList: {
-        isFetching: false,
-        members: [],
-        member: {}
-    },
+
     vendorList: {
         vendors: [],
         isFetching: false,
-        vendor: {}
+        vendor: {},
+        KeyWord: "",
+        Page: 0,
+        Limit: 10
     },
     receiptList: {
         receipts: [],
         isFetching: false,
-        receipt: null
+        receipt: null,
+        KeyWord: "",
+        Page: 0,
+        Limit: 10
     },
     orderGoodList: {
         orderGoods: [],
@@ -99,7 +112,12 @@ function OrderGoodListReducer(state = defaultState.orderGoodList, action) {
 function ReceiptsListReducer(state = defaultState.receiptList, action) {
     switch (action.type) {
         case "FETCH_RECEIPTS":
-            return Object.assign({}, state, { isFetching: true });
+            return Object.assign({}, state, {
+                isFetching: true,
+                KeyWord: action.payload.KeyWord,
+                Page: action.payload.Page,
+                Limit: action.payload.Limit
+            });
         case "FETCH_RECEIPTS_DONE":
             return Object.assign({}, state, {
                 isFetching: false,
@@ -126,7 +144,10 @@ function VendorListReducer(state = defaultState.vendorList, action) {
         case "FETCH_VENDORS":
             return Object.assign({}, state, {
                 isFetching: true,
-                vendor: null
+                vendor: null,
+                KeyWord: action.payload.Keyword,
+                Page: action.payload.Page,
+                Limit: action.payload.Limit
             });
         case "FETCH_VENDORS_DONE":
             return Object.assign({}, state, {
@@ -197,7 +218,12 @@ function MemberEditorReducer(state = defaultState.memberEditor, action) {
 function MemberListReducer(state = defaultState.memberList, action) {
     switch (action.type) {
         case "FETCH_MEMBER":
-            return Object.assign({}, state, { isFetching: true });
+            return Object.assign({}, state, {
+                isFetching: true,
+                KeyWord: action.payload.KeyWord,
+                Page: action.payload.Page,
+                Limit: action.payload.Limit
+            });
         case "FETCH_MEMBER_DONE":
             return Object.assign({}, state, {
                 isFetching: false,
@@ -238,7 +264,12 @@ function MemberListReducer(state = defaultState.memberList, action) {
 function OrderListReducer(state = defaultState.orderList, action) {
     switch (action.type) {
         case "FETCH_ORDERS":
-            return Object.assign({}, state, { isFetching: true });
+            return Object.assign({}, state, {
+                isFetching: true,
+                KeyWord:action.payload.KeyWord,
+                Limit: action.payload.Limit,
+                Page: action.payload.Page
+            });
         case "FETCH_ORDERS_DONE":
             return Object.assign({}, state, {
                 isFetching: false,
@@ -259,6 +290,7 @@ function OrderEditorReducer(state = defaultState.orderEditor, action) {
             return Object.assign({}, state, {
                 isFetching: false,
                 order: action.payload.data,
+                values: action.payload.data,
                 orderGoods: action.payload.goodsData
             });
         case "GOOD_SELECTOR_CHANGED":
@@ -271,14 +303,35 @@ function OrderEditorReducer(state = defaultState.orderEditor, action) {
                 values: action.payload,
                 order: action.payload
             });
-        case "FETCH_ORDERS_DONE":
-            return Object.assign({}, state, {
-                isFetching: false,
-                orders: action.payload
-            });
+        // case "FETCH_ORDERS_DONE":
+        //     return Object.assign({}, state, {
+        //         isFetching: false,
+        //         orders: action.payload,
+        //         values: action.payload.data
+        //     });
         case "SWITCH_SELECTOR_SHOW":
             return Object.assign({}, state, {
                 isShowGoodSearchZone: action.payload
+            });
+        case "SET_VALUES":
+            return Object.assign({}, state, {
+                values: action.payload
+            });
+        case "SET_ERRORS":
+            return Object.assign({}, state, {
+                errors: action.payload
+            });
+        case "SET_FORM_CHECK_RESULT":
+            return Object.assign({}, state, {
+                message: action.payload
+            });
+        case "FETCH_EMPLOYEE_DONE":
+            return Object.assign({}, state, {
+                employees: action.payload
+            });
+        case "FETCH_MEMBER_DONE":
+            return Object.assign({}, state, {
+                members: action.payload
             });
         default:
             return state;
@@ -288,7 +341,7 @@ function OrderEditorReducer(state = defaultState.orderEditor, action) {
 function GoodListReducer(state = defaultState.goodList, action) {
     switch (action.type) {
         case "FETCH_GOODS":
-            return Object.assign({}, state, { isFetching: true });
+            return Object.assign({}, state, { isFetching: true, KeyWord: action.payload.KeyWord, Page: action.payload.Page, Limit: action.Limit });
         case "FETCH_GOODS_DONE":
             return Object.assign({}, state, {
                 isFetching: false,
@@ -309,7 +362,11 @@ function GoodListReducer(state = defaultState.goodList, action) {
                 action: "hidden",
                 good: null
             });
-
+        case "GOOD_EDITOR_DONE":
+            return Object.assign({}, state, {
+                action: "hidden",
+                good: null
+            });
         default:
             return state;
     }

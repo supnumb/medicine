@@ -10,7 +10,7 @@ let memberData = {
     "Password": "super1111",
     "City": "北京市",
     "Gender": "男",
-    "Address": "",
+    "Address": "北京花家地南里",
     "Remark": "注释",
     "MobilPhone": "13511111112",
     "WeiXinCode": "111111",
@@ -27,8 +27,11 @@ describe("#会员模块测试", function() {
     before(function(done) {
         agent.post('/api/employee/signin').send({ login_name: "13511111111", password: "super1111" }).expect(200).end(function(err, res) {
             if (err) {
-                done(err);
+                return done(err);
             }
+
+						console.log(res.text);
+
             res.text.should.containEql("登录成功");
             done();
         });
@@ -235,9 +238,8 @@ describe("#会员模块测试", function() {
     })
 
     it("## 登录雇员详细信息 ", function(done) {
-        let employeeData = { MemberID: 48 };
 
-        agent.post('/api/employee/profile').send(employeeData).expect(200).end(function(err, res) {
+        agent.post('/api/employee/profile').expect(200).end(function(err, res) {
             if (err) {
                 return done(err);
             }
@@ -279,6 +281,7 @@ describe("#会员模块测试", function() {
 
     it("## 列出公司所有正在使用的雇员 ", function(done) {
         agent.post('/api/employee/search').expect(200).end(function(err, res) {
+
             if (err) {
                 return done(err);
             }

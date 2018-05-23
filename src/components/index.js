@@ -52,3 +52,9 @@ export {
     default as ReceiptEditor
 }
 from './ReceiptEditor';
+
+
+export {
+    default as EmployeeSignIn
+}
+from './EmployeeSignIn';

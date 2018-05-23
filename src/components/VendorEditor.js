@@ -2,7 +2,13 @@ import React from 'react';
 import { Form, Field, createFormControl } from 'form-lib';
 import { SchemaModel, StringType } from 'rsuite-schema';
 
-const model = SchemaModel({ Name: StringType().isRequired('角色名不能为空') });
+const TextareaField = createFormControl('textarea');
+
+const model = SchemaModel({
+    Name: StringType().isRequired('请输入供应商名称'),
+    Contact: StringType().isRequired("请输入联系人"),
+    Telephone: StringType().isRequired("请输入联系电话")
+});
 
 function param(formdata) { }
 
@@ -20,7 +26,7 @@ class VendorEditor extends React.Component {
 
     _saveVendor() {
         if (!this.form.check()) {
-            this.setState({ message: "数据格式有错误" })
+            this.setState({ message: "请检查输入的数据" })
             return;
         }
 
@@ -141,12 +147,13 @@ class VendorEditor extends React.Component {
                         备注
                     </label>
                     <div className="col-sm-6">
-                        <Field name="Remark" id="Remark" />
+                        <Field name="Remark" id="Remark" accepter={TextareaField} />
                     </div>
                     <p className="text-danger">{errors.Remark}</p>
                 </div>
 
                 <div className="form-group">
+                    <label className="control-label col-sm-3"></label>
                     <p className="text-danger">{message}</p>
                 </div>
 

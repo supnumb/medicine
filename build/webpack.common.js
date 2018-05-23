@@ -12,7 +12,8 @@ const libPath = isDebug
 module.exports = {
 
     entry: {
-        workspace: "./src/web/back.client.js"
+        workspace: "./src/web/back.client.js",
+        signin: "./src/web/signin.client.js",
     },
 
     plugins: [
@@ -32,6 +33,16 @@ module.exports = {
             template: "./views/back_template.html",
             hash: true,
             chunks: ['workspace']
+        }),
+
+        new HtmlWebpackPlugin({
+            title: "药师工作台",
+            showErrors: true,
+            inject: false,
+            filename: "html/employee_signin.html",
+            template: "./views/back_template.html",
+            hash: true,
+            chunks: ['signin']
         }),
 
         // new DashboardPlugin(),

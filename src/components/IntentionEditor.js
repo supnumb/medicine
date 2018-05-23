@@ -3,10 +3,11 @@ import Store from './Reducer'
 
 import IntentionList from './IntentionList';
 
-import {Form, Field, createFormControl} from 'form-lib';
-import {SchemaModel, StringType} from 'rsuite-schema';
+import { Form, Field, createFormControl } from 'form-lib';
+import { SchemaModel, StringType } from 'rsuite-schema';
+const TextareaField = createFormControl('textarea');
 
-const model = SchemaModel({Name: StringType().isRequired('角色名不能为空')});
+const model = SchemaModel({ Goods: StringType().isRequired('请输入意向药品') });
 
 /**
  * 会员意向编辑组件
@@ -19,36 +20,58 @@ class IntentionEditor extends React.Component {
         this.state = {
             values: {},
             errors: {},
-            isFetching: false
+            isFetching: false,
+            updateIntention: null
         };
 
         this.loadObjectDetail = this._loadObjectDetail.bind(this);
         this.submitIntention = this._submitIntention.bind(this);
     }
 
-    _loadObjectDetail() {}
+    _loadObjectDetail() { }
 
     _submitIntention() {
 
-        let {member} = this.props;
-        let formData = new FormData();
+        if (!this.form.check()) {
+            this.setState({ message: "请输入意向药品" });
+            return;
+        }
 
-        let {values: {
-                Remarks
-            }} = this.state;
+        console.log("ssss");
 
-        formData.append("MemberID", member.ID);
-        formData.append("Goods", Remarks)
+
+        this.setState({ isFetching: true });
+
+        let { values } = this.state;
+        let { member } = this.props;
+
+        console.log(values);
+
+        let postData = {
+            MemberID: member.ID,
+            Goods: values.Goods
+        }
 
         fetch('/api/intention/save', {
-            body: formData,
+            body: JSON.stringify(postData),
             method: 'POST',
             mode: 'same-origin',
-            credentials: 'same-origin'
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json'
+            }
         }).then(res => res.json()).then(json => {
+            console.log(json);
+
             if (json.code == 0) {
-                console.log(json);
+                if (this.props.onSaveCompleted) {
+                    this.setState({ updateIntention: json.data, values: { Goods: "" }, isFetching: false });
+                } else {
+                    this.setState({ updateIntention: json.data, values: { Goods: "" }, isFetching: false });
+                    alert(json.message)
+                }
             } else {
+                this.setState({ isFetching: false });
                 alert(json.message);
             }
         }).catch(err => {
@@ -56,39 +79,47 @@ class IntentionEditor extends React.Component {
         })
     }
 
-    componentDidMount() {
-        let {member} = this.props;
-        if (member) {
-            this.setState({values: member});
+    componentWillReceiveProps(nextProps) {
+        let { member } = nextProps;
+        let { member: oldMember } = this.props;
+
+        if (member.ID != oldMember.ID) {
+            this.setState({ values: member });
         }
     }
 
-    componentUnMount() {}
+    componentDidMount() {
+        let { member } = this.props;
+        if (member) {
+            this.setState({ values: member });
+        }
+    }
 
     render() {
-        let {member} = this.props;
-        let {values, errors, isFetching} = this.state;
+        let { member } = this.props;
+        let { values, errors, isFetching, updateIntention } = this.state;
 
         return (<div id="IntentionEditor">
-            <IntentionList member={member}/>
+            <IntentionList member={member} updateIntention={updateIntention} />
 
             <Form ref={ref => this.form = ref} values={values} id="form" model={model} onChange={(values) => {
-                    this.setState({values});
-                    this.form.cleanErrors();
-                }} onCheck={(errors) => {
-                    this.setState({errors})
-                }}>
+                this.setState({ values });
+                this.form.cleanErrors();
+            }} onCheck={(errors) => {
+                this.setState({ errors })
+            }}>
 
                 <div className="form-group">
                     <label>
                         意向药品
                     </label>
-                    <Field name="Remark" id="Remark"/>
+                    <Field name="Goods" id="Goods" accepter={TextareaField} />
+                    <Field type="hidden" name="MemberID"></Field>
                     <p className="text-danger">{errors.Remark}</p>
                 </div>
 
                 <div className="form-group">
-                    <button onClick={this.submitIntention} className="btn btn-primary">
+                    <button disabled={isFetching} onClick={this.submitIntention} className="btn btn-primary">
                         保存
                     </button>
                     &nbsp;&nbsp;

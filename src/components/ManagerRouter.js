@@ -1,6 +1,6 @@
 import React from 'react';
-import {Route, BrowserRouter as Router, Switch, NavLink} from 'react-router-dom';
-import {hot} from 'react-hot-loader'
+import { Route, BrowserRouter as Router, Switch, NavLink,  } from 'react-router-dom';
+import { hot } from 'react-hot-loader'
 
 import {
     GoodList,
@@ -13,12 +13,18 @@ import {
     Container,
     MainMenu,
     OrderEditor,
-    ReceiptEditor
+    ReceiptEditor,
+    EmployeeSignIn
 } from './index';
 
 import '../../public/stylesheets/rsuite.less';
 
 const routes = [
+    {
+        path: "/employee/signin",
+        extra: true,
+        component: EmployeeSignIn
+    },
     {
         path: "/orders/",
         extra: true,
@@ -59,35 +65,22 @@ const routes = [
 ];
 
 /**
- * 厨师工作台
+ * 药师工作台
  * @extends React.Component
  */
 class ManagerRouter extends React.Component {
     constructor(props) {
         super(props);
 
+        console.log(props);
+
         this.state = {
             employee: {}
         }
     }
 
-    componentDidMount() {
-        // fetch('/api/employee/profile', {
-        //     method: "GET",
-        //     mode: 'same-origin',
-        //     credentials: 'same-origin'
-        // }).then(res => res.json()).then(json => {
-        //     if (json.code == 0) {
-        //         console.log("加载雇员详细信息", json);
-        //         this.setState({employee: json.data})
-        //     } else {
-        //         alert(json.message);
-        //     }
-        // }).catch(err => console.log(err));
-    }
-
     render() {
-        let {employee} = this.state;
+        let { employee } = this.state;
 
         return (<Router>
             <div>
@@ -98,12 +91,12 @@ class ManagerRouter extends React.Component {
                     {/* <div className="container"> */}
                     <div className="row">
                         {/* 左侧菜单 */}
-                        <div className="col-md-1 sidebar"><MainMenu/></div>
+                        <div className="col-md-1 sidebar"><MainMenu /></div>
                         {/* 右侧内容 */}
                         <Switch>
                             {
                                 routes.map((route, i) => {
-                                    return (<Container key={i} Employee={employee} {...route}/>)
+                                    return (<Container key={i} Employee={employee} {...route} />)
                                 })
                             }
                         </Switch>
@@ -113,7 +106,5 @@ class ManagerRouter extends React.Component {
         </Router>);
     }
 }
-
-// export default ManagerRouter;
 
 export default hot(module)(ManagerRouter)

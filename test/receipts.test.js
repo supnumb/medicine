@@ -7,6 +7,8 @@ let receiptData = {
     VendorName: "哈药集团",
     VendorID: 5,
     Date: '2018-05-06',
+    EmployeeID:1,
+    
     ReceiptGoods: [{
         GoodID: 1,
         Amount: 100,

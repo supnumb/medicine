@@ -21,6 +21,16 @@
 5、exports.updateGood 代码可以很大的简化成JSON对象；先解构再组装，浪费时间且进度慢；（这个是严重问题）
 
 
+------
+1、保存供应商的接口；地址（Address）验证去掉； Address不是必须的字段； 
+2、good/save接口成功要返回 message值
+3、/api/member/search 返回数据按修改时间字段倒序排列
+4、/api/member/84 返回 的回访记录和意向记录倒序排列
+5、/api/member/84 返回 的回访记录&意向记录返回操作人员名称、返回更新时间去掉年份和秒种，保留成如下格式:06-18 12:23 
+6、/api/intention/save  api/visit/save 返回 {code:0,message:"SUCCESS",data:} 类似这样接口成功返回时 Success 改成:XXXX操作成功，例如：保存意向记录成功 之类有明确指向的内容的； 
+
+
+
 ### 问题修改反馈
 
 1、已修改全部models

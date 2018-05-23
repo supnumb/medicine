@@ -19,7 +19,8 @@ const lib = [
     'rsuite-schema',
     'react-bootstrap-typeahead',
     'prop-types',
-    'rsuite'
+    'rsuite',
+    'rsuite-utils'
 ];
 
 module.exports = {
