@@ -12,7 +12,6 @@
  */
 
 const moment = require('moment');
-const eventproxy = require('eventproxy');
 
 const { Order } = require('../models/index');
 
@@ -28,13 +27,6 @@ const { Order } = require('../models/index');
 exports.cash = (req, res, next) => {
 
     let { StartTime = '', EndTime = '', action } = req.body;
-
-    let ep = new eventproxy();
-
-    ep.fail(function(error) {
-        console.error(error);
-        return res.status(403).send({ code: -1, message: "系统错误", data: error });
-    });
 
     if (!StartTime && !EndTime) {
 
@@ -53,14 +45,14 @@ exports.cash = (req, res, next) => {
     Order.cash(StartTime, EndTime, function(err, mem) {
 
         if (err) {
-            return ep.emit('error', "数据库操作错误");
+            return res.send({ code: 2, message: "数据库出错" });
         };
 
         if (action == 'export') {
 
         }
 
-        return res.status(200).send({ code: 0, data: mem });
+        return res.send({ code: 0, message: "收银统计操作成功！", data: mem });
 
     });
 }
@@ -77,18 +69,9 @@ exports.rate = (req, res, next) => {
 
     let { StartTime = '', EndTime = '', action } = req.body;
 
-    let ep = new eventproxy();
-
-    ep.fail(function(error) {
-        console.error(error);
-        return res.status(403).send({ code: -1, message: "系统错误", data: error });
-    });
-
     if (!StartTime && !EndTime) {
 
         const dt = new Date();
-
-        console.log(dt.getMonth());
 
         dt.setMonth(dt.getMonth() - 1);
 
@@ -100,14 +83,14 @@ exports.rate = (req, res, next) => {
     Order.rate(StartTime, EndTime, function(err, mem) {
 
         if (err) {
-            return ep.emit('error', "数据库操作错误");
+            return res.send({ code: 2, message: "数据库出错" });
         };
 
         if (action == 'export') {
 
         }
 
-        return res.status(200).send({ code: 0, data: mem });
+        return res.send({ code: 0, message: "销售员毛利率统计操作成功！", data: mem });
 
     });
 }
@@ -123,13 +106,6 @@ exports.rate = (req, res, next) => {
 exports.good = (req, res, next) => {
 
     let { StartTime = '', EndTime = '', action } = req.body;
-
-    let ep = new eventproxy();
-
-    ep.fail(function(error) {
-        console.error(error);
-        return res.status(403).send({ code: -1, message: "系统错误", data: error });
-    });
 
     if (!StartTime && !EndTime) {
 
@@ -147,14 +123,14 @@ exports.good = (req, res, next) => {
     Order.good(StartTime, EndTime, function(err, mem) {
 
         if (err) {
-            return ep.emit('error', "数据库操作错误");
+            return res.send({ code: 2, message: "数据库出错" });
         };
 
         if (action == 'export') {
 
         }
 
-        return res.status(200).send({ code: 0, data: mem });
+        return res.send({ code: 0, message: "销售统计操作成功！", data: mem });
 
     });
 }

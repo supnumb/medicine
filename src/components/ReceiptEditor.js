@@ -195,7 +195,11 @@ class ReceiptEditor extends React.Component {
             console.log(json);
 
             if (json.code == 0) {
+<<<<<<< Updated upstream
                 json.data.VendorName = json.data.Name;
+=======
+                json.data.VendorName=json.data.Name;
+>>>>>>> Stashed changes
                 this.setState({ receipt: json.data, values: json.data, receiptGoods: json.ReceiptGoodData });
             } else {
                 alert(json.message);
@@ -236,8 +240,11 @@ class ReceiptEditor extends React.Component {
             }
         } = this.props;
 
+<<<<<<< Updated upstream
         console.log({receipt});
 
+=======
+>>>>>>> Stashed changes
         if (receipt) {
             this.setState({values:receipt});
             this.loadReceiptDetailFromDB(receipt);
@@ -281,7 +288,11 @@ class ReceiptEditor extends React.Component {
     render() {
         let { receipt, values, errors, receiptGoods, employees, vendors, isShowGoodSelector, isFetching, message } = this.state;
 
+<<<<<<< Updated upstream
         // console.log({ values, receiptGoods, receipt });
+=======
+        console.log({ values, receiptGoods, receipt });
+>>>>>>> Stashed changes
 
         let loading = isFetching ? (<Icon icon='spinner' spin />) : ("");
 

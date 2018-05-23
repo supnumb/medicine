@@ -27,7 +27,7 @@ function Intention() {
         _intentionInfo: "select * from Intentions where ID=:ID;",
 
         //搜索(MemberID)
-        _search: "select * from Intentions where MemberID=:MemberID;",
+        _search: "select i.*,m.Name as OperatorName from Intentions i left join Members m on i.OperatorID=m.ID where i.MemberID=:MemberID order by i.UpdateTime desc;",
 
     };
 
@@ -185,7 +185,7 @@ Intention.prototype.search = function(MemberID, callback) {
         rows.forEach(function(element, index) {
 
             rows[index].CreateTime = moment(rows[index].CreateTime).format('YYYY-MM-DD');
-            rows[index].UpdateTime = moment(rows[index].UpdateTime).format('YYYY-MM-DD HH:mm:ss');
+            rows[index].UpdateTime = moment(rows[index].UpdateTime).format('MM-DD HH:mm');
 
         });
 

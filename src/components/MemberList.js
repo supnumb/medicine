@@ -136,7 +136,6 @@ if(data.code==0){
             <td style={{
                 "width": "60px"
             }}>{m.Name}</td>
-
             <td>{m.City}</td>
             <td>{m.MobilPhone}</td>
             <td>{m.IntentionGoods}</td>

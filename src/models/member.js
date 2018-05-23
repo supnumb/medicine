@@ -33,7 +33,7 @@ function Member() {
         _memberQuantity: "select count(m.ID) as Quantity from Members m  where m.Flag=:Flag and m.Status=1 and m.CreateTime>=:StartTime and m.CreateTime<=:EndTime and m.MobilPhone like :MobilPhone and concat(m.Name,m.Address) like :KeyWord;",
 
         //会员列表
-        _memberList: "select m.*,count(i.ID) as IntentionQuantity,count(v.ID) as VisitQuantity,count(o.ID) as OrderQuantity from Members m left join Intentions i on m.ID=i.MemberID left join Visits v on m.ID=v.MemberID left join Orders o on m.ID=o.MemberID where m.Flag=:Flag and m.Status=1 and m.CreateTime>=:StartTime and m.CreateTime<=:EndTime and m.MobilPhone like :MobilPhone and concat(m.Name,m.Address) like :KeyWord group by m.ID order by :OrderBy desc limit :Page,:Limit;",
+        _memberList: "select m.*,count(distinct i.ID) as IntentionQuantity,count(distinct v.ID) as VisitQuantity,count(distinct o.ID) as OrderQuantity from Members m left join Intentions i on m.ID=i.MemberID left join Visits v on m.ID=v.MemberID left join Orders o on m.ID=o.MemberID where m.Flag=:Flag and m.Status=1 and m.CreateTime>=:StartTime and m.CreateTime<=:EndTime and m.MobilPhone like :MobilPhone and concat(m.Name,m.Address) like :KeyWord group by m.ID order by m.UpdateTime desc limit :Page,:Limit;",
 
         //会员详情
         _memberInfo: "select * from Members where ID=:ID;",
@@ -180,7 +180,7 @@ Member.prototype.memberList = function(KeyWord, MobilPhone, Page, Limit, OrderBy
                 MobilPhone: `%${MobilPhone}%`,
                 Page,
                 Limit,
-                OrderBy: ` m.${OrderBy}`,
+                OrderBy: `m.${OrderBy}`,
                 StartTime,
                 EndTime,
             }, function(err, db) {

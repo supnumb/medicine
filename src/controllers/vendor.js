@@ -12,7 +12,6 @@
  */
 
 const moment = require('moment');
-const eventproxy = require('eventproxy');
 
 const { Vendor } = require('../models/index');
 
@@ -33,20 +32,13 @@ exports.addVendor = (req, res, next) => {
         ID,
         Name,
         Telephone,
-        Address,
+        Address = '',
         Contact,
         Remark = ''
     } = req.body;
 
-    let ep = new eventproxy();
-
-    ep.fail(function (error) {
-        console.error(error);
-        return res.status(403).send({ code: -1, message: "系统错误", data: error });
-    });
-
-    if (!Name || !Telephone || !Address || !Contact) {
-        return res.status(200).send({ code: 2, message: "Name|Telephone|Address|Contact参数不匹配！" });
+    if (!Name || !Telephone || !Contact) {
+        return res.send({ code: 2, message: "Name|Telephone|Contact参数不匹配！" });
     };
 
     const vendorData = {
@@ -62,10 +54,10 @@ exports.addVendor = (req, res, next) => {
         Vendor.update(vendorData, function (err, mem) {
 
             if (err) {
-                return ep.emit('error', "数据库操作错误");
+                return res.send({ code: 2, message: "数据库出错" });
             };
 
-            return res.status(200).send({ code: 0, data: mem });
+            return res.status(200).send({ code: 0, message: "修改供货商操作成功！", data: mem });
 
         });
 
@@ -74,10 +66,10 @@ exports.addVendor = (req, res, next) => {
         Vendor.add(vendorData, function (err, mem) {
 
             if (err) {
-                return ep.emit('error', "数据库操作错误");
+                return res.send({ code: 2, message: "数据库出错" });
             };
 
-            return res.status(200).send({ code: 0, message: "success", data: mem });
+            return res.status(200).send({ code: 0, message: "添加供货商操作成功！", data: mem });
 
         });
     }
@@ -95,13 +87,6 @@ exports.deleteVendor = (req, res, next) => {
 
     let { ID } = req.body;
 
-    let ep = new eventproxy();
-
-    ep.fail(function (error) {
-        console.error(error);
-        return res.status(403).send({ code: -1, message: "系统错误", data: error });
-    });
-
     if (!ID) {
         return res.status(200).send({ code: 2, message: "ID参数不匹配！" });
     };
@@ -109,14 +94,14 @@ exports.deleteVendor = (req, res, next) => {
     Vendor.delete(ID, function (err, mem) {
 
         if (err) {
-            return ep.emit('error', "数据库操作错误");
+            return res.send({ code: 2, message: "数据库出错" });
         };
 
         if (mem.affectedRows == 0) {
             return res.status(200).send({ code: 2, message: "未找到对应信息！" });
         }
 
-        return res.status(200).send({ code: 0, message: "success", data: mem });
+        return res.status(200).send({ code: 0, message: "删除供货商操作成功！", data: mem });
 
     });
 }
@@ -140,13 +125,6 @@ exports.vendorList = (req, res, next) => {
         Limit = 10
     } = req.body;
 
-    let ep = new eventproxy();
-
-    ep.fail(function (error) {
-        console.error(error);
-        return res.status(403).send({ code: -1, message: "系统错误", data: error });
-    });
-
     if (Page > 0) {
         Page = (Page - 1) * Limit;
     }
@@ -154,12 +132,12 @@ exports.vendorList = (req, res, next) => {
     Vendor.vendorList(KeyWord, Page, Limit, function (err, mem) {
 
         if (err) {
-            return ep.emit('error', "数据库操作错误");
+            return res.send({ code: 2, message: "数据库出错" });
         };
 
         const { Quantity, rows } = mem;
 
-        return res.status(200).send({ code: 0, message: 'success', Quantity, data: rows });
+        return res.send({ code: 0, message: '查询供货商列表操作成功', Quantity, data: rows });
     });
 }
 
@@ -176,13 +154,6 @@ exports.vendorInfo = (req, res, next) => {
         VendorID = ''
     } = req.params;
 
-    let ep = new eventproxy();
-
-    ep.fail(function (error) {
-        console.error(error);
-        return res.status(403).send({ code: -1, message: "系统错误", data: error });
-    });
-
     if (!VendorID) {
         return res.status(200).send({ code: 2, message: "ID参数不匹配！" });
     };
@@ -190,10 +161,10 @@ exports.vendorInfo = (req, res, next) => {
     Vendor.vendorInfo(VendorID, function (err, mem) {
 
         if (err) {
-            return ep.emit('error', "数据库操作错误");
+            return res.send({ code: 2, message: "数据库出错" });
         };
 
-        return res.status(200).send({ code: 0, data: mem });
+        return res.send({ code: 0, message: "查询供货商详情操作成功！", data: mem });
 
     });
 }

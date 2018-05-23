@@ -27,7 +27,7 @@ function Visit() {
         _visitInfo: "select * from Visits where ID=:ID;",
 
         //搜索(MemberID)
-        _search: "select * from Visits where MemberID=:MemberID and Status=1;",
+        _search: "select v.*,m.Name as OperatorName from Visits v left join Members m on v.OperatorID=m.ID where v.MemberID=:MemberID and v.Status=1 order by v.UpdateTime desc;",
 
     };
 
@@ -183,7 +183,7 @@ Visit.prototype.search = function(MemberID, callback) {
         rows.forEach(function(element, index) {
 
             rows[index].CreateTime = moment(rows[index].CreateTime).format('YYYY-MM-DD');
-            rows[index].UpdateTime = moment(rows[index].UpdateTime).format('YYYY-MM-DD HH:mm:ss');
+            rows[index].UpdateTime = moment(rows[index].UpdateTime).format('MM-DD HH:mm');
 
         });
 

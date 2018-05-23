@@ -13,7 +13,6 @@
  */
 
 const moment = require('moment');
-const eventproxy = require('eventproxy');
 
 const { Receipt, ReceiptTran } = require('../models/index');
 
@@ -31,13 +30,6 @@ exports.add = (req, res, next) => {
 
     let { VendorName, VendorID, Date, ReceiptGoods } = req.body;
 
-    let ep = new eventproxy();
-
-    ep.fail(function(error) {
-        console.error(error);
-        return res.status(403).send({ code: -1, message: "系统错误", data: error });
-    });
-
     if (!VendorName || !VendorID || !Date || ReceiptGoods.length == 0) {
         return res.status(200).send({ code: 2, message: "VendorName|VendorID|Date|ReceiptGoods参数不匹配！" });
     };
@@ -53,10 +45,10 @@ exports.add = (req, res, next) => {
         }
 
         if (err) {
-            return ep.emit('error', "数据库操作错误");
+            return res.send({ code: 2, message: "数据库出错" });
         };
 
-        return res.status(200).send({ code: 0, message: "success", data: mem });
+        return res.status(200).send({ code: 0, message: "添加入库单操作成功！", data: mem });
 
     });
 }
@@ -76,15 +68,7 @@ exports.cancel = (req, res, next) => {
 
     let { ID = '', VendorName, VendorID, Date, ReceiptGoods } = req.body;
 
-    let ep = new eventproxy();
-
-    ep.fail(function(error) {
-        console.error(error);
-        return res.status(403).send({ code: -1, message: "系统错误", data: error });
-    });
-
     if (!ID || !VendorName || !VendorID || ReceiptGoods.length == 0) {
-        res.status(422);
         return res.status(200).send({ code: 2, message: "订单ID|VendorName|VendorID|ReceiptGoods参数不匹配！" });
     };
 
@@ -95,14 +79,14 @@ exports.cancel = (req, res, next) => {
     ReceiptTran.cancel(ReceiptData, function(err, mem) {
 
         if (err && err.message) {
-            return res.status(200).send({ code: 2, message: err.message });
+            return res.send({ code: 2, message: err.message });
         }
 
         if (err) {
-            return ep.emit('error', "数据库操作错误");
+            return res.send({ code: 2, message: "数据库出错" });
         };
 
-        return res.status(200).send({ code: 0, data: mem });
+        return res.send({ code: 0, message: "返回入库单操作成功！", data: mem });
 
     });
 
@@ -123,13 +107,6 @@ exports.receiptList = (req, res, next) => {
 
     let { KeyWord = '', Page = 0, Limit = 10, StartTime = '2018-01-01', EndTime = '' } = req.body;
 
-    let ep = new eventproxy();
-
-    ep.fail(function(error) {
-        console.error(error);
-        return res.status(403).send({ code: -1, message: "系统错误", data: error });
-    });
-
     if (Page > 0) {
         Page = (Page - 1) * Limit;
     }
@@ -141,12 +118,14 @@ exports.receiptList = (req, res, next) => {
     Receipt.search(KeyWord, Page, Limit, StartTime, EndTime, function(err, mem) {
 
         if (err) {
-            return ep.emit('error', "数据库操作错误");
+            return res.send({ code: 2, message: "数据库出错" });
         };
 
         const { Quantity, rows } = mem;
 
-        return res.status(200).send({ code: 0, message: 'success', Quantity, data: rows });
+        console.log(mem);
+
+        return res.send({ code: 0, message: '查询入库单列表操作成功！', Quantity, data: rows });
 
     });
 }
@@ -162,13 +141,6 @@ exports.receiptInfo = (req, res, next) => {
 
     let { ID } = req.body;
 
-    let ep = new eventproxy();
-
-    ep.fail(function(error) {
-        console.error(error);
-        return res.status(403).send({ code: -1, message: "系统错误", data: error });
-    });
-
     if (!ID) {
         return res.status(200).send({ code: 2, message: "订单ID参数不匹配!" });
     };
@@ -176,13 +148,12 @@ exports.receiptInfo = (req, res, next) => {
     Receipt.receiptInfo(ID, function(err, mem) {
 
         if (err) {
-            ep.emit('error', "数据库操作错误");
-            return res.status(200).send({ code: 2, message: "数据库操作错误！" });
+            return res.send({ code: 2, message: "数据库操作错误！" });
         };
 
         const { data, ReceiptGood } = mem;
 
-        return res.status(200).send({ code: 0, data: data[0], ReceiptGoodData: ReceiptGood });
+        return res.send({ code: 0, message: "查询入库单详情操作成功！", data: data[0], ReceiptGoodData: ReceiptGood });
 
     });
 }
@@ -199,13 +170,6 @@ exports.settle = (req, res, next) => {
 
     let { ID } = req.body;
 
-    let ep = new eventproxy();
-
-    ep.fail(function(error) {
-        console.error(error);
-        return res.status(403).send({ code: -1, message: "系统错误", data: error });
-    });
-
     if (!ID) {
         return res.status(200).send({ code: 2, message: "入库单ID参数不匹配!" });
     };
@@ -213,10 +177,10 @@ exports.settle = (req, res, next) => {
     Receipt.settle(ID, function(err, mem) {
 
         if (err) {
-            return ep.emit('error', "数据库操作错误");
+            return res.send({ code: 2, message: "数据库出错" });
         };
 
-        return res.status(200).send({ code: 0, message: "success", data: mem });
+        return res.send({ code: 0, message: "入库单结算操作成功！", data: mem });
 
     });
 }

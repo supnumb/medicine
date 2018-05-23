@@ -88,7 +88,7 @@ describe("#供应商数据模块测试", function () {
     })
 
     it("##07.05 查询供应商（按名称）,返回数据：供应商基本信息，Code=0", function (done) {
-        let KeyWord = "辉";
+        let KeyWord = "135";
         let Page = 0,
             Limit = 10;
 
@@ -97,7 +97,6 @@ describe("#供应商数据模块测试", function () {
                 return done(err);
             }
 
-            console.log(res.text);
             res.text.should.containEql(KeyWord);
 
             res.text.should.containEql("0");
