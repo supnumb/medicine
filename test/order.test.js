@@ -19,7 +19,6 @@ describe("#药品基础数据模块测试", function() {
 
     it("##009 雇员保存销售单 应该返回成功，Code=0", function(done) {
         let orderData = {
-            "Date": "2018-05-16",
             "DeliveryCode": "",
             "DeliveryCompany": "",
             "DeliveryFee": "",
@@ -34,7 +33,7 @@ describe("#药品基础数据模块测试", function() {
             "Employee": { "ID": 90, "Name": "张三", "PinYin": "", "Telephone": "", "Password": "$2a$10$Onjws2toeoL4x.HbDt3Rsut4pz6xERoYP.nKp0pqbIOkGVZ.dmu3S", "City": "", "Gender": "男", "Address": "", "label": "", "Remark": "", "MobilPhone": "11111111111", "WeiXinCode": "", "IsWeixinFriend": 0, "FriendName": "", "BirthYear": "", "Diseases": "", "RelationWithPatient": "", "Status": 1, "Flag": 1, "CreateTime": "2018-05-17 17:10:51", "UpdateTime": "2018-05-17 17:13:56" },
             "ReceiptAmount": 20,
             "TotalAmount": 20,
-            "Goods": [{ "ID": 20, "Name": "感冒灵颗粒111", "PinYin": "ganmaoling", "OfficalName": "感冒药", "Dimension": "10包/盒", "FormOfDrug": "20g/包", "Unit": "包", "DefaultCostPrice": 15, "DefaultPrice": 20, "LimitPrice": 18, "BidPrice": 15, "Manufacturer": "哈药六厂", "Competion": "无", "Medicare": "有", "PeriodTreatment": "3", "Translation": "感冒", "UseWay": "每次一包，一日三次", "Remark": "", "IsForeign": 0, "ApprovalNumber": "123123", "Status": 1, "Flag": 0, "CreateTime": "2018-05-06 00:00:00", "UpdateTime": "2018-05-08 16:12:27", "TotalQuantity": 0, "ValiableQuantity": 0, "SaledQuantity": 0, "GoodID": 20, "Quantity": 1, "FinalPrice": 20, "GoodSumPrice": 20 }, { "ID": 21, "Name": "感冒灵颗粒111", "PinYin": "ganmaoling", "OfficalName": "感冒药", "Dimension": "10包/盒", "FormOfDrug": "20g/包", "Unit": "包", "DefaultCostPrice": 15, "DefaultPrice": 20, "LimitPrice": 18, "BidPrice": 15, "Manufacturer": "哈药六厂", "Competion": "无", "Medicare": "有", "PeriodTreatment": "3", "Translation": "感冒", "UseWay": "每次一包，一日三次", "Remark": "", "IsForeign": 0, "ApprovalNumber": "123123", "Status": 1, "Flag": 0, "CreateTime": "2018-05-08 00:00:00", "UpdateTime": "2018-05-08 16:12:29", "TotalQuantity": 0, "ValiableQuantity": 0, "SaledQuantity": 0, "GoodID": 21, "Quantity": 1, "FinalPrice": 20, "GoodSumPrice": 20 }]
+            "Goods": [{ "ID": 20, "Name": "感冒灵颗粒111", "PinYin": "ganmaoling", "OfficalName": "感冒药", "Dimension": "10包/盒", "FormOfDrug": "20g/包", "Unit": "包", "DefaultCostPrice": 15, "DefaultPrice": 20, "LimitPrice": 18, "BidPrice": 15, "Manufacturer": "哈药六厂", "Competion": "无", "Medicare": "有", "PeriodTreatment": "3", "Translation": "感冒", "UseWay": "每次一包，一日三次", "Remark": "", "IsForeign": 0, "ApprovalNumber": "123123", "Status": 1, "Flag": 0, "CreateTime": "2018-05-06 00:00:00", "UpdateTime": "2018-05-08 16:12:27", "TotalQuantity": 1, "ValiableQuantity": 1, "SaledQuantity": 0, "GoodID": 20, "Quantity": 1, "FinalPrice": 20, "GoodSumPrice": 20 }, { "ID": 21, "Name": "感冒灵颗粒111", "PinYin": "ganmaoling", "OfficalName": "感冒药", "Dimension": "10包/盒", "FormOfDrug": "20g/包", "Unit": "包", "DefaultCostPrice": 15, "DefaultPrice": 20, "LimitPrice": 18, "BidPrice": 15, "Manufacturer": "哈药六厂", "Competion": "无", "Medicare": "有", "PeriodTreatment": "3", "Translation": "感冒", "UseWay": "每次一包，一日三次", "Remark": "", "IsForeign": 0, "ApprovalNumber": "123123", "Status": 1, "Flag": 0, "CreateTime": "2018-05-08 00:00:00", "UpdateTime": "2018-05-08 16:12:29", "TotalQuantity": 0, "ValiableQuantity": 0, "SaledQuantity": 0, "GoodID": 21, "Quantity": 1, "FinalPrice": 20, "GoodSumPrice": 20 }]
         }
 
         agent.post('/api/order/submit').send(orderData).expect(200).end(function(err, res) {
@@ -46,7 +45,7 @@ describe("#药品基础数据模块测试", function() {
 
             //ID = res.body.data.ID;
 
-            res.text.should.containEql(2);
+            res.text.should.containEql(0);
             done();
         });
     })
@@ -69,7 +68,6 @@ describe("#药品基础数据模块测试", function() {
             DeliverCode: '',
             DeliverReceiptFee: '',
             Remark: '',
-            Date: '2018-04-30',
             Goods: [{
                 GoodID: 1,
                 GoodName: '感冒药',

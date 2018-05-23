@@ -47,7 +47,7 @@ exports.stockList = (req, res, next) => {
 
         const { Quantity, rows } = mem;
 
-        return res.status(200).send({ code: 0, message: "success", Quantity, data: rows });
+        return res.status(200).send({ code: 0, message: "查询库存列表操作成功！", Quantity, data: rows });
 
     });
 }
@@ -78,7 +78,7 @@ exports.revision = (req, res, next) => {
         };
 
 
-        return res.send({ code: 0, data: mem });
+        return res.send({ code: 0, message: "库存调整操作成功！", data: mem });
 
     });
 }

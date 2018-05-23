@@ -52,7 +52,7 @@ exports.cash = (req, res, next) => {
 
         }
 
-        return res.send({ code: 0, data: mem });
+        return res.send({ code: 0, message: "收银统计操作成功！", data: mem });
 
     });
 }
@@ -90,7 +90,7 @@ exports.rate = (req, res, next) => {
 
         }
 
-        return res.send({ code: 0, data: mem });
+        return res.send({ code: 0, message: "销售员毛利率统计操作成功！", data: mem });
 
     });
 }
@@ -130,7 +130,7 @@ exports.good = (req, res, next) => {
 
         }
 
-        return res.send({ code: 0, data: mem });
+        return res.send({ code: 0, message: "销售统计操作成功！", data: mem });
 
     });
 }

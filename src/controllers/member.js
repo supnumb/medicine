@@ -160,7 +160,7 @@ exports.save = (req, res, next) => {
                 return res.status(200).send({ code: 2, message: "未找到对应信息！", data: mem });
             }
 
-            return res.status(200).send({ code: 0, message: "success", data: mem });
+            return res.status(200).send({ code: 0, message: "修改会员信息操作成功！", data: mem });
 
         });
 
@@ -172,7 +172,7 @@ exports.save = (req, res, next) => {
                 return res.send({ code: 2, message: "数据库出错" });
             };
 
-            return res.status(200).send({ code: 0, message: "success", data: mem });
+            return res.status(200).send({ code: 0, message: "添加会员信息操作成功！", data: mem });
 
         });
 
@@ -201,7 +201,7 @@ exports.deleteMember = (req, res, next) => {
             return res.send({ code: 2, message: "数据库出错" });
         };
 
-        return res.status(200).send({ code: 0, message: "success", data: mem });
+        return res.status(200).send({ code: 0, message: "删除会员信息操作成功！", data: mem });
 
     });
 }
@@ -219,7 +219,7 @@ exports.deleteMember = (req, res, next) => {
  */
 exports.memberList = (req, res, next) => {
 
-    let { KeyWord = '', MobilPhone = '', Page = 0, Limit = 10, OrderBy = 'ID', StartTime = '2018-01-01', EndTime = '' } = req.body;
+    let { KeyWord = '', MobilPhone = '', Page = 0, Limit = 10, OrderBy = 'UpdateTime', StartTime = '2018-01-01', EndTime = '' } = req.body;
 
     if (Page > 0) {
         Page = (Page - 1) * Limit;
@@ -241,9 +241,11 @@ exports.memberList = (req, res, next) => {
             return res.send({ code: 2, message: "数据库出错" });
         };
 
-        const { Quantity, rows } = mem
+        const { Quantity, rows } = mem;
 
-        return res.status(200).send({ code: 0, message: "success", Quantity, data: rows });
+        console.log(mem);
+
+        return res.status(200).send({ code: 0, message: "查询会员列表操作成功！", Quantity, data: rows });
 
     });
 }
@@ -333,7 +335,11 @@ exports.memberInfo = (req, res, next) => {
             return res.status(200).send({ code: 2, message: "未找到对应信息！" });
         }
 
-        return res.status(200).send({ code: 0, message: "success", data: result[0], intentionData: result[1], visitData: result[2], orderData: result[3] });
+
+        console.log(result[1]);
+        console.log(result[2]);
+
+        return res.status(200).send({ code: 0, message: "查询会员详情操作成功！", data: result[0], intentionData: result[1], visitData: result[2], orderData: result[3] });
     });
 
 }
@@ -365,7 +371,7 @@ exports.addVisit = (req, res, next) => {
             return res.send({ code: 2, message: "数据库出错" });
         };
 
-        return res.status(200).send({ code: 0, message: "success", data: mem });
+        return res.status(200).send({ code: 0, message: "添加回访记录操作成功！", data: mem });
 
     });
 }
@@ -399,7 +405,7 @@ exports.visitList = (req, res, next) => {
 
         const { Quantity, rows } = mem;
 
-        return res.send({ code: 0, message: "success", Quantity, data: rows });
+        return res.send({ code: 0, message: "查询回访记录列表操作成功！", Quantity, data: rows });
 
     });
 }
@@ -430,7 +436,7 @@ exports.addIntention = (req, res, next) => {
             return res.send({ code: 2, message: "数据库出错" });
         };
 
-        return res.status(200).send({ code: 0, message: "success", data: mem });
+        return res.status(200).send({ code: 0, message: "意向记录添加操作成功！", data: mem });
 
     });
 }
@@ -462,7 +468,7 @@ exports.updateIntention = (req, res, next) => {
             return res.send({ code: 2, message: "数据库出错" });
         };
 
-        return res.send({ code: 0, message: "success", data: mem });
+        return res.send({ code: 0, message: "意向记录修改操作成功！", data: mem });
 
     });
 }
@@ -496,7 +502,7 @@ exports.intentionList = (req, res, next) => {
 
         const { Quantity, rows } = mem;
 
-        return res.status(200).send({ code: 0, message: "success", Quantity, data: rows });
+        return res.status(200).send({ code: 0, message: "查询意向记录列表操作成功！", Quantity, data: rows });
 
     });
 }

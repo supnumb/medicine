@@ -84,13 +84,11 @@ describe("# 进货单模块单元测试", function() {
         });
     })
 
-    it("###024 按药品名称、供应商名称查询入库单，应该返回：Code=0", function(done) {
-        agent.post(`/api/receipt/search`).send({ KeyWord: "感冒灵" }).expect(200).end(function(err, res) {
+    it.only("###024 按药品名称、供应商名称查询入库单，应该返回：Code=0", function(done) {
+        agent.post(`/api/receipt/search`).send({ KeyWord: "" }).expect(200).end(function(err, res) {
             if (err) {
                 return done(err);
             }
-
-            console.log(JSON.parse(res.text));
 
             res.text.should.containEql(0);
             done();

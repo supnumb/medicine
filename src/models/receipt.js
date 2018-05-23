@@ -13,7 +13,7 @@ function Receipt() {
         _receiptQuantity: "select count(r.ID) as Quantity from Receipts r,ReceiptGoods p,Goods g,Vendors v,Members m  where r.ID=p.ReceiptID and p.GoodID=g.ID and r.VendorID=v.ID and r.OperatorID=m.ID and r.Date>=:StartTime and r.Date<=:EndTime and concat(r.ID,g.Name) like :KeyWord;",
 
         //列表
-        _search: "select r.*,m.name as EmployeeName,g.Name,p.Amount,p.CostPrice,v.Contact,v.Telephone,v.Address from Receipts r,ReceiptGoods p,Goods g,Vendors v,Members m  where r.ID=p.ReceiptID and p.GoodID=g.ID and r.VendorID=v.ID and r.OperatorID=m.ID and r.Date>=:StartTime and r.Date<=:EndTime and concat(r.ID,g.Name) like :KeyWord group by r.ID order by r.Date desc limit :Page,:Limit;",
+        _search: "select r.*,m.name as EmployeeName,group_concat(g.Name) as Goods,p.Amount,p.CostPrice,v.Contact,v.Telephone,v.Address from Receipts r,ReceiptGoods p,Goods g,Vendors v,Members m  where r.ID=p.ReceiptID and p.GoodID=g.ID and r.VendorID=v.ID and r.OperatorID=m.ID and r.Date>=:StartTime and r.Date<=:EndTime and concat(r.ID,g.Name) like :KeyWord group by r.ID order by r.Date desc limit :Page,:Limit;",
 
         //详情
         _ReceiptInfo: "select r.*,v.Name,v.Telephone,v.Address,v.Contact,v.Remark from Receipts r left join Vendors v on r.VendorID=v.ID left join Members m on r.OperatorID=m.ID where r.ID=:ID;",

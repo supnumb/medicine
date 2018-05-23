@@ -101,7 +101,7 @@ describe("#会员模块测试", function() {
 
     it("##006 会员列表，按时间倒序列出，返回数据里包含：电话、姓名、意向单内容、回访记录数量，成单数量", function(done) {
 
-        agent.post('/api/member/search').send({ OrderBy: "ID" }).expect(200).end(function(err, res) {
+        agent.post('/api/member/search').send({ OrderBy: "UpdateTime" }).expect(200).end(function(err, res) {
             if (err) {
                 return done(err);
             }
@@ -152,6 +152,7 @@ describe("#会员模块测试", function() {
 
     it("##002 得到指定的会员详细信息(数据存在)，应该返回Code=0;详细信息有：会员基本信息、回访记录、意向记录、成单记录", function(done) {
 
+        MemberID = 84;
         agent.post(`/api/member/${MemberID}`).expect(200).end(function(err, res) {
             if (err) {
                 return done(err);

@@ -41,13 +41,13 @@ const { Order, OrderTran } = require('../models/index');
  */
 exports.edit = (req, res, next) => {
 
-    let { ID, MemberID, OperatorID = 1, EmployeeID, Address, Connact, Telephone, TotalAmount, ReceiptAmount, PayStyle, DeliveryCompany = '', DeliveryFee = '', DeliverCode = '', DeliverReceiptFee = '', Remark = '', Date = new Date(), Goods } = req.body;
+    let { ID, MemberID, OperatorID = 1, EmployeeID, Address, Connact, Telephone, TotalAmount, ReceiptAmount, PayStyle, DeliveryCompany = '', DeliveryFee = '', DeliverCode = '', DeliverReceiptFee = '', Remark = '', Goods } = req.body;
 
     if (!MemberID || !EmployeeID || !Address || !Connact || !Telephone || !TotalAmount || !ReceiptAmount || !PayStyle || Goods.length == 0) {
         return res.send({ code: 2, message: "参数不完整" });
     };
 
-    const orderData = { ID, MemberID, EmployeeID, OperatorID, Address, Connact, Telephone, TotalAmount, ReceiptAmount, PayStyle, DeliveryCompany, DeliveryFee, DeliverCode, DeliverReceiptFee, Remark, Date, Goods };
+    const orderData = { ID, MemberID, EmployeeID, OperatorID, Address, Connact, Telephone, TotalAmount, ReceiptAmount, PayStyle, DeliveryCompany, DeliveryFee, DeliverCode, DeliverReceiptFee, Remark, Date: new Date(), Goods };
 
     OrderTran.edit(orderData, function(err, mem) {
 
@@ -61,7 +61,7 @@ exports.edit = (req, res, next) => {
 
 
 
-        return res.send({ code: 0, message: "success", data: { ID: mem.insertId } });
+        return res.send({ code: 0, message: "编辑销售订单操作成功！", data: { ID: mem.insertId } });
 
     });
 }
@@ -88,7 +88,11 @@ exports.cancel = (req, res, next) => {
             return res.send({ code: 2, message: "数据库出错" });
         };
 
-        return res.status(200).send({ code: 0, data: mem });
+        return res.status(200).send({
+            code: 0,
+            message: "退回销售订单操作成功！",
+            data: mem
+        });
 
     });
 
@@ -125,7 +129,7 @@ exports.orderList = (req, res, next) => {
 
         let { Quantity, rows } = mem;
 
-        return res.send({ code: 0, Quantity, data: rows });
+        return res.send({ code: 0, message: "查询订单列表操作成功！", Quantity, data: rows });
 
     });
 }
@@ -154,7 +158,7 @@ exports.orderInfo = (req, res, next) => {
 
         const { rows, goods } = mem;
 
-        return res.status(200).send({ code: 0, data: rows[0], goodsData: goods });
+        return res.send({ code: 0, message: "查询订单详情操作成功！", data: rows[0], goodsData: goods });
 
     });
 }

@@ -48,7 +48,7 @@ exports.add = (req, res, next) => {
             return res.send({ code: 2, message: "数据库出错" });
         };
 
-        return res.status(200).send({ code: 0, message: "success", data: mem });
+        return res.status(200).send({ code: 0, message: "添加入库单操作成功！", data: mem });
 
     });
 }
@@ -86,7 +86,7 @@ exports.cancel = (req, res, next) => {
             return res.send({ code: 2, message: "数据库出错" });
         };
 
-        return res.send({ code: 0, data: mem });
+        return res.send({ code: 0, message: "返回入库单操作成功！", data: mem });
 
     });
 
@@ -123,7 +123,9 @@ exports.receiptList = (req, res, next) => {
 
         const { Quantity, rows } = mem;
 
-        return res.send({ code: 0, message: 'success', Quantity, data: rows });
+        console.log(mem);
+
+        return res.send({ code: 0, message: '查询入库单列表操作成功！', Quantity, data: rows });
 
     });
 }
@@ -151,7 +153,7 @@ exports.receiptInfo = (req, res, next) => {
 
         const { data, ReceiptGood } = mem;
 
-        return res.send({ code: 0, data: data[0], ReceiptGoodData: ReceiptGood });
+        return res.send({ code: 0, message: "查询入库单详情操作成功！", data: data[0], ReceiptGoodData: ReceiptGood });
 
     });
 }
@@ -178,7 +180,7 @@ exports.settle = (req, res, next) => {
             return res.send({ code: 2, message: "数据库出错" });
         };
 
-        return res.send({ code: 0, message: "success", data: mem });
+        return res.send({ code: 0, message: "入库单结算操作成功！", data: mem });
 
     });
 }

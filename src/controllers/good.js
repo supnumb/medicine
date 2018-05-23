@@ -44,7 +44,6 @@ exports.addGood = (req, res, next) => {
     let { ID, Name, PinYin = '', OfficalName, Dimension, FormOfDrug, Unit, DefaultCostPrice, DefaultPrice, LimitPrice = 0, BidPrice = 0, Manufacturer, Competion, Medicare = '', PeriodTreatment, Translation, UseWay, Remark = '', IsForeign = 0, ApprovalNumber } = req.body;
 
     if (!Name || !OfficalName || !Dimension || !FormOfDrug || !Unit || !DefaultCostPrice || !DefaultPrice || !Manufacturer || !Competion || !PeriodTreatment || !Translation || !UseWay || !ApprovalNumber) {
-        res.status(422);
         return res.send({ code: 2, message: "参数不完整" });
     };
 
@@ -59,7 +58,7 @@ exports.addGood = (req, res, next) => {
                 return res.send({ code: 2, message: "数据库出错" });
             };
 
-            return res.status(200).send({ code: 0, data: mem });
+            return res.status(200).send({ code: 0, message: "修改药品操作成功！", data: mem });
 
         });
 
@@ -71,7 +70,7 @@ exports.addGood = (req, res, next) => {
                 return res.send({ code: 2, message: "数据库出错" });
             };
 
-            return res.status(200).send({ code: 0, message: "success", data: mem });
+            return res.status(200).send({ code: 0, message: "添加药品操作成功！", data: mem });
 
         });
 
@@ -104,7 +103,7 @@ exports.deleteGood = (req, res, next) => {
             return res.status(200).send({ code: 2, message: "未找到对应信息！" });
         }
 
-        return res.status(200).send({ code: 0, message: "success", data: mem });
+        return res.status(200).send({ code: 0, message: "删除药品操作成功！", data: mem });
 
     });
 }
@@ -151,7 +150,7 @@ exports.updateGood = (req, res, next) => {
             return res.send({ code: 2, message: "数据库出错" });
         };
 
-        return res.status(200).send({ code: 0, data: mem });
+        return res.status(200).send({ code: 0, message: "修改药品操作成功！", data: mem });
 
     });
 }
@@ -187,7 +186,7 @@ exports.goodList = (req, res, next) => {
 
         const { Quantity, rows } = mem;
 
-        return res.send({ code: 0, message: "success", Quantity, data: rows });
+        return res.send({ code: 0, message: "查询药品列表操作成功！", Quantity, data: rows });
 
     });
 }
@@ -213,7 +212,7 @@ exports.goodInfo = (req, res, next) => {
             return res.send({ code: 2, message: "数据库出错" });
         };
 
-        return res.status(200).send({ code: 0, data: mem });
+        return res.status(200).send({ code: 0, message: "查询药品详情操作成功！", data: mem });
 
     });
 }

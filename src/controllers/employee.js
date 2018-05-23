@@ -37,7 +37,7 @@ exports.search = (req, res, next) => {
             return res.send({ code: 2, message: "数据库出错" });
         };
 
-        return res.send({ code: 0, message: "success", data: mem });
+        return res.send({ code: 0, message: "查询雇员列表操作成功！", data: mem });
 
     });
 }
@@ -85,7 +85,7 @@ exports.addEmployee = (req, res, next) => {
             return res.send({ code: 2, message: "数据库出错" });
         };
 
-        return res.status(200).send({ code: 0, message: "success", data: mem });
+        return res.status(200).send({ code: 0, message: "添加雇员操作成功！", data: mem });
 
     });
 }
@@ -111,7 +111,7 @@ exports.profile = (req, res, next) => {
             return res.send({ code: 2, message: "数据库出错" });
         };
 
-        return res.status(200).send({ code: 0, message: "success", data: mem });
+        return res.status(200).send({ code: 0, message: "查看雇员详情操作成功！", data: mem });
 
     });
 
@@ -167,7 +167,7 @@ exports.alterpass = (req, res, next) => {
                                 return res.send({ code: 2, message: "数据库出错" });
                             }
 
-                            return res.status(200).send({ code: 0, message: "修改成功！" });
+                            return res.status(200).send({ code: 0, message: "雇员修改密码操作成功！" });
 
                         });
                     } else {
@@ -183,7 +183,7 @@ exports.alterpass = (req, res, next) => {
                         return res.send({ code: 2, message: "数据库出错" });
                     }
 
-                    return res.send({ code: 0, message: "修改成功！" });
+                    return res.send({ code: 0, message: "雇员修改密码操作成功！" });
 
                 });
             }
