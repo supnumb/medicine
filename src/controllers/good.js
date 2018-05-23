@@ -10,7 +10,6 @@
  */
 
 const moment = require('moment');
-const eventproxy = require('eventproxy');
 
 const { Good } = require('../models/index');
 
@@ -44,13 +43,6 @@ exports.addGood = (req, res, next) => {
 
     let { ID, Name, PinYin = '', OfficalName, Dimension, FormOfDrug, Unit, DefaultCostPrice, DefaultPrice, LimitPrice = 0, BidPrice = 0, Manufacturer, Competion, Medicare = '', PeriodTreatment, Translation, UseWay, Remark = '', IsForeign = 0, ApprovalNumber } = req.body;
 
-    let ep = new eventproxy();
-
-    ep.fail(function(error) {
-        console.error(error);
-        return res.status(403).send({ code: -1, message: "系统错误", data: error });
-    });
-
     if (!Name || !OfficalName || !Dimension || !FormOfDrug || !Unit || !DefaultCostPrice || !DefaultPrice || !Manufacturer || !Competion || !PeriodTreatment || !Translation || !UseWay || !ApprovalNumber) {
         res.status(422);
         return res.send({ code: 2, message: "参数不完整" });
@@ -64,7 +56,7 @@ exports.addGood = (req, res, next) => {
         Good.update(goodData, function(err, mem) {
 
             if (err) {
-                return ep.emit('error', "数据库操作错误");
+                return res.send({ code: 2, message: "数据库出错" });
             };
 
             return res.status(200).send({ code: 0, data: mem });
@@ -76,7 +68,7 @@ exports.addGood = (req, res, next) => {
         Good.add(goodData, function(err, mem) {
 
             if (err) {
-                return ep.emit('error', "数据库操作错误");
+                return res.send({ code: 2, message: "数据库出错" });
             };
 
             return res.status(200).send({ code: 0, message: "success", data: mem });
@@ -98,22 +90,14 @@ exports.deleteGood = (req, res, next) => {
 
     let { ID } = req.body;
 
-    let ep = new eventproxy();
-
-    ep.fail(function(error) {
-        console.error(error);
-        return res.status(403).send({ code: -1, message: "系统错误", data: error });
-    });
-
     if (!ID) {
-        res.status(422);
         return res.send({ code: 2, message: "药品Id参数不完整" });
     };
 
     Good.delete(ID, function(err, mem) {
 
         if (err) {
-            return ep.emit('error', "数据库操作错误");
+            return res.send({ code: 2, message: "数据库出错" });
         };
 
         if (mem.affectedRows == 0) {
@@ -155,15 +139,7 @@ exports.updateGood = (req, res, next) => {
 
     let { ID, Name, PinYin = '', OfficalName, Dimension, FormOfDrug, Unit, DefaultCostPrice, DefaultPrice, LimitPrice = 0, BidPrice = 0, Manufacturer, Competion, Medicare = '', PeriodTreatment, Translation, UseWay, Remark = '', IsForeign = 0, ApprovalNumber } = req.body;
 
-    let ep = new eventproxy();
-
-    ep.fail(function(error) {
-        console.error(error);
-        return res.status(403).send({ code: -1, message: "系统错误", data: error });
-    });
-
     if (!ID || !Name || !OfficalName || !Dimension || !FormOfDrug || !Unit || !DefaultCostPrice || !DefaultPrice || !Manufacturer || !Competion || !PeriodTreatment || !Translation || !UseWay || !ApprovalNumber) {
-        res.status(422);
         return res.send({ code: 2, message: "参数不完整" });
     };
 
@@ -172,7 +148,7 @@ exports.updateGood = (req, res, next) => {
     Good.update(goodData, function(err, mem) {
 
         if (err) {
-            return ep.emit('error', "数据库操作错误");
+            return res.send({ code: 2, message: "数据库出错" });
         };
 
         return res.status(200).send({ code: 0, data: mem });
@@ -195,13 +171,6 @@ exports.goodList = (req, res, next) => {
 
     let { KeyWord = '', Page = 0, Limit = 10, StartTime = '2018-01-01', EndTime = '' } = req.body;
 
-    let ep = new eventproxy();
-
-    ep.fail(function(error) {
-        console.error(error);
-        return res.status(403).send({ code: -1, message: "系统错误", data: error });
-    });
-
     if (Page > 0) {
         Page = (Page - 1) * Limit;
     }
@@ -213,12 +182,12 @@ exports.goodList = (req, res, next) => {
     Good.goodList(KeyWord, Page, Limit, StartTime, EndTime, function(err, mem) {
 
         if (err) {
-            return ep.emit('error', "数据库操作错误");
+            return res.send({ code: 2, message: "数据库出错" });
         };
 
         const { Quantity, rows } = mem;
 
-        return res.status(200).send({ code: 0, message: "success", Quantity, data: rows });
+        return res.send({ code: 0, message: "success", Quantity, data: rows });
 
     });
 }
@@ -234,22 +203,14 @@ exports.goodInfo = (req, res, next) => {
 
     let { GoodID = '' } = req.params;
 
-    let ep = new eventproxy();
-
-    ep.fail(function(error) {
-        console.error(error);
-        return res.status(403).send({ code: -1, message: "系统错误", data: error });
-    });
-
     if (!GoodID) {
-        res.status(422);
         return res.send({ code: 2, message: "参数不匹配" });
     };
 
     Good.goodInfo(GoodID, function(err, mem) {
 
         if (err) {
-            return ep.emit('error', "数据库操作错误");
+            return res.send({ code: 2, message: "数据库出错" });
         };
 
         return res.status(200).send({ code: 0, data: mem });

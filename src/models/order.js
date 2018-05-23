@@ -895,48 +895,7 @@ OrderTran.prototype.cancel = function(ID, callback) {
                 ReceiptGood_update += ` ELT (ID,${update_ReceiptQuantity}) where ID in (${update_ReceiptGoodID});`;
                 Stock_update += ` ELT (GoodID,${update_Stock_Valiable}),SaledQuantity= ELT (GoodID,${update_Stock_Saled}) where ID in (${update_Stock});`;
 
-
-                //入库单修改
-                //console.log("ReceiptGood_update", ReceiptGood_update);
-
-                //库存修改
-                //console.log("Stock_update", Stock_update);
-
-                async.parallel([
-
-                    function(cb) {
-
-                        tran.query(ReceiptGood_update, {}, function(err, db) {
-
-                            if (err) {
-                                return cb(err, null);
-                            }
-
-                            cb(null, db);
-
-                        });
-
-                    },
-
-                    function(cb) {
-
-                        tran.query(Stock_update, {}, function(err, db) {
-
-                            if (err) {
-                                return cb(err, null);
-                            }
-
-                            cb(null, db);
-
-                        });
-
-                    }
-
-                ], function(err, result) {
-
-                    if (err) {
-                        return callback(err, null);
-                    }
+                if (rows.length == 0) {
 
                     tran.commit(function(err) {
 
@@ -949,8 +908,65 @@ OrderTran.prototype.cancel = function(ID, callback) {
                         return callback(null, 1);
 
                     });
+                } else {
 
-                });
+                    async.parallel([
+
+                        function(cb) {
+
+                            tran.query(ReceiptGood_update, {}, function(err, db) {
+
+                                if (err) {
+                                    return cb(err, null);
+                                }
+
+                                cb(null, db);
+
+                            });
+
+                        },
+
+                        function(cb) {
+
+                            tran.query(Stock_update, {}, function(err, db) {
+
+                                if (err) {
+                                    return cb(err, null);
+                                }
+
+                                cb(null, db);
+
+                            });
+
+                        }
+
+                    ], function(err, result) {
+
+                        if (err) {
+                            return callback(err, null);
+                        }
+
+                        tran.commit(function(err) {
+
+                            if (err) {
+                                console.log("提交事务失败", err);
+                                tran.rollback();
+                                return callback(err, null);
+                            }
+
+                            return callback(null, 1);
+
+                        });
+
+                    });
+
+                }
+
+                //入库单修改
+                //console.log("ReceiptGood_update", ReceiptGood_update);
+
+                //库存修改
+                //console.log("Stock_update", Stock_update);
 
             });
 

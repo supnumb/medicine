@@ -17,7 +17,6 @@ const config = require('../../config');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const moment = require('moment');
-const eventproxy = require('eventproxy');
 
 const { Member } = require('../models/index');
 
@@ -32,21 +31,13 @@ exports.search = (req, res, next) => {
 
     const { KeyWord = '' } = req.body;
 
-    let ep = new eventproxy();
-
-    ep.fail(function(error) {
-        console.error(error);
-        return res.status(403).send({ code: -1, message: "系统错误", data: error });
-    });
-
     Member.employeeList(KeyWord, function(err, mem) {
 
         if (err) {
-            ep.emit('error', "数据库操作错误");
             return res.send({ code: 2, message: "数据库出错" });
         };
 
-        return res.status(200).send({ code: 0, message: "success", data: mem });
+        return res.send({ code: 0, message: "success", data: mem });
 
     });
 }
@@ -65,12 +56,12 @@ exports.addEmployee = (req, res, next) => {
 
     const { Name, MobilPhone, Password } = req.body;
 
-    let ep = new eventproxy();
+    // let ep = new eventproxy();
 
-    ep.fail(function(error) {
-        console.error(error);
-        return res.status(403).send({ code: -1, message: "系统错误", data: error });
-    });
+    // ep.fail(function(error) {
+    //     console.error(error);
+    //     return res.status(403).send({ code: -1, message: "系统错误", data: error });
+    // });
 
     if (!Name || !MobilPhone || !Password) {
         return res.send({ code: 2, message: "Name|MobilPhone|Password参数不完整" });
@@ -91,7 +82,7 @@ exports.addEmployee = (req, res, next) => {
     Member.addEmployee(memberData, function(err, mem) {
 
         if (err) {
-            return ep.emit('error', "数据库操作错误");
+            return res.send({ code: 2, message: "数据库出错" });
         };
 
         return res.status(200).send({ code: 0, message: "success", data: mem });
@@ -110,13 +101,6 @@ exports.profile = (req, res, next) => {
 
     let { MemberID = '' } = req.body;
 
-    let ep = new eventproxy();
-
-    ep.fail(function(error) {
-        console.error(error);
-        return res.status(403).send({ code: -1, message: "系统错误", data: error });
-    });
-
     if (!MemberID) {
         MemberID = req.session.user.ID;
     };
@@ -124,7 +108,7 @@ exports.profile = (req, res, next) => {
     Member.memberInfo(MemberID, function(err, mem) {
 
         if (err) {
-            return ep.emit('error', "数据库操作错误");
+            return res.send({ code: 2, message: "数据库出错" });
         };
 
         return res.status(200).send({ code: 0, message: "success", data: mem });
@@ -146,13 +130,6 @@ exports.alterpass = (req, res, next) => {
 
     const { MemberID, OldPass, NewPass } = req.body;
 
-    let ep = new eventproxy();
-
-    ep.fail(function(error) {
-        console.error(error);
-        return res.status(403).send({ code: -1, message: "系统错误", data: error });
-    });
-
     if (!MemberID && !OldPass) {
         return res.send({ code: 2, message: "雇员ID|原密码参数不完整" });
     }
@@ -169,7 +146,7 @@ exports.alterpass = (req, res, next) => {
 
     Member.checkByID(MemberID, function(err, mem) {
         if (err) {
-            return ep.emit('error', "数据库操作错误");
+            return res.send({ code: 2, message: "数据库出错" });
         };
 
         if (mem) {
@@ -179,8 +156,7 @@ exports.alterpass = (req, res, next) => {
                 bcrypt.compare(OldPass, mem.Password, function(err, result) {
 
                     if (err) {
-                        console.error(err);
-                        return ep.emit('error', err);
+                        return res.send({ code: 2, message: "数据库出错" });
                     }
 
                     if (result) {
@@ -188,15 +164,14 @@ exports.alterpass = (req, res, next) => {
                         Member.alterpass(MemberID, passhash, function(err, data) {
 
                             if (err) {
-                                console.error(err);
-                                return ep.emit('error', err);
+                                return res.send({ code: 2, message: "数据库出错" });
                             }
 
                             return res.status(200).send({ code: 0, message: "修改成功！" });
 
                         });
                     } else {
-                        return res.status(422).send({ code: 2, message: "原密码输入有误" });
+                        return res.send({ code: 2, message: "原密码输入有误" });
                     }
                 });
 
@@ -205,17 +180,16 @@ exports.alterpass = (req, res, next) => {
                 Member.alterpass(MemberID, passhash, function(err, data) {
 
                     if (err) {
-                        console.error(err);
-                        return ep.emit('error', err);
+                        return res.send({ code: 2, message: "数据库出错" });
                     }
 
-                    return res.status(200).send({ code: 0, message: "修改成功！" });
+                    return res.send({ code: 0, message: "修改成功！" });
 
                 });
             }
 
         } else {
-            return res.status(200).send({ code: 2, message: "未找到对应信息" });
+            return res.send({ code: 2, message: "未找到对应信息" });
         }
 
     });

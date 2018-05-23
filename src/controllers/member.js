@@ -21,7 +21,6 @@ const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const async = require('async');
 const moment = require('moment');
-const eventproxy = require('eventproxy');
 
 const { Member, Intention, Order, Visit } = require('../models/index');
 
@@ -46,40 +45,32 @@ exports.checkUser = (req, res, next) => {
 exports.signIn = (req, res, next) => {
     let { login_name, password } = req.body;
 
-    let ep = new eventproxy();
-    ep.fail(function(error) {
-        console.error(error);
-        return res.status(403).send({ code: -1, message: "系统错误", data: error });
-    });
-
     if (!login_name || !password) {
-        res.status(422);
         return res.send({ code: 2, message: "电话、密码参数不完整" });
     };
 
     Member.check(login_name, function(err, mem) {
         if (err) {
-            return ep.emit('error', "数据库操作错误");
+            return res.send({ code: 2, message: "数据库出错" });
         };
 
         if (mem) {
             bcrypt.compare(password, mem.Password, function(err, result) {
 
                 if (err) {
-                    console.error(err);
-                    ep.emit('error', err);
+                    return res.send({ code: 2, message: "密码比对出错" });
                 }
 
                 if (result) {
                     req.session.user = mem;
                     return res.send({ code: 0, message: "登录成功" });
                 } else {
-                    return res.status(422).send({ code: 2, message: "电话或密码不正确" });
+                    return res.send({ code: 2, message: "电话或密码不正确" });
                 }
             });
         } else {
 
-            return res.status(200).send({ code: 2, message: `${login_name}没有注册。` });
+            return res.send({ code: 2, message: `${login_name}没有注册。` });
         }
     });
 }
@@ -135,12 +126,6 @@ exports.save = (req, res, next) => {
         RelationWithPatient = ''
     } = req.body;
 
-    let ep = new eventproxy();
-
-    ep.fail(function(error) {
-        console.error(error);
-        return res.status(403).send({ code: -1, message: "系统错误", data: error });
-    });
 
     if (!Name || !City || !Gender || !MobilPhone) {
         return res.send({ code: 2, message: "Name|City|Gender|MobilPhone参数不完整" });
@@ -168,8 +153,7 @@ exports.save = (req, res, next) => {
         Member.updateMember(memberData, function(err, mem) {
 
             if (err) {
-                ep.emit('error', "数据库操作错误");
-                return res.status(200).send({ code: -1, message: "数据库连接失败！" });
+                return res.send({ code: -1, message: "数据库连接失败！" });
             };
 
             if (mem.affectedRows == 0) {
@@ -185,7 +169,7 @@ exports.save = (req, res, next) => {
         Member.addMember(memberData, function(err, mem) {
 
             if (err) {
-                return ep.emit('error', "数据库操作错误");
+                return res.send({ code: 2, message: "数据库出错" });
             };
 
             return res.status(200).send({ code: 0, message: "success", data: mem });
@@ -207,22 +191,14 @@ exports.deleteMember = (req, res, next) => {
 
     let { MemberID } = req.body;
 
-    let ep = new eventproxy();
-
-    ep.fail(function(error) {
-        console.error(error);
-        return res.status(403).send({ code: -1, message: "系统错误", data: error });
-    });
-
     if (!MemberID) {
-        res.status(422);
         return res.send({ code: 2, message: "会员Id参数不完整" });
     };
 
     Member.deleteMember(MemberID, function(err, mem) {
 
         if (err) {
-            return ep.emit('error', "数据库操作错误");
+            return res.send({ code: 2, message: "数据库出错" });
         };
 
         return res.status(200).send({ code: 0, message: "success", data: mem });
@@ -245,13 +221,6 @@ exports.memberList = (req, res, next) => {
 
     let { KeyWord = '', MobilPhone = '', Page = 0, Limit = 10, OrderBy = 'ID', StartTime = '2018-01-01', EndTime = '' } = req.body;
 
-    let ep = new eventproxy();
-
-    ep.fail(function(error) {
-        console.error(error);
-        return res.status(403).send({ code: -1, message: "系统错误", data: error });
-    });
-
     if (Page > 0) {
         Page = (Page - 1) * Limit;
     }
@@ -269,7 +238,7 @@ exports.memberList = (req, res, next) => {
     Member.memberList(KeyWord, MobilPhone, Page, Limit, OrderBy, StartTime, EndTime, function(err, mem) {
 
         if (err) {
-            return ep.emit('error', "数据库操作错误");
+            return res.send({ code: 2, message: "数据库出错" });
         };
 
         const { Quantity, rows } = mem
@@ -292,15 +261,7 @@ exports.memberInfo = (req, res, next) => {
         MemberID = ''
     } = req.params;
 
-    let ep = new eventproxy();
-
-    ep.fail(function(error) {
-        console.error(error);
-        return res.status(403).send({ code: -1, message: "系统错误", data: error });
-    });
-
     if (!MemberID) {
-        res.status(422);
         return res.send({ code: 2, message: "参数不匹配" });
     };
 
@@ -365,8 +326,7 @@ exports.memberInfo = (req, res, next) => {
     ], function(err, result) {
 
         if (err) {
-            ep.emit('error', "数据库操作错误");
-            return res.status(403).send({ code: -1, message: "系统错误", data: error });
+            return res.send({ code: -1, message: "系统错误", data: error });
         };
 
         if (!result[0]) {
@@ -390,13 +350,6 @@ exports.addVisit = (req, res, next) => {
 
     let { MemberID, Remarks } = req.body;
 
-    let ep = new eventproxy();
-
-    ep.fail(function(error) {
-        console.error(error);
-        return res.status(403).send({ code: -1, message: "系统错误", data: error });
-    });
-
     if (!MemberID || !Remarks) {
         res.status(422);
         return res.send({ code: 2, message: "参数不完整" });
@@ -409,7 +362,7 @@ exports.addVisit = (req, res, next) => {
     Visit.add(MemberID, OperatorID, Remarks, function(err, mem) {
 
         if (err) {
-            return ep.emit('error', "数据库操作错误");
+            return res.send({ code: 2, message: "数据库出错" });
         };
 
         return res.status(200).send({ code: 0, message: "success", data: mem });
@@ -430,13 +383,6 @@ exports.visitList = (req, res, next) => {
 
     let { KeyWord = '', Page = 0, Limit = 10, StartTime = '2018-01-01', EndTime = '' } = req.body;
 
-    let ep = new eventproxy();
-
-    ep.fail(function(error) {
-        console.error(error);
-        return res.status(403).send({ code: -1, message: "系统错误", data: error });
-    });
-
     if (Page > 0) {
         Page = (Page - 1) * Limit;
     }
@@ -448,12 +394,12 @@ exports.visitList = (req, res, next) => {
     Visit.visitList(KeyWord, Page, Limit, StartTime, EndTime, function(err, mem) {
 
         if (err) {
-            return ep.emit('error', "数据库操作错误");
+            return res.send({ code: 2, message: "数据库出错" });
         };
 
         const { Quantity, rows } = mem;
 
-        return res.status(200).send({ code: 0, message: "success", Quantity, data: rows });
+        return res.send({ code: 0, message: "success", Quantity, data: rows });
 
     });
 }
@@ -470,15 +416,7 @@ exports.addIntention = (req, res, next) => {
 
     let { MemberID, Goods } = req.body;
 
-    let ep = new eventproxy();
-
-    ep.fail(function(error) {
-        console.error(error);
-        return res.status(403).send({ code: -1, message: "系统错误", data: error });
-    });
-
     if (!MemberID || !Goods) {
-        res.status(422);
         return res.send({ code: 2, message: "会员Id、意向商品参数不完整" });
     };
 
@@ -489,7 +427,7 @@ exports.addIntention = (req, res, next) => {
     Intention.add(MemberID, OperatorID, Goods, function(err, mem) {
 
         if (err) {
-            return ep.emit('error', "数据库操作错误");
+            return res.send({ code: 2, message: "数据库出错" });
         };
 
         return res.status(200).send({ code: 0, message: "success", data: mem });
@@ -511,13 +449,6 @@ exports.updateIntention = (req, res, next) => {
 
     let { ID, Goods, Status = 5 } = req.body;
 
-    let ep = new eventproxy();
-
-    ep.fail(function(error) {
-        console.error(error);
-        return res.status(403).send({ code: -1, message: "系统错误", data: error });
-    });
-
     if (!ID || !Goods) {
         res.status(422);
         return res.send({ code: 2, message: "意向单Id、意向商品参数不完整" });
@@ -528,10 +459,10 @@ exports.updateIntention = (req, res, next) => {
     Intention.update(ID, OperatorID, Goods, Status, function(err, mem) {
 
         if (err) {
-            return ep.emit('error', "数据库操作错误");
+            return res.send({ code: 2, message: "数据库出错" });
         };
 
-        return res.status(200).send({ code: 0, message: "success", data: mem });
+        return res.send({ code: 0, message: "success", data: mem });
 
     });
 }
@@ -549,13 +480,6 @@ exports.intentionList = (req, res, next) => {
 
     let { KeyWord = '', Page = 0, Limit = 10, StartTime = '2018-01-01', EndTime = '' } = req.body;
 
-    let ep = new eventproxy();
-
-    ep.fail(function(error) {
-        console.error(error);
-        return res.status(403).send({ code: -1, message: "系统错误", data: error });
-    });
-
     if (Page > 0) {
         Page = (Page - 1) * Limit;
     }
@@ -567,8 +491,7 @@ exports.intentionList = (req, res, next) => {
     Intention.intentionList(KeyWord, Page, Limit, StartTime, EndTime, function(err, mem) {
 
         if (err) {
-            ep.emit('error', "数据库操作错误");
-            return res.status(200).send({ code: 2, message: "数据库操作错误" });
+            return res.send({ code: 2, message: "数据库操作错误" });
         };
 
         const { Quantity, rows } = mem;
