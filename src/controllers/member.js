@@ -50,20 +50,6 @@ exports.checkUser = (req, res, next) => {
 exports.signIn = (req, res, next) => {
     let { login_name, password } = req.body;
 
-<<<<<<< Updated upstream
-<<<<<<< HEAD
-=======
->>>>>>> Stashed changes
-    console.log({ login_name, password });
-
-    let ep = new eventproxy();
-    ep.fail(function (error) {
-        console.error(error);
-        return res.status(403).send({ code: -1, message: "系统错误", data: error });
-    });
-
-=======
->>>>>>> afccea332d9f42d6733c56292ac340e16ee6aee0
     if (!login_name || !password) {
         return res.send({ code: 2, message: "电话、密码参数不完整" });
     };
@@ -147,16 +133,6 @@ exports.save = (req, res, next) => {
         RelationWithPatient = ''
     } = req.body;
 
-<<<<<<< HEAD
-    let ep = new eventproxy();
-
-    ep.fail(function (error) {
-        console.error(error);
-        return res.status(403).send({ code: -1, message: "系统错误", data: error });
-    });
-=======
->>>>>>> afccea332d9f42d6733c56292ac340e16ee6aee0
-
     if (!Name || !City || !Gender || !MobilPhone) {
         return res.send({ code: 2, message: "Name|City|Gender|MobilPhone参数不完整" });
     };
@@ -221,16 +197,6 @@ exports.deleteMember = (req, res, next) => {
 
     let { MemberID } = req.body;
 
-<<<<<<< HEAD
-    let ep = new eventproxy();
-
-    ep.fail(function (error) {
-        console.error(error);
-        return res.status(403).send({ code: -1, message: "系统错误", data: error });
-    });
-
-=======
->>>>>>> afccea332d9f42d6733c56292ac340e16ee6aee0
     if (!MemberID) {
         return res.send({ code: 2, message: "会员Id参数不完整" });
     };
@@ -259,18 +225,7 @@ exports.deleteMember = (req, res, next) => {
  */
 exports.memberList = (req, res, next) => {
 
-<<<<<<< HEAD
-    let { KeyWord = '', MobilPhone = '', Page = 0, Limit = 10, OrderBy = 'ID', StartTime = '2018-01-01', EndTime = '' } = req.body;
-
-    let ep = new eventproxy();
-
-    ep.fail(function (error) {
-        console.error(error);
-        return res.status(403).send({ code: -1, message: "系统错误", data: error });
-    });
-=======
     let { KeyWord = '', MobilPhone = '', Page = 0, Limit = 10, OrderBy = 'UpdateTime', StartTime = '2018-01-01', EndTime = '' } = req.body;
->>>>>>> afccea332d9f42d6733c56292ac340e16ee6aee0
 
     if (Page > 0) {
         Page = (Page - 1) * Limit;
@@ -314,16 +269,6 @@ exports.memberInfo = (req, res, next) => {
         MemberID = ''
     } = req.params;
 
-<<<<<<< HEAD
-    let ep = new eventproxy();
-
-    ep.fail(function (error) {
-        console.error(error);
-        return res.status(403).send({ code: -1, message: "系统错误", data: error });
-    });
-
-=======
->>>>>>> afccea332d9f42d6733c56292ac340e16ee6aee0
     if (!MemberID) {
         return res.send({ code: 2, message: "参数不匹配" });
     };
@@ -417,15 +362,6 @@ exports.addVisit = (req, res, next) => {
 
     console.log(req.body);
 
-<<<<<<< Updated upstream
-    let { MemberID, Remarks } = req.body;
-=======
-    ep.fail(function (error) {
-        console.error(error);
-        return res.status(403).send({ code: -1, message: "系统错误", data: error });
-    });
->>>>>>> Stashed changes
-
     if (!MemberID || !Remarks) {
         res.status(422);
         return res.send({ code: 2, message: "参数不完整" });
@@ -459,16 +395,6 @@ exports.visitList = (req, res, next) => {
 
     let { KeyWord = '', Page = 0, Limit = 10, StartTime = '2018-01-01', EndTime = '' } = req.body;
 
-<<<<<<< Updated upstream
-=======
-    let ep = new eventproxy();
-
-    ep.fail(function (error) {
-        console.error(error);
-        return res.status(403).send({ code: -1, message: "系统错误", data: error });
-    });
-
->>>>>>> Stashed changes
     if (Page > 0) {
         Page = (Page - 1) * Limit;
     }
