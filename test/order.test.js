@@ -54,7 +54,7 @@ describe("#药品基础数据模块测试", function() {
 
         let orderData = {
             ID,
-            MemberID: 1,
+            MemberID: 85,
             EmployeeID: 50,
             OperatorID: 1,
             Address: '北京',
@@ -69,12 +69,12 @@ describe("#药品基础数据模块测试", function() {
             DeliverReceiptFee: '',
             Remark: '',
             Goods: [{
-                GoodID: 1,
+                GoodID: 20,
                 GoodName: '感冒药',
                 Quantity: 1,
                 FinalPrice: 10
             }, {
-                GoodID: 17,
+                GoodID: 21,
                 GoodName: '退烧药',
                 Quantity: 0,
                 FinalPrice: 6
@@ -93,7 +93,7 @@ describe("#药品基础数据模块测试", function() {
         });
     })
 
-    it("##010 雇员查询销售单列表(销售单列表+记录条数) 应该返回成功，Code=0", function(done) {
+    it.only("##010 雇员查询销售单列表(销售单列表+记录条数) 应该返回成功，Code=0", function(done) {
         let KeyWord = "";
         let Page = 0,
             Limit = 10;
