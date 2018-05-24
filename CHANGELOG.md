@@ -91,3 +91,11 @@
 9、修改进货商品详情数据返回。
 10、修改订单列表，增加用户名称返回。Name用户名，EmployeeName销售员名称，OperatorName操作员名称。
 11、修改销售订单Date问题，不传该字段也不会出错。
+
+
+### 2018-05-24
+1、修改退回入库单接口，/receipt/cancel--->/receipt/return。
+2、合并入库单添加、修改接口 /receipt/save。
+3、修改字段returnQuantity为ReturnQuantity。
+4、增加保存销售单时销售单ID返回。
+5、入库单是否已售不可修改，比对Quantity和ValiableQuantity两个字段，若ValiableQuantity<Quantity则该入库商品不可修改。
