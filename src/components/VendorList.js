@@ -95,6 +95,7 @@ class VendorList extends React.Component {
 
         let listJsx = vendors.map((v, index) => {
             return (<tr key={index}>
+                <td>{v.ID}</td>
                 <td>{v.Name}</td>
                 <td>{v.Telephone}</td>
                 <td>{v.Address}</td>
@@ -136,6 +137,7 @@ class VendorList extends React.Component {
                 <table className="table table-striped table-hover">
                     <thead>
                         <tr>
+                            <th>ID</th>
                             <th>供应商名</th>
                             <th>电话</th>
                             <th>地址</th>

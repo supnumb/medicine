@@ -26,16 +26,18 @@ const { Member, Intention, Order, Visit } = require('../models/index');
 
 exports.checkUser = (req, res, next) => {
 
-    let refer = req.originalUrl;
+    console.log("user",req.session.user);
 
-    if (/^\/api\//.test(refer)) {
-        if (req.session.user) {
-            next();
-        } else {
-            return res.status(422).send({ code: 99, message: "该操作需要您先进行登录！" });
-        }
+    if (req.session.user) {
+        next();
     } else {
-        res.redirect('/employee_signin/' + encodeURIComponent(refer));
+        let refer = req.originalUrl;
+        if (/^\/api\//.test(refer)) {
+            return res.status(422).send({ code: 99, message: "该操作需要您先进行登录！" });
+        } else {
+
+            res.redirect('/employee_signin/' + encodeURIComponent(refer));
+        }
     }
 }
 
@@ -249,7 +251,7 @@ exports.memberList = (req, res, next) => {
 
         const { Quantity, rows } = mem;
 
-        console.log(mem);
+        // console.log(mem);
 
         return res.status(200).send({ code: 0, message: "查询会员列表操作成功！", Quantity, data: rows });
 

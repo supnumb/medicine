@@ -20,11 +20,11 @@ import {
 import '../../public/stylesheets/rsuite.less';
 
 const routes = [
-    {
-        path: "/employee/signin",
-        extra: true,
-        component: EmployeeSignIn
-    },
+    // {
+    //     path: "/employee/signin",
+    //     extra: true,
+    //     component: EmployeeSignIn
+    // },
     {
         path: "/orders/",
         extra: true,

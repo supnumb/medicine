@@ -127,13 +127,6 @@ exports.orderList = (req, res, next) => {
 
     let { KeyWord = '', Page = 0, Limit = 10, StartTime = '2018-01-01', EndTime = '' } = req.body;
 
-    let ep = new eventproxy();
-
-    ep.fail(function (error) {
-        console.error(error);
-        return res.status(403).send({ code: -1, message: "系统错误", data: error });
-    });
-
     if (Page > 0) {
         Page = (Page - 1) * Limit;
     }
