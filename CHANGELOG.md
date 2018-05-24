@@ -98,4 +98,4 @@
 2、合并入库单添加、修改接口 /receipt/save。
 3、修改字段returnQuantity为ReturnQuantity。
 4、增加保存销售单时销售单ID返回。
-5、入库单是否已售不可修改，比对Quantity和ValiableQuantity两个字段，若ValiableQuantity<Quantity则该入库商品不可修改。
+5、入库单是否已售不可修改，Flag=1，商品已售不可修改，Flag=0,商品可以修改

@@ -269,6 +269,8 @@ OrderTran.prototype.edit = function(Obj, callback) {
 
             let ReceiptGood_update = 'update ReceiptGoods set ValiableQuantity= case ';
 
+            let ReceiptGood_update_child = 'Flag= case ';
+
             let Stock_update = 'update Stocks set ValiableQuantity= case GoodID';
 
             let Stock_update_child = 'SaledQuantity= case GoodID';
@@ -308,6 +310,10 @@ OrderTran.prototype.edit = function(Obj, callback) {
                         for (let i = 0; i < arrs.length; i++) {
 
                             if (arrs[i].ValiableQuantity >= Quantity_num) {
+                                let Flag = 0;
+                                if (Quantity_num > 0) {
+                                    Flag = 1;
+                                }
                                 TotalCostPrice += arrs[i].CostPrice * Quantity_num;
                                 arrs[i].ValiableQuantity = arrs[i].ValiableQuantity - Quantity_num;
                                 ReceiptQuantity += Quantity_num;
@@ -315,6 +321,7 @@ OrderTran.prototype.edit = function(Obj, callback) {
                                 ReceiptGoodID += arrs[i].ID;
                                 ReceiptGoodIDs += arrs[i].ID + ",";
                                 ReceiptGood_update += ` when ID=${arrs[i].ID} then ${arrs[i].ValiableQuantity} `;
+                                ReceiptGood_update_child += ` when ID=${arrs[i].ID} then ${Flag} `;
                             } else {
                                 TotalCostPrice += arrs[i].CostPrice * arrs[i].ValiableQuantity;
                                 Quantity_num -= arrs[i].ValiableQuantity;
@@ -322,7 +329,8 @@ OrderTran.prototype.edit = function(Obj, callback) {
                                 arrs[i].ValiableQuantity = 0;
                                 ReceiptGoodID += arrs[i].ID + ",";
                                 ReceiptGoodIDs += arrs[i].ID + ",";
-                                ReceiptGood_update += ` when ID=${arrs[i].ID} then 0, `
+                                ReceiptGood_update += ` when ID=${arrs[i].ID} then 0, `;
+                                ReceiptGood_update_child += ` when ID=${arrs[i].ID} then 1 `;
                             }
                         }
 
@@ -355,7 +363,7 @@ OrderTran.prototype.edit = function(Obj, callback) {
 
                         OrderGood_add = OrderGood_add.slice(0, OrderGood_add.length - 1);
 
-                        ReceiptGood_update += ` end where ID in (${ReceiptGoodIDs});`;
+                        ReceiptGood_update += ` end,${ReceiptGood_update_child} end where ID in (${ReceiptGoodIDs});`;
 
                         Stock_update = Stock_update + ' end,' + Stock_update_child + ' end where GoodID in (' + ReceiptGoodIDs + ')';
 
@@ -363,7 +371,7 @@ OrderTran.prototype.edit = function(Obj, callback) {
 
                         //console.log("OrderGood_add", OrderGood_add);
                         //console.log("-----------------------------");
-                        //console.log("ReceiptGood_update", ReceiptGood_update);
+                        console.log("ReceiptGood_update", ReceiptGood_update);
                         //console.log("-----------------------------");
                         //console.log("Stock_update", Stock_update);
                         //console.log("-----------------------------");
