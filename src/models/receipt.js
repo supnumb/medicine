@@ -74,18 +74,17 @@ ReceiptTran.prototype.add = function(Obj, callback) {
 
             async.eachSeries(ReceiptGoods, function(item, cb) {
 
-                let { GoodID, Amount, CostPrice, Quantity, ExpiryDate, BatchNo } = item;
+                let { GoodID, CostPrice, Quantity, ExpiryDate, BatchNo } = item;
 
                 let ValiableQuantity = Quantity;
 
-                let ReceiptGood_add = 'insert into ReceiptGoods (ReceiptID,GoodID,Amount,CostPrice,Quantity,ValiableQuantity,ExpiryDate,BatchNo) values (:ReceiptID,:GoodID,:Amount,:CostPrice,:Quantity,:ValiableQuantity,:ExpiryDate,:BatchNo)';
+                let ReceiptGood_add = 'insert into ReceiptGoods (ReceiptID,GoodID,CostPrice,Quantity,ValiableQuantity,ExpiryDate,BatchNo) values (:ReceiptID,:GoodID,:CostPrice,:Quantity,:ValiableQuantity,:ExpiryDate,:BatchNo)';
                 let Stock_update = 'update Stocks set TotalQuantity=TotalQuantity+:Quantity,ValiableQuantity=ValiableQuantity+:Quantity where GoodID=:GoodID;';
                 let Stock_add = 'insert into Stocks (GoodID,TotalQuantity,ValiableQuantity,CreateTime) values (:GoodID,:Quantity,:Quantity,now());';
 
                 pool.query(ReceiptGood_add, {
                     ReceiptID,
                     GoodID,
-                    Amount,
                     CostPrice,
                     Quantity,
                     ValiableQuantity,
@@ -179,7 +178,7 @@ ReceiptTran.prototype.add = function(Obj, callback) {
  * 4、增加库存记录信息
  * 
  */
-ReceiptTran.prototype.cancel = function(Obj, callback) {
+ReceiptTran.prototype.update = function(Obj, callback) {
 
     let tran = pool.getTran();
 
@@ -207,16 +206,16 @@ ReceiptTran.prototype.cancel = function(Obj, callback) {
 
             async.eachSeries(ReceiptGoods, function(item, cb) {
 
-                let { GoodID, Amount, CostPrice, Quantity, returnQuantity, ExpiryDate, BatchNo } = item;
+                let { GoodID, CostPrice, Quantity, ReturnQuantity, ExpiryDate, BatchNo } = item;
 
-                let ReceiptGood_update = 'update ReceiptGoods set Quantity=Quantity-:returnQuantity,ValiableQuantity=ValiableQuantity-:returnQuantity,returnQuantity=:returnQuantity where ReceiptID=:ReceiptID and GoodID=:GoodID and ValiableQuantity>=:returnQuantity';
-                let Stock_update = 'update Stocks set TotalQuantity=TotalQuantity-:returnQuantity,ValiableQuantity=ValiableQuantity-:returnQuantity where GoodID=:GoodID;';
+                let ReceiptGood_update = 'update ReceiptGoods set Quantity=Quantity-:ReturnQuantity,ValiableQuantity=ValiableQuantity-:ReturnQuantity,ReturnQuantity=:ReturnQuantity where ReceiptID=:ReceiptID and GoodID=:GoodID and ValiableQuantity>=:ReturnQuantity';
+                let Stock_update = 'update Stocks set TotalQuantity=TotalQuantity-:ReturnQuantity,ValiableQuantity=ValiableQuantity-:ReturnQuantity where GoodID=:GoodID;';
                 let Stock_add = 'insert into Stocks (GoodID,TotalQuantity,ValiableQuantity,CreateTime) values (:GoodID,:Quantity,:Quantity,now());';
 
                 tran.query(ReceiptGood_update, {
                     ReceiptID,
                     GoodID,
-                    returnQuantity
+                    ReturnQuantity
                 }, function(err, arrs) {
 
                     if (err) {
@@ -227,9 +226,9 @@ ReceiptTran.prototype.cancel = function(Obj, callback) {
                         return cb({ message: `${GoodID}商品数量不足！` }, null);
                     }
 
-                    StockChange_add += `(${OperatorID},${GoodID},${returnQuantity},'药品退回统计',4,${ReceiptID },0) `;
+                    StockChange_add += `(${OperatorID},${GoodID},${ReturnQuantity},'药品退回统计',4,${ReceiptID },0) `;
 
-                    tran.query(Stock_update, { returnQuantity, GoodID }, function(err, rows) {
+                    tran.query(Stock_update, { ReturnQuantity, GoodID }, function(err, rows) {
 
                         if (err) {
                             return cb(err, null);
@@ -286,8 +285,6 @@ ReceiptTran.prototype.cancel = function(Obj, callback) {
                     });
 
                 }
-
-
 
             });
 

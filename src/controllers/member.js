@@ -26,8 +26,6 @@ const { Member, Intention, Order, Visit } = require('../models/index');
 
 exports.checkUser = (req, res, next) => {
 
-    console.log("user",req.session.user);
-
     if (req.session.user) {
         next();
     } else {
@@ -56,13 +54,13 @@ exports.signIn = (req, res, next) => {
         return res.send({ code: 2, message: "电话、密码参数不完整" });
     };
 
-    Member.check(login_name, function (err, mem) {
+    Member.check(login_name, function(err, mem) {
         if (err) {
             return res.send({ code: 2, message: "数据库出错" });
         };
 
         if (mem) {
-            bcrypt.compare(password, mem.Password, function (err, result) {
+            bcrypt.compare(password, mem.Password, function(err, result) {
 
                 if (err) {
                     return res.send({ code: 2, message: "密码比对出错" });
@@ -158,7 +156,7 @@ exports.save = (req, res, next) => {
 
     if (ID && ID > 0) {
 
-        Member.updateMember(memberData, function (err, mem) {
+        Member.updateMember(memberData, function(err, mem) {
 
             if (err) {
                 return res.send({ code: -1, message: "数据库连接失败！" });
@@ -174,7 +172,7 @@ exports.save = (req, res, next) => {
 
     } else {
 
-        Member.addMember(memberData, function (err, mem) {
+        Member.addMember(memberData, function(err, mem) {
 
             if (err) {
                 return res.send({ code: 2, message: "数据库出错" });
@@ -203,7 +201,7 @@ exports.deleteMember = (req, res, next) => {
         return res.send({ code: 2, message: "会员Id参数不完整" });
     };
 
-    Member.deleteMember(MemberID, function (err, mem) {
+    Member.deleteMember(MemberID, function(err, mem) {
 
         if (err) {
             return res.send({ code: 2, message: "数据库出错" });
@@ -243,7 +241,7 @@ exports.memberList = (req, res, next) => {
         EndTime = moment(new Date()).format('YYYY-MM-DD 23:59:59');
     }
 
-    Member.memberList(KeyWord, MobilPhone, Page, Limit, OrderBy, StartTime, EndTime, function (err, mem) {
+    Member.memberList(KeyWord, MobilPhone, Page, Limit, OrderBy, StartTime, EndTime, function(err, mem) {
 
         if (err) {
             return res.send({ code: 2, message: "数据库出错" });
@@ -277,23 +275,9 @@ exports.memberInfo = (req, res, next) => {
 
     async.parallel([
 
-        function (cb) {
+        function(cb) {
 
-            Member.memberInfo(MemberID, function (err, mem) {
-
-                if (err) {
-                    return cb(err, null);
-                };
-
-                cb(null, mem);
-
-            });
-
-        },
-
-        function (cb) {
-
-            Intention.search(MemberID, function (err, mem) {
+            Member.memberInfo(MemberID, function(err, mem) {
 
                 if (err) {
                     return cb(err, null);
@@ -305,9 +289,9 @@ exports.memberInfo = (req, res, next) => {
 
         },
 
-        function (cb) {
+        function(cb) {
 
-            Visit.search(MemberID, function (err, mem) {
+            Intention.search(MemberID, function(err, mem) {
 
                 if (err) {
                     return cb(err, null);
@@ -319,9 +303,23 @@ exports.memberInfo = (req, res, next) => {
 
         },
 
-        function (cb) {
+        function(cb) {
 
-            Order.search(MemberID, function (err, mem) {
+            Visit.search(MemberID, function(err, mem) {
+
+                if (err) {
+                    return cb(err, null);
+                };
+
+                cb(null, mem);
+
+            });
+
+        },
+
+        function(cb) {
+
+            Order.search(MemberID, function(err, mem) {
 
                 if (err) {
                     return cb(err, null);
@@ -333,7 +331,7 @@ exports.memberInfo = (req, res, next) => {
 
         }
 
-    ], function (err, result) {
+    ], function(err, result) {
 
         if (err) {
             return res.send({ code: -1, message: "系统错误", data: error });
@@ -373,7 +371,7 @@ exports.addVisit = (req, res, next) => {
         req.session.user.ID :
         1;
 
-    Visit.add(MemberID, OperatorID, Remarks, function (err, mem) {
+    Visit.add(MemberID, OperatorID, Remarks, function(err, mem) {
 
         if (err) {
             return res.send({ code: 2, message: "数据库出错" });
@@ -405,7 +403,7 @@ exports.visitList = (req, res, next) => {
         EndTime = moment(new Date()).format('YYYY-MM-DD 23:59:59');
     }
 
-    Visit.visitList(KeyWord, Page, Limit, StartTime, EndTime, function (err, mem) {
+    Visit.visitList(KeyWord, Page, Limit, StartTime, EndTime, function(err, mem) {
 
         if (err) {
             return res.send({ code: 2, message: "数据库出错" });
@@ -439,7 +437,7 @@ exports.addIntention = (req, res, next) => {
         req.session.user.ID :
         1;
 
-    Intention.add(MemberID, OperatorID, Goods, function (err, mem) {
+    Intention.add(MemberID, OperatorID, Goods, function(err, mem) {
 
         if (err) {
             return res.send({ code: 2, message: "数据库出错" });
@@ -471,7 +469,7 @@ exports.updateIntention = (req, res, next) => {
 
     const OperatorID = req.session ? req.session.user.ID : 1;
 
-    Intention.update(ID, OperatorID, Goods, Status, function (err, mem) {
+    Intention.update(ID, OperatorID, Goods, Status, function(err, mem) {
 
         if (err) {
             return res.send({ code: 2, message: "数据库出错" });
@@ -503,7 +501,7 @@ exports.intentionList = (req, res, next) => {
         EndTime = moment(new Date()).format('YYYY-MM-DD 23:59:59');
     }
 
-    Intention.intentionList(KeyWord, Page, Limit, StartTime, EndTime, function (err, mem) {
+    Intention.intentionList(KeyWord, Page, Limit, StartTime, EndTime, function(err, mem) {
 
         if (err) {
             return res.send({ code: 2, message: "数据库操作错误" });

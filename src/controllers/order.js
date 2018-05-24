@@ -17,7 +17,6 @@ const moment = require('moment');
 
 const { Order, OrderTran } = require('../models/index');
 
-
 /**
  * 编辑销售订单
  * @param  {Object}   req  http 请求对象
@@ -43,20 +42,13 @@ exports.edit = (req, res, next) => {
 
     let { ID, MemberID, OperatorID = 1, EmployeeID, Address, Connact, Telephone, TotalAmount, ReceiptAmount, PayStyle, DeliveryCompany = '', DeliveryFee = '', DeliverCode = '', DeliverReceiptFee = '', Remark = '', Goods } = req.body;
 
-    let ep = new eventproxy();
-
-    ep.fail(function (error) {
-        console.error(error);
-        return res.status(403).send({ code: -1, message: "系统错误", data: error });
-    });
-
     if (!MemberID || !EmployeeID || !Address || !Connact || !Telephone || !ReceiptAmount || !PayStyle || Goods.length == 0) {
         return res.send({ code: 2, message: "参数不完整" });
     };
 
     const orderData = { ID, MemberID, EmployeeID, OperatorID, Address, Connact, Telephone, TotalAmount, ReceiptAmount, PayStyle, DeliveryCompany, DeliveryFee, DeliverCode, DeliverReceiptFee, Remark, Date: new Date(), Goods };
 
-    OrderTran.edit(orderData, function (err, mem) {
+    OrderTran.edit(orderData, function(err, mem) {
 
         if (err && err.message) {
             return res.send({ code: 2, message: err.message });
@@ -66,9 +58,9 @@ exports.edit = (req, res, next) => {
             return res.send({ code: 2, message: "数据库操作有误！" });
         };
 
+        console.log(mem);
 
-
-        return res.send({ code: 0, message: "编辑销售订单操作成功！", data: { ID: mem.insertId } });
+        return res.send({ code: 0, message: "编辑销售订单操作成功！", data: { ID: mem.ID } });
 
     });
 }
@@ -84,18 +76,11 @@ exports.cancel = (req, res, next) => {
 
     let { ID = '' } = req.body;
 
-    let ep = new eventproxy();
-
-    ep.fail(function (error) {
-        console.error(error);
-        return res.status(403).send({ code: -1, message: "系统错误", data: error });
-    });
-
     if (!ID) {
         return res.send({ code: 2, message: "订单ID参数不匹配!" });
     };
 
-    OrderTran.cancel(ID, function (err, mem) {
+    OrderTran.cancel(ID, function(err, mem) {
 
         if (err) {
             console.log("err", err);
@@ -135,7 +120,7 @@ exports.orderList = (req, res, next) => {
         EndTime = moment(new Date()).format('YYYY-MM-DD 23:59:59');
     }
 
-    Order.orderList(KeyWord, Page, Limit, StartTime, EndTime, function (err, mem) {
+    Order.orderList(KeyWord, Page, Limit, StartTime, EndTime, function(err, mem) {
 
         if (err) {
             return res.send({ code: 2, message: "数据库出错" });
@@ -159,19 +144,12 @@ exports.orderInfo = (req, res, next) => {
 
     let { ID } = req.body;
 
-    let ep = new eventproxy();
-
-    ep.fail(function (error) {
-        console.error(error);
-        return res.status(403).send({ code: -1, message: "系统错误", data: error });
-    });
-
     if (!ID) {
         res.status(422);
         return res.status(200).send({ code: 2, message: "订单ID参数不匹配!" });
     };
 
-    Order.orderInfo(ID, function (err, mem) {
+    Order.orderInfo(ID, function(err, mem) {
 
         if (err) {
             return res.send({ code: 2, message: "数据库出错" });

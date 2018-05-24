@@ -17,8 +17,9 @@ describe("#药品基础数据模块测试", function() {
 
     let ID = 0;
 
-    it("##009 雇员保存销售单 应该返回成功，Code=0", function(done) {
+    it.only("##009 雇员保存销售单 应该返回成功，Code=0", function(done) {
         let orderData = {
+
             "DeliveryCode": "",
             "DeliveryCompany": "",
             "DeliveryFee": "",
@@ -93,7 +94,7 @@ describe("#药品基础数据模块测试", function() {
         });
     })
 
-    it.only("##010 雇员查询销售单列表(销售单列表+记录条数) 应该返回成功，Code=0", function(done) {
+    it("##010 雇员查询销售单列表(销售单列表+记录条数) 应该返回成功，Code=0", function(done) {
         let KeyWord = "";
         let Page = 0,
             Limit = 10;

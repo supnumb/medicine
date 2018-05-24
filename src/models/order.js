@@ -283,8 +283,6 @@ OrderTran.prototype.edit = function(Obj, callback) {
 
                 const OrderID = rows.insertId;
 
-                console.log("OrderID", OrderID);
-
                 let ReceiptGoodIDs = '';
 
                 async.eachSeries(Goods, function(item, cb) {
@@ -324,7 +322,7 @@ OrderTran.prototype.edit = function(Obj, callback) {
                                 arrs[i].ValiableQuantity = 0;
                                 ReceiptGoodID += arrs[i].ID + ",";
                                 ReceiptGoodIDs += arrs[i].ID + ",";
-                                ReceiptGood_update += ` when ID=${arrs[i].ID} then 0 `
+                                ReceiptGood_update += ` when ID=${arrs[i].ID} then 0, `
                             }
                         }
 
@@ -339,7 +337,6 @@ OrderTran.prototype.edit = function(Obj, callback) {
                         Stock_update_child += ` when ${GoodID} then SaledQuantity+${Quantity} `;
 
                         StockChangeRecord_add += `(${OperatorID},${GoodID},${Quantity},'备注',2,${OrderID},${TotalCostPrice},now()),`;
-
 
                         cb(null, arrs);
 
@@ -447,7 +444,6 @@ OrderTran.prototype.edit = function(Obj, callback) {
                                     return callback(err, null);
                                 }
 
-                                console.log("aaaa", OrderID);
                                 return callback(null, { ID: OrderID });
 
                             });
@@ -563,7 +559,7 @@ OrderTran.prototype.edit = function(Obj, callback) {
                     //console.log("del_arr", del_arr);
 
                     //入库单修改
-                    //console.log("ReceiptGood_update", ReceiptGood_update);
+                    console.log("ReceiptGood_update", ReceiptGood_update);
 
                     //库存修改
                     //console.log("Stock_update", Stock_update);

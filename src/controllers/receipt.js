@@ -17,7 +17,7 @@ const moment = require('moment');
 const { Receipt, ReceiptTran } = require('../models/index');
 
 /**
- * 添加入库单
+ * 入库单添加、修改
  * @param  {Object}   req  http 请求对象
  * @param  {Object}   res  http 响应对象
  * @param  {Number}   req.body.VendorName 供货商名称
@@ -26,31 +26,52 @@ const { Receipt, ReceiptTran } = require('../models/index');
  * @param  {Array}    req.body.ReceiptGoods 入库单商品
  * @param  {Function} next 管道操作，传递到下一步
  */
-exports.add = (req, res, next) => {
+exports.save = (req, res, next) => {
 
-    let { VendorName, VendorID, Date, ReceiptGoods } = req.body;
+    let { ID, VendorName, VendorID, Date, ReceiptGoods } = req.body;
 
     if (!VendorName || !VendorID || !Date || ReceiptGoods.length == 0) {
         return res.status(200).send({ code: 2, message: "VendorName|VendorID|Date|ReceiptGoods参数不匹配！" });
     };
 
-    const ReceiptData = { VendorName, VendorID, Date, ReceiptGoods };
+    const ReceiptData = { ID, VendorName, VendorID, Date, ReceiptGoods };
 
     ReceiptData.OperatorID = req.session ? req.session.user.ID : 1;
 
-    ReceiptTran.add(ReceiptData, function(err, mem) {
+    if (ID && ID > 0) {
 
-        if (err && err.message) {
-            return res.status(200).send({ code: 2, message: err.message });
-        }
+        ReceiptTran.update(ReceiptData, function(err, mem) {
 
-        if (err) {
-            return res.send({ code: 2, message: "数据库出错" });
-        };
+            if (err && err.message) {
+                return res.send({ code: 2, message: err.message });
+            }
 
-        return res.status(200).send({ code: 0, message: "添加入库单操作成功！", data: mem });
+            if (err) {
+                return res.send({ code: 2, message: "数据库出错" });
+            };
 
-    });
+            return res.send({ code: 0, message: "返回入库单操作成功！", data: mem });
+
+        });
+
+    } else {
+
+        ReceiptTran.add(ReceiptData, function(err, mem) {
+
+            if (err && err.message) {
+                return res.status(200).send({ code: 2, message: err.message });
+            }
+
+            if (err) {
+                return res.send({ code: 2, message: "数据库出错" });
+            };
+
+            return res.status(200).send({ code: 0, message: "添加入库单操作成功！", data: mem });
+
+        });
+
+    }
+
 }
 
 /**
@@ -64,7 +85,7 @@ exports.add = (req, res, next) => {
  * @param  {Array}    req.body.ReceiptGoods 入库单商品
  * @param  {Function} next 管道操作，传递到下一步
  */
-exports.cancel = (req, res, next) => {
+exports.update = (req, res, next) => {
 
     let { ID = '', VendorName, VendorID, Date, ReceiptGoods } = req.body;
 
@@ -76,7 +97,7 @@ exports.cancel = (req, res, next) => {
 
     ReceiptData.OperatorID = req.session ? req.session.user.ID : 1;
 
-    ReceiptTran.cancel(ReceiptData, function(err, mem) {
+    ReceiptTran.update(ReceiptData, function(err, mem) {
 
         if (err && err.message) {
             return res.send({ code: 2, message: err.message });

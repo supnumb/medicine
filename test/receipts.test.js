@@ -2,19 +2,16 @@ var app = require('../app');
 var supertest = require('supertest');
 var agent = supertest.agent(app);
 var should = require('should');
-//, Amount, CostPrice, Quantity, ExpiryDate, BatchNo
+//Amount, CostPrice, Quantity, ExpiryDate, BatchNo
 let receiptData = {
     VendorName: "哈药集团",
     VendorID: 5,
     Date: '2018-05-06',
-    EmployeeID:1,
-    
+    EmployeeID: 1,
     ReceiptGoods: [{
-        GoodID: 1,
-        Amount: 100,
+        GoodID: 42,
         CostPrice: 10,
         Quantity: 10,
-        ValiableQuantity: 10,
         ExpiryDate: '2020-10-31',
         BatchNo: "12004532"
     }]
@@ -40,23 +37,19 @@ describe("# 进货单模块单元测试", function() {
             if (err) {
                 return done(err);
             }
-
-            console.log(res.text);
             res.text.should.containEql("0");
             done();
         });
     })
 
-    it("###026.01 得到指定入库单的详情信息,入库单基本信息，入库单关联的商品信息，应该返回：Code=0", function(done) {
-        let ID = 18;
+    it.only("###026.01 得到指定入库单的详情信息,入库单基本信息，入库单关联的商品信息，应该返回：Code=0", function(done) {
+        let ID = 65;
         agent.post(`/api/receipt/detail`).send({ ID }).expect(200).end(function(err, res) {
             if (err) {
                 return done(err);
             }
 
             console.log(res.text);
-
-
 
             res.text.should.containEql(0);
             done();
@@ -86,7 +79,7 @@ describe("# 进货单模块单元测试", function() {
         });
     })
 
-    it.only("###024 按药品名称、供应商名称查询入库单，应该返回：Code=0", function(done) {
+    it("###024 按药品名称、供应商名称查询入库单，应该返回：Code=0", function(done) {
         agent.post(`/api/receipt/search`).send({ KeyWord: "" }).expect(200).end(function(err, res) {
             if (err) {
                 return done(err);
@@ -105,16 +98,14 @@ describe("# 进货单模块单元测试", function() {
             Date: '2018-05-06',
             ReceiptGoods: [{
                 GoodID: 17,
-                Amount: 100,
                 CostPrice: 10,
                 Quantity: 10,
-                ValiableQuantity: 10,
-                returnQuantity: 3,
+                ReturnQuantity: 3,
                 ExpiryDate: '2020-10-31',
                 BatchNo: "12004532"
             }]
         };
-        agent.post(`/api/receipt/cancel`).send(receiptData).expect(200).end(function(err, res) {
+        agent.post(`/api/receipt/return`).send(receiptData).expect(200).end(function(err, res) {
             if (err) {
                 return done(err);
             }
