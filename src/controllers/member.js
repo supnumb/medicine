@@ -360,6 +360,7 @@ exports.memberInfo = (req, res, next) => {
  */
 exports.addVisit = (req, res, next) => {
 
+    let { MemberID, Remarks } = req.body;
     console.log(req.body);
 
     if (!MemberID || !Remarks) {

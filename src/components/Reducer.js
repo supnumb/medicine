@@ -266,7 +266,7 @@ function OrderListReducer(state = defaultState.orderList, action) {
         case "FETCH_ORDERS":
             return Object.assign({}, state, {
                 isFetching: true,
-                KeyWord:action.payload.KeyWord,
+                KeyWord: action.payload.KeyWord,
                 Limit: action.payload.Limit,
                 Page: action.payload.Page
             });
@@ -303,12 +303,10 @@ function OrderEditorReducer(state = defaultState.orderEditor, action) {
                 values: action.payload,
                 order: action.payload
             });
-        // case "FETCH_ORDERS_DONE":
-        //     return Object.assign({}, state, {
-        //         isFetching: false,
-        //         orders: action.payload,
-        //         values: action.payload.data
-        //     });
+        case "FETCH_SUBMIT_ORDER":
+            return Object.assign({}, state, {
+                isFetching: true
+            });
         case "SWITCH_SELECTOR_SHOW":
             return Object.assign({}, state, {
                 isShowGoodSearchZone: action.payload

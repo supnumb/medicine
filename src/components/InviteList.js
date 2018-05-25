@@ -1,5 +1,6 @@
 import React from 'react';
 import Store from './Reducer';
+import { Icon } from 'rsuite';
 
 class InviteList extends React.Component {
     constructor(props) {
@@ -14,16 +15,16 @@ class InviteList extends React.Component {
     }
 
     _loadVistsFromDB(member) {
-        Store.dispatch({type: "FETCH_INVITE"});
-        console.log(member.ID);
+        Store.dispatch({ type: "FETCH_INVITE" });
+        // console.log(member.ID);
         fetch(`/api/member/${member.ID}`, {
             method: 'POST',
             mode: 'same-origin',
             credentials: 'same-origin'
         }).then(res => res.json()).then(json => {
-            console.log({json});
+            console.log({ json });
             if (json.code == 0) {
-                Store.dispatch({type: "FETCH_INVITE_DONE", payload: json.visitData})
+                Store.dispatch({ type: "FETCH_INVITE_DONE", payload: json.visitData })
             } else {
                 alert(json.message);
             }
@@ -33,25 +34,25 @@ class InviteList extends React.Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        let {member} = nextProps;
-        let {member: oldMember} = this.props;
+        let { member } = nextProps;
+        let { member: oldMember } = this.props;
 
         if (member.ID != oldMember.ID) {
-            console.log({member});
+            console.log({ member });
             if (member) {
                 this.loadVistsFromDB(member);
             }
         }
     }
 
-    componentWillReceiveProps(nextProps){
+    componentWillReceiveProps(nextProps) {
         let { updateInvite, member } = nextProps;
         let { updateInvite: oldUpdate, member: oldMember } = this.props;
 
         if (oldUpdate) {
             if (updateInvite.insertId != oldUpdate.insertId) {
                 this.loadVistsFromDB(member);
-            }else if(oldMember.ID != member.ID){
+            } else if (oldMember.ID != member.ID) {
                 this.loadVistsFromDB(member);
             }
         } else if (oldMember.ID != member.ID) {
@@ -62,7 +63,7 @@ class InviteList extends React.Component {
     }
 
     componentDidMount() {
-        let {member} = this.props;
+        let { member } = this.props;
         if (member) {
             this.loadVistsFromDB(member);
         }
@@ -75,6 +76,8 @@ class InviteList extends React.Component {
                 isFetching
             }
         } = this.state;
+
+        let loading = isFetching ? (<Icon icon='spinner' spin />) : ("");
 
         let listJsx = invists.map((i, index) => (<tr key={index}>
             <td>{i.ID}</td>
@@ -97,7 +100,7 @@ class InviteList extends React.Component {
                     {listJsx}
                 </tbody>
             </table>
-
+            {loading}
         </div>)
     }
 }

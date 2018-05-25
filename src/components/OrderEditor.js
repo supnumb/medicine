@@ -10,7 +10,7 @@ import { asyncContainer, Typeahead } from 'react-bootstrap-typeahead';
 
 const AsyncTypeahead = asyncContainer(Typeahead);
 const model = SchemaModel({
-    Name: StringType().isRequired('客户名不能为空'),
+    MemberName: StringType().isRequired('请输入查询客户名称'),
     MobilPhone: StringType().isRequired('请填写客户联系电话'),
     Address: StringType().isRequired('请填写配送地址')
 });
@@ -37,7 +37,7 @@ class OrderEditor extends React.Component {
         this.onSelectMember = this._onSelectMember.bind(this);
     }
 
-    componentUnMount() {
+    componentWillUnmount() {
         this.unSubscribe();
     }
 
@@ -150,8 +150,8 @@ class OrderEditor extends React.Component {
     }
 
     /**
-   * 加载所有雇员列表
-   */
+      * 加载所有雇员列表
+      */
     _loadEmployeesFromDB() {
 
         fetch('/api/employee/search', {
@@ -192,6 +192,8 @@ class OrderEditor extends React.Component {
             return;
         }
 
+        Store.dispatch({ type: "FETCH_SUBMIT_ORDER" })
+
         let _amount = 0;
         orderGoods.forEach(g => {
             _amount = g.Quantity * g.FinalPrice;
@@ -215,14 +217,13 @@ class OrderEditor extends React.Component {
             console.log(json);
 
             if (json.code == 0) {
-                Store.dispatch({ type: "SET_FORM_CHECK_RESULT", payload: "" });
+                this.props.history.push('/orders')
             } else {
                 alert(json.message)
             }
         }).catch(err => {
             console.error(err);
-        })
-
+        });
     }
 
     _loadOrderDetailFromDB(order) {
@@ -237,7 +238,10 @@ class OrderEditor extends React.Component {
                 'Content-Type': 'application/json'
             }
         }).then(res => res.json()).then(json => {
+            console.log(json);
+
             if (json.code == 0) {
+                json.data.MobilPhone = json.data.Telephone;
                 Store.dispatch({ type: "FETCH_ORDER_DONE", payload: json });
             }
         }).catch(err => {
@@ -284,7 +288,9 @@ class OrderEditor extends React.Component {
             }
         } = this.state;
 
-        let loading = isFetching ? (<Icon icon='spinner' spin />) : ("");
+        console.log({ values, orderGoods });
+
+
         let goodSelector = ("");
 
         if (isShowGoodSearchZone) {
@@ -300,7 +306,6 @@ class OrderEditor extends React.Component {
 
                 <Form className="form-horizontal" ref={ref => this.form = ref} values={values} id="form" model={model} onChange={(values) => {
                     console.log(values);
-
                     Store.dispatch({ type: "SET_VALUES", payload: values });
                     this.form.cleanErrors();
                 }} onCheck={(errors) => {
@@ -312,12 +317,12 @@ class OrderEditor extends React.Component {
                             客户名&nbsp;<span className="red">*</span>
                         </label>
                         <div className="col-md-4">
-                            <AsyncTypeahead id="Name" name="Name" inputProps={{
+                            <AsyncTypeahead id="MemberName" name="MemberName" inputProps={{
                                 name: "Name",
                                 id: "ID"
-                            }} defaultInputValue={values.Name} onSearch={this.loadMembersFromDB} labelKey="label" onChange={this.onSelectMember} isLoading={isFetching} options={members} />
+                            }} placeholder={values.MemberName} onSearch={this.loadMembersFromDB} labelKey="label" onChange={this.onSelectMember} isLoading={isFetching} options={members} />
 
-                            <p className="text-danger">{errors.Name}</p>
+                            <p className="text-danger">{errors.MemberName}</p>
                         </div>
                     </div>
 
@@ -347,40 +352,39 @@ class OrderEditor extends React.Component {
                             付款方式
                         </label>
                         <div className="col-md-8">
-                            <RadioGroup name="PayStyle" id="PayStyle" inline="true" onChange={
+                            <RadioGroup name="PayStyle" value={values.PayStyle} id="PayStyle" inline={true} onChange={
                                 (value, event) => {
                                     values.PayStyle = value;
                                     Store.dispatch({ type: "SET_VALUES", payload: values });
-                                    console.log(value, event);
                                 }
                             }>
-                                <Radio value="1">微信</Radio>
-                                <Radio value="2">支付宝</Radio>
-                                <Radio value="3">现金</Radio>
-                                <Radio value="4">货到付款</Radio>
-                                <Radio value="5">二维码</Radio>
+                                <Radio value={1}>微信</Radio>
+                                <Radio value={2}>支付宝</Radio>
+                                <Radio value={3}>现金</Radio>
+                                <Radio value={4}>货到付款</Radio>
+                                <Radio value={5}>二维码</Radio>
                             </RadioGroup>
                         </div>
                     </div>
-
-                    <hr />
 
                     <div className="form-group">
                         <label className="control-label col-md-2">
                             快递公司
                         </label>
                         <div className="col-md-6">
-                            <RadioGroup name="DeliveryCompany" id="DeliveryCompany" inline="true" onChange={
+                            <RadioGroup value={values.DeliveryCompany} name="DeliveryCompany" id="DeliveryCompany" inline={true} onChange={
                                 (value, event) => {
                                     // values.PayStyle = value;
                                     // Store.dispatch({ type: "SET_VALUES", payload: values });
-                                    console.log(value, event);
+
+                                    values.DeliveryCompany = value;
+                                    Store.dispatch({ type: "SET_VALUES", payload: values });
                                 }
                             }>
-                                <Radio value="1">未发</Radio>
-                                <Radio value="2">圆通</Radio>
-                                <Radio value="3">顺丰</Radio>
-                                <Radio value="4">韵达</Radio>
+                                <Radio value="未发">未发</Radio>
+                                <Radio value="圆通">圆通</Radio>
+                                <Radio value="顺丰">顺丰</Radio>
+                                <Radio value="韵达">韵达</Radio>
                             </RadioGroup>
 
                         </div>
@@ -408,30 +412,42 @@ class OrderEditor extends React.Component {
 
                     <div className="form-group">
                         <label className="control-label col-md-2">
+                            保价费用
+                        </label>
+                        <div className="col-md-4 ">
+                            <Field name="DeliveryInsure" id="DeliveryInsure" />
+                        </div>
+                        <p className="text-danger">{errors.DeliveryInsure}</p>
+                    </div>
+
+                    <div className="form-group">
+                        <label className="control-label col-md-2">
                             是否收到
                         </label>
                         <div className="col-md-6">
-                            <label className="radio-inline">
-                                <input type="radio" checked="checked" name="DeliveryReceive" id="DeliveryReceive" value="1" />
-                                未收到
-                            </label>
+                            <RadioGroup defaultValue={0} value={values.DeliveryReceive} name="DeliveryReceive" id="DeliveryReceive" inline={true} onChange={
+                                (value, event) => {
+                                    values.DeliveryReceive = value;
+                                    Store.dispatch({ type: "SET_VALUES", payload: values });
 
-                            <label className="radio-inline">
-                                <input type="radio" name="DeliveryReceive" id="DeliveryReceive" value="2" />
-                                已经收到
-                            </label>
-
+                                    // values.PayStyle = value;
+                                    // Store.dispatch({ type: "SET_VALUES", payload: values });
+                                    // console.log(value, event);
+                                }
+                            }>
+                                <Radio value="0">不明确</Radio>
+                                <Radio value="1">未收到</Radio>
+                                <Radio value="2">已经收到</Radio>
+                            </RadioGroup>
                         </div>
                     </div>
-
-                    <hr />
 
                     <div className="form-group">
                         <label className="control-label col-md-2">
                             销售员
                         </label>
                         <div className="col-md-4">
-                            <SelectPicker id="EmployeeName" name="EmployeeName" onSelect={this.onEmployeeSelect} placeholder="请选择销售员" data={employees} />
+                            <SelectPicker id="EmployeeName" name="EmployeeName" onSelect={this.onEmployeeSelect} value={values.EmployeeID} placeholder="请选择销售员" data={employees} />
                         </div>
                     </div>
 
@@ -448,18 +464,19 @@ class OrderEditor extends React.Component {
                     <OrderGoodList orderGoods={orderGoods} onShowSelectorZone={() => { Store.dispatch({ type: "SWITCH_SELECTOR_SHOW", payload: true }) }} />
 
                     <hr />
+
                     <div className="form-group">
 
                         <div className="col-md-4">
                             <p className="text-danger">{message}
                             </p>
-                            <button className="btn btn-primary" onClick={this.submitOrder}>保存销售单</button>
+                            <button className="btn btn-primary" disabled={isFetching} onClick={this.submitOrder}>{isFetching ? "正在保存..." : "保存销售单"}</button>
                             &nbsp;&nbsp;
                         </div>
                     </div>
 
                 </Form>
-                {loading}
+
             </div>
 
             {goodSelector}

@@ -144,7 +144,7 @@ exports.receiptList = (req, res, next) => {
 
         const { Quantity, rows } = mem;
 
-        console.log(mem);
+        // console.log(mem);
 
         return res.send({ code: 0, message: '查询入库单列表操作成功！', Quantity, data: rows });
 

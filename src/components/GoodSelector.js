@@ -86,7 +86,7 @@ class GoodSelector extends React.Component {
                 <td>{g.FormOfDrug}</td>
                 <td>{g.Dimension}</td>
                 <td>{g.Unit}</td>
-                <td>{g.Medicare}</td>
+                <td>{g.ValiableQuantity}</td>
             </tr>);
         })
 
@@ -104,7 +104,7 @@ class GoodSelector extends React.Component {
                         <th>剂型</th>
                         <th>规格</th>
                         <th>价格</th>
-                        <th>医保</th>
+                        <th>库存</th>
                     </tr>
                 </thead>
                 <tbody>

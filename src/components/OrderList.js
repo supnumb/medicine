@@ -131,7 +131,7 @@ class OrderList extends React.Component {
         let mListJsx = orders.map((o, index) => (<tr key={index}>
             <td>{o.ID}</td>
             <td>{o.Name}</td>
-            <td>{o.MobilePhone}</td>
+            <td>{o.MobilPhone}</td>
             <td>{o.GoodNames}</td>
             <td>{o.ReceiptAmount}</td>
             <td>{o.PayStyleLabel}</td>

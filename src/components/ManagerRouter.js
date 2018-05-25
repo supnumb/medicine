@@ -1,5 +1,5 @@
 import React from 'react';
-import { Route, BrowserRouter as Router, Switch, NavLink,  } from 'react-router-dom';
+import { Route, BrowserRouter as Router, Switch, NavLink, } from 'react-router-dom';
 import { hot } from 'react-hot-loader'
 
 import {
@@ -79,13 +79,34 @@ class ManagerRouter extends React.Component {
         }
     }
 
+    componentDidMount() {
+        fetch('/api/employee/profile', {
+            method: "GET",
+            mode: 'same-origin',
+            credentials: 'same-origin'
+        }).then(res => res.json()).then(json => {
+            if (json.code == 0) {
+                console.log("加载雇员详细信息", json);
+                this.setState({ employee: json.data })
+            } else {
+                console.log(this);
+
+                this.props.history.push("/employee_signin");
+            }
+        }).catch(err => console.log(err));
+    }
+    
     render() {
         let { employee } = this.state;
+
+        console.log(employee);
+
 
         return (<Router>
             <div>
                 <div className="navbar navbar-inverse navbar-fixed-top">
                     <h2>美信康年大药房</h2>
+                    {employee.Name}
                 </div>
                 <div className="container-fluid">
                     {/* <div className="container"> */}

@@ -1,5 +1,6 @@
 import React from 'react';
 import Store from './Reducer';
+import { Icon, } from 'rsuite';
 
 class OrderGoodList extends React.Component {
     constructor(props) {
@@ -62,6 +63,8 @@ class OrderGoodList extends React.Component {
 
     render() {
         let { orderGood, orderGoods, isFetching } = this.state;
+
+        let loading = isFetching ? (<Icon icon='spinner' spin />) : ("");
 
         let listJsx = orderGoods.map((og, index) => {
 
@@ -135,7 +138,7 @@ class OrderGoodList extends React.Component {
                     </tr>
                 </tfoot>
             </table>
-
+            {loading}
         </div>)
     }
 }

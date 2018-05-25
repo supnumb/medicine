@@ -35,15 +35,18 @@ class ReceiptEditor extends React.Component {
         };
 
         this.loadReceiptDetailFromDB = this._loadReceiptDetailFromDB.bind(this);
-        this.loadEmployeesFromDB = this._loadEmployeesFromDB.bind(this);
+        // this.loadEmployeesFromDB = this._loadEmployeesFromDB.bind(this);
         this.loadVendorListFromDB = this._loadVendorListFromDB.bind(this);
         this.onSelectVendor = this._onSelectVendor.bind(this);
-        this.onEmployeeSelect = this._onEmployeeSelect.bind(this);
+        // this.onEmployeeSelect = this._onEmployeeSelect.bind(this);
         this.onGoodSelectorChanged = this._onGoodSelectorChanged.bind(this);
         this.submitReceipt = this._submitReceipt.bind(this);
     }
 
     _submitReceipt() {
+
+        console.log(this.form.check());
+
         if (!this.form.check()) {
             this.setState({ message: "数据格式有错误!" });
             return;
@@ -51,11 +54,6 @@ class ReceiptEditor extends React.Component {
 
         let { values, receiptGoods, receipt } = this.state;
         let receiptData = Object.assign({}, receipt, values);
-
-        if (!receiptData.EmployeeID) {
-            this.setState({ message: "" });
-            return;
-        }
 
         let _amount = 0;
         receiptGoods.forEach(g => {
@@ -122,7 +120,7 @@ class ReceiptEditor extends React.Component {
     }
 
     _loadVendorListFromDB(keyword) {
-        console.log(keyword);
+        // console.log(keyword);
 
         let data = { KeyWord: keyword };
 
@@ -153,27 +151,27 @@ class ReceiptEditor extends React.Component {
     /**
      * 加载所有雇员列表
      */
-    _loadEmployeesFromDB() {
+    // _loadEmployeesFromDB() {
 
-        fetch('/api/employee/search', {
-            method: 'POST',
-            mode: 'same-origin',
-            credentials: 'same-origin',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }).then(res => res.json()).then(json => {
-            // console.log({ json });
-            if (json.code == 0) {
-                let employees = json.data.map((e) => ({ "value": e.ID, "label": e.Name, "data": e }));
-                this.setState({ employees: employees })
-            } else {
-                alert(json.message);
-            }
-        }).catch(err => {
-            console.error(err);
-        })
-    }
+    //     fetch('/api/employee/search', {
+    //         method: 'POST',
+    //         mode: 'same-origin',
+    //         credentials: 'same-origin',
+    //         headers: {
+    //             'Content-Type': 'application/json'
+    //         }
+    //     }).then(res => res.json()).then(json => {
+    //         // console.log({ json });
+    //         if (json.code == 0) {
+    //             let employees = json.data.map((e) => ({ "value": e.ID, "label": e.Name, "data": e }));
+    //             this.setState({ employees: employees })
+    //         } else {
+    //             alert(json.message);
+    //         }
+    //     }).catch(err => {
+    //         console.error(err);
+    //     })
+    // }
 
     /**
      * 加载进货单的详细信息
@@ -217,7 +215,7 @@ class ReceiptEditor extends React.Component {
                 state: oldReceipt
             }
         } = this.props;
-        console.log({receipt});
+        console.log({ receipt });
         if (oldReceipt) {
             if (receipt && receipt.ID != oldReceipt.ID) {
                 this.loadReceiptDetailFromDB(receipt);
@@ -236,23 +234,21 @@ class ReceiptEditor extends React.Component {
             }
         } = this.props;
 
-        console.log({receipt});
+        console.log({ receipt });
 
         if (receipt) {
-            this.setState({values:receipt});
+            this.setState({ values: receipt });
             this.loadReceiptDetailFromDB(receipt);
         }
 
         this.loadVendorListFromDB();
-        this.loadEmployeesFromDB();
+        // this.loadEmployeesFromDB();
     }
 
     _onGoodSelectorChanged(selected) {
         let { receiptGoods } = this.state;
 
         if (selected) {
-            console.log(selected);
-
             selected.forEach(sg => {
                 let isHas = false;
                 receiptGoods.forEach(g => {
@@ -281,7 +277,7 @@ class ReceiptEditor extends React.Component {
     render() {
         let { receipt, values, errors, receiptGoods, employees, vendors, isShowGoodSelector, isFetching, message } = this.state;
 
-        // console.log({ values, receiptGoods, receipt });
+        console.log({ message });
 
         let loading = isFetching ? (<Icon icon='spinner' spin />) : ("");
 
@@ -305,11 +301,10 @@ class ReceiptEditor extends React.Component {
                             供应商&nbsp;<span className="red">*</span>
                         </label>
                         <div className="col-md-4">
-                            <AsyncTypeahead id="VendorName" name="VendorName" inputProps={{
+                            <AsyncTypeahead useCache={true} id="VendorName" name="VendorName" inputProps={{
                                 name: "Name",
                                 id: "ID"
-                            }} value={values.VendorName} placeholder={values.VendorName} defaultInputValue={values.VendorName} onSearch={this.loadVendorListFromDB} labelKey="label" onChange={this.onSelectVendor} isLoading={isFetching} options={vendors} />
-
+                            }} defaultInputValue={values.VendorID} value={values.VendorID} placeholder={values.VendorName} onSearch={this.loadVendorListFromDB} labelKey="label" onChange={this.onSelectVendor} isLoading={isFetching} options={vendors} />
                         </div>
                         <p className="text-danger">{errors.VendorName}</p>
                     </div>
@@ -331,24 +326,25 @@ class ReceiptEditor extends React.Component {
                         </div>
                         <p className="text-danger">{errors.Telephone}</p>
                     </div>
-                    <div className="form-group">
+                    {/* <div className="form-group">
                         <label className="control-label col-md-2">
-                            销售员&nbsp;<span className="red">*</span>
+                            操作员&nbsp;<span className="red">*</span>
                         </label>
                         <div className="col-md-4">
-                            <SelectPicker id="EmployeeName" defaultValue={values.EmployeeID} name="EmployeeName" onSelect={this.onEmployeeSelect} placeholder="请选择销售员" data={employees} />
+                            <SelectPicker id="EmployeeName" value={values.OperatorID} name="EmployeeName" onSelect={this.onEmployeeSelect} placeholder="请选择销售员" data={employees} />
                         </div>
                         <p className="text-danger">{errors.EmployeeName}</p>
-                    </div>
+                    </div> */}
                     <div className="form-group">
                         <label className="control-label col-md-2">
                             进货日期&nbsp;<span className="red">*</span>
                         </label>
                         <div className="col-md-4">
-                            <DatePicker name="Date" id="Date" defaultValue={Moment()} onChange={(date) => {
+                            <DatePicker name="Date" id="Date" value={Moment(values.Date)} onChange={(date) => {
                                 let { values } = this.state;
                                 values.Date = Moment(date).format("YYYY-MM-DD");
                                 console.log(date);
+                                this.setState({ values });
                             }} />
                         </div>
                     </div>
@@ -361,7 +357,7 @@ class ReceiptEditor extends React.Component {
                         {message}
                     </p>
 
-                    <button className="btn btn-primary" onClick={this.submitReceipt}> 保存进货单</button>
+                    <button className="btn btn-primary" onClick={this.submitReceipt}>保存进货单</button>
                 </Form>
 
             </div>

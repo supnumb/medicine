@@ -1,14 +1,13 @@
 import React from 'react';
 import Store from './Reducer'
-
-import InviteList from './InviteList';
-
 import { Form, Field, createFormControl } from 'form-lib';
 import { SchemaModel, StringType } from 'rsuite-schema';
 
-const TextareaField = createFormControl('textarea');
 
-const model = SchemaModel({ Name: StringType().isRequired('请输入回访内容') });
+import InviteList from './InviteList';
+
+const TextareaField = createFormControl('textarea');
+const model = SchemaModel({ Remarks: StringType().isRequired('请输入回访内容') });
 
 /**
  * 客户回访编辑组件

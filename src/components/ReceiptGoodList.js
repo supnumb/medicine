@@ -1,6 +1,9 @@
 import React from 'react';
 import Button from 'rsuite/lib/Button';
 
+import { DatePicker } from 'rsuite';
+import Moment from 'moment';
+
 class ReceiptGoodList extends React.Component {
     constructor(props) {
         super(props);
@@ -39,20 +42,43 @@ class ReceiptGoodList extends React.Component {
 
     componentWillReceiveProps(nextProps) {
         let { goods } = nextProps;
-        console.log({ goods });
-        this.setState({ goods: goods || [] });
+        // console.log({ goods });
+
+        if (goods) {
+            goods.forEach(g => {
+                if (!g.ExpiredDate) {
+                    g.ExpiredDate = Moment().add(90, 'days').calendar();
+                }
+            });
+
+            this.setState({ goods });
+
+        } else {
+            this.setState({ goods: [] });
+        }
     }
 
     componentDidMount() {
         let { goods } = this.props;
         // console.log({ goods });
 
-        this.setState({ goods: goods || [] });
+        if (goods) {
+            goods.forEach(g => {
+                if (!g.ExpiredDate) {
+                    g.ExpiredDate = Moment().add(90, 'days').calendar();
+                }
+            });
+
+            this.setState({ goods });
+
+        } else {
+            this.setState({ goods: [] });
+        }
     }
 
     render() {
         let { receiptGood, goods } = this.state;
-        // console.log({ receiptGood, goods });
+        console.log({ receiptGood, goods });
 
         let jsx = goods.map((g, index) => {
 
@@ -61,21 +87,29 @@ class ReceiptGoodList extends React.Component {
                     <td>{g.GoodID} </td>
                     <td>{g.Name}</td>
                     <td>{g.OfficalName}</td>
-                    <td><input style={{ "width": "70px" }} type="text" id="ExpiredDate" value={g.ExpiryDate} onChange={(event) => {
-                        this.onTextChanged(event, g);
-                    }} placeholder="有效期" />
+                    <td>
+                        <DatePicker name="Date" id="Date" value={Moment(g.ExpiredDate)} onChange={(date) => {
+                            console.log({ date: Moment(date).format("YYYY-MM-DD") });
+                            g.ExpiredDate = Moment(date).format("YYYY-MM-DD");
+                            this.setState({ goods });
+                        }} placeholder="有效期"/>
+                        
                     </td>
+                    <td>
+
+                        <input onChange={(event) => {
+                            this.onTextChanged(event, g);
+                        }} style={{ "width": "40px" }} type="text" id="CostPrice" value={g.CostPrice} placeholder="成本价" /></td>
                     <td><input onChange={(event) => {
                         this.onTextChanged(event, g);
-                    }} style={{ "width": "40px" }} type="text" id="CostPrice" value={g.CostPrice} placeholder="成本价" /></td>
-                    <td><input onChange={(event) => {
-                        this.onTextChanged(event, g);
-                    }} style={{ "width": "40px" }} type="text" id="Quentity" value={g.Quentity} placeholder="数量" /></td>
+                    }} style={{ "width": "40px" }} type="text" id="Quantity" value={g.Quantity} placeholder="数量" /></td>
                     <td><input onChange={(event) => {
                         this.onTextChanged(event, g);
                     }} style={{ "width": "80px" }} type="text" id="BatchNo" value={g.BatchNo} placeholder="批号" /></td>
                     <td>
-                        <a href="#" onClick={() => { }}>保存</a>
+                        <a href="#" onClick={() => {
+                            this.setState({ receiptGood: null })
+                        }}>保存</a>
                     </td>
                 </tr>);
 
@@ -84,7 +118,7 @@ class ReceiptGoodList extends React.Component {
                     <td>{g.GoodID} </td>
                     <td>{g.Name}</td>
                     <td>{g.OfficalName}</td>
-                    <td>{g.ExpiryDate}</td>
+                    <td>{g.ExpiredDate}</td>
                     <td>{g.CostPrice}</td>
                     <td>{g.Quantity}</td>
                     <td>{g.BatchNo}</td>

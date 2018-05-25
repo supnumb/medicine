@@ -16,7 +16,7 @@ function Order() {
         _orderList: "select o.*,m.Name,m.MobilPhone,(select name from Members where ID=o.EmployeeID) as EmployeeName,(select name from Members where ID=o.OperatorID) as OperatorName,GROUP_CONCAT(g.GoodName) as GoodNames from Orders o left join Members m on o.MemberID=m.ID left join OrderGoods g on o.ID=g.OrderID where m.MobilPhone like :KeyWord group by o.ID order by o.UpdateTime desc limit :Page,:Limit;",
 
         //订单记录详情
-        _orderInfo: "select * from Orders where ID=:ID;",
+        _orderInfo: "select * from OrderView where ID=:ID;",
 
         //订单商品
         _orderGood: "select o.*,g.Name,g.OfficalName,g.Dimension,g.FormOfDrug,g.Unit,g.Manufacturer from OrderGoods o left join Goods g on o.GoodID=g.ID where o.OrderID=:ID;",
@@ -314,6 +314,7 @@ OrderTran.prototype.edit = function(Obj, callback) {
                                 if (Quantity_num > 0) {
                                     Flag = 1;
                                 }
+                               
                                 TotalCostPrice += arrs[i].CostPrice * Quantity_num;
                                 arrs[i].ValiableQuantity = arrs[i].ValiableQuantity - Quantity_num;
                                 ReceiptQuantity += Quantity_num;
@@ -322,7 +323,9 @@ OrderTran.prototype.edit = function(Obj, callback) {
                                 ReceiptGoodIDs += arrs[i].ID + ",";
                                 ReceiptGood_update += ` when ID=${arrs[i].ID} then ${arrs[i].ValiableQuantity} `;
                                 ReceiptGood_update_child += ` when ID=${arrs[i].ID} then ${Flag} `;
+                          
                             } else {
+                          
                                 TotalCostPrice += arrs[i].CostPrice * arrs[i].ValiableQuantity;
                                 Quantity_num -= arrs[i].ValiableQuantity;
                                 ReceiptQuantity += arrs[i].ValiableQuantity + ",";
@@ -331,6 +334,7 @@ OrderTran.prototype.edit = function(Obj, callback) {
                                 ReceiptGoodIDs += arrs[i].ID + ",";
                                 ReceiptGood_update += ` when ID=${arrs[i].ID} then 0, `;
                                 ReceiptGood_update_child += ` when ID=${arrs[i].ID} then 1 `;
+                          
                             }
                         }
 
