@@ -95,18 +95,36 @@ class ManagerRouter extends React.Component {
             }
         }).catch(err => console.log(err));
     }
-    
+
     render() {
         let { employee } = this.state;
 
         console.log(employee);
 
-
         return (<Router>
             <div>
                 <div className="navbar navbar-inverse navbar-fixed-top">
-                    <h2>美信康年大药房</h2>
-                    {employee.Name}
+                    <div className="navbar-header">
+                        <button type="button" className="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                            <span className="sr-only"></span>
+                            <span className="icon-bar"></span>
+                            <span className="icon-bar"></span>
+                            <span className="icon-bar"></span>
+                        </button>
+                        <a className="navbar-brand" href="/back_index">美信康年大药房</a>
+                    </div>
+                    <ul className="nav navbar-top-links navbar-right">
+
+                        <li className="dropdown">
+                            <a className="dropdown-toggle" data-toggle="dropdown" href="#">
+                                <i className="fa fa-user fa-fw"></i> <i className="fa fa-caret-down">{employee.Name}</i>
+                            </a>
+                            <ul className="dropdown-menu dropdown-user">
+                                <li><a href="/employee_signin">Logout</a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
                 </div>
                 <div className="container-fluid">
                     {/* <div className="container"> */}

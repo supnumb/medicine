@@ -16,7 +16,6 @@ router.get('/orderAdd', function (req, res, next) {
     res.render('orderAdd');
 });
 
-
 router.get('/orderList', function (req, res, next) {
     res.render('orderList');
 });
