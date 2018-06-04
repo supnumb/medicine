@@ -86,9 +86,4 @@ module.exports = {
     resolve: {
         extensions: ['.js', '.scss']
     },
-    output: {
-        path: path.resolve(__dirname, '../public/assets/'),
-        filename: 'js/[name].bundle.js',
-        publicPath: 'http://erp.bjmxkn.cn:8080/assets/'
-    }
 };

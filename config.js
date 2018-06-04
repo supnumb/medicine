@@ -10,11 +10,11 @@ var config = {
     },
 
     DB_PRO: {
-        host: 'www.loclive.cn',
+        host: 'localhost',
         connectionLimit: 50,
-        user: "chenxy",
-        port: "3360",
-        password: "60v&iA",
+        user: "programer",
+        port: "3306",
+        password: "p1@32I",
         database: "Medicine"
     }
 };
