@@ -17,5 +17,10 @@ module.exports = merge(common, {
         historyApiFallback: true,
         headers: { "Access-Control-Allow-Origin": "*" },
         contentBase: path.resolve(__dirname, '../public/')
+    },
+    output: {
+        path: path.resolve(__dirname, '../public/assets/'),
+        filename: 'js/[name].bundle.js',
+        publicPath: 'http://localhost:8080/assets/'
     }
 });
