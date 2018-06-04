@@ -9,7 +9,7 @@ module.exports = merge(common, {
     output: {
         path: path.resolve(__dirname, '../public/assets/'),
         filename: 'js/[name].bundle.js',
-        publicPath: 'http://erp.bjmxkn.cn:8080/assets/'
+        publicPath: '/assets/'
     },
     plugins: [
         new webpack.DefinePlugin({'process.env.NODE_ENV': JSON.stringify('production')}),
