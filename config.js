@@ -10,9 +10,9 @@ var config = {
     },
 
     DB_PRO: {
-        host: 'localhost',
+        host: 'maria_medicine',
         connectionLimit: 50,
-        user: "programer",
+        user: "root",
         port: "3306",
         password: "p1@32I",
         database: "Medicine"
