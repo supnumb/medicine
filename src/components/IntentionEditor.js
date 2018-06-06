@@ -2,6 +2,7 @@ import React from 'react';
 import Store from './Reducer'
 
 import IntentionList from './IntentionList';
+import { Icon, RadioGroup, Radio } from 'rsuite';
 
 import { Form, Field, createFormControl } from 'form-lib';
 import { SchemaModel, StringType } from 'rsuite-schema';
@@ -108,6 +109,24 @@ class IntentionEditor extends React.Component {
             }} onCheck={(errors) => {
                 this.setState({ errors })
             }}>
+
+                <div className="form-group">
+                    <label>
+                        标签
+                    </label>
+                    <div>
+                        <RadioGroup name="IsForeign" inline={true} value={values.IsForeign} onChange={
+                            (value) => {
+                                let { values } = this.state;
+                                values.IsForeign = value;
+                                this.setState({ values })
+                            }
+                        }>
+                            <Radio value="0">已经放弃</Radio>
+                            <Radio value="1">准备购买</Radio>
+                        </RadioGroup>
+                    </div>
+                </div>
 
                 <div className="form-group">
                     <label>

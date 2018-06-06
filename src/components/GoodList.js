@@ -114,8 +114,8 @@ class GoodList extends React.Component {
             <td>{g.Dimension}</td>
             <td>{g.Unit}</td>
             <td>{g.DefaultCostPrice}</td>
-            <td>{g.DefaultPrice}</td>
-            <td>{g.LimitPrice}</td>
+            <td>{g.Translation}</td>
+            <td>{g.PeriodTreatment}</td>
             <td>{g.Manufacturer}</td>
             <td>{g.UseWay}</td>
 
@@ -165,8 +165,8 @@ class GoodList extends React.Component {
                             <th>规格</th>
                             <th>单位</th>
                             <th>默认成本</th>
-                            <th>默认售价</th>
-                            <th>权限价</th>
+                            <th>适应症</th>
+                            <th>疗程</th>
                             <th>生产商</th>
                             <th>用法</th>
                             <th>进口</th>

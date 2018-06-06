@@ -121,7 +121,6 @@ exports.orderList = (req, res, next) => {
     }
 
     Order.orderList(KeyWord, Page, Limit, StartTime, EndTime, function(err, mem) {
-
         if (err) {
             return res.send({ code: 2, message: "数据库出错" });
         };
@@ -129,7 +128,6 @@ exports.orderList = (req, res, next) => {
         let { Quantity, rows } = mem;
 
         return res.send({ code: 0, message: "查询订单列表操作成功！", Quantity, data: rows });
-
     });
 }
 

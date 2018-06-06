@@ -43,7 +43,7 @@ app.use(session({
 }));
 
 
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public'),{maxAge:5*60*1000}));
 
 app.use('/users', usersRouter);
 app.use('/api', apiRouter);

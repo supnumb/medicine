@@ -103,7 +103,6 @@ Order.prototype.orderList = function(KeyWord, Page, Limit, StartTime, EndTime, c
         },
 
         function(cb) {
-
             that._orderList({
                 KeyWord: `%${KeyWord}%`,
                 Page,
@@ -156,9 +155,7 @@ Order.prototype.orderList = function(KeyWord, Page, Limit, StartTime, EndTime, c
         });
 
         return callback(null, { Quantity, rows });
-
     });
-
 };
 
 /**

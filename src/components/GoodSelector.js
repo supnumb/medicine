@@ -22,15 +22,15 @@ class GoodSelector extends React.Component {
 
         let { goods } = this.state;
         let checkedGoods = [];
-        
+
         $("input[type=checkbox]:checked").each((index, ele) => {
             goods.forEach(g => {
                 if (g.ID == parseInt($(ele).val()))
-                checkedGoods.push(g);
+                    checkedGoods.push(g);
             });
         });
 
-        console.log(checkedGoods);
+        // console.log(checkedGoods);
 
         if (this.props.onCheckChanged) {
             this.props.onCheckChanged(checkedGoods);
@@ -93,7 +93,11 @@ class GoodSelector extends React.Component {
         return (<div id='GoodSelector' className="editor_zone">
             <h4>药品选择</h4>
             <div>
-                <input type="text" id="keyword" /> <button>查询</button>
+                <input type="text" id="keyword" /> <button onClick={() => {
+                    let keyword = $("#keyword").val();
+                    console.log(keyword);
+                    this.loadGoodsFromDB(keyword)
+                }}>查询</button>
             </div>
 
             <table className="table table-striped table-hover">

@@ -187,6 +187,16 @@ class GoodEditor extends React.Component {
 
                 <div className="form-group">
                     <label className="control-label col-sm-3">
+                        <span className="red">*</span>适应症:
+                    </label>
+                    <div className="col-sm-6">
+                        <Field name="Translation" id="Translation" />
+                    </div>
+                    <p className="text-danger">{errors.Translation}</p>
+                </div>
+
+                <div className="form-group">
+                    <label className="control-label col-sm-3">
                         <span className="red">*</span>用法用量
                     </label>
 
@@ -199,37 +209,7 @@ class GoodEditor extends React.Component {
 
                 <div className="form-group">
                     <label className="control-label col-sm-3">
-                    <span className="red">*</span>中标价:
-                    </label>
-                    <div className="col-sm-6">
-                        <Field name="BidPrice" id="BidPrice" />
-                    </div>
-                    <p className="text-danger">{errors.BidPrice}</p>
-                </div>
-
-                <div className="form-group">
-                    <label className="control-label col-sm-3">
-                    <span className="red">*</span>竞争情况:
-                    </label>
-                    <div className="col-sm-6">
-                        <Field name="Competion" id="Competion" />
-                    </div>
-                    <p className="text-danger">{errors.Competion}</p>
-                </div>
-
-                <div className="form-group">
-                    <label className="control-label col-sm-3">
-                    <span className="red">*</span>医保情况:
-                    </label>
-                    <div className="col-sm-6">
-                        <Field name="Medicare" id="Medicare" />
-                    </div>
-                    <p className="text-danger">{errors.Medicare}</p>
-                </div>
-
-                <div className="form-group">
-                    <label className="control-label col-sm-3">
-                    <span className="red">*</span> 疗程:
+                        <span className="red">*</span> 疗程:
                     </label>
                     <div className="col-sm-6">
                         <Field name="PeriodTreatment" id="PeriodTreatment" />
@@ -237,19 +217,11 @@ class GoodEditor extends React.Component {
                     <p className="text-danger">{errors.PeriodTreatment}</p>
                 </div>
 
-                <div className="form-group">
-                    <label className="control-label col-sm-3">
-                    <span className="red">*</span>适应症:
-                    </label>
-                    <div className="col-sm-6">
-                        <Field name="Translation" id="Translation" />
-                    </div>
-                    <p className="text-danger">{errors.Translation}</p>
-                </div>
+
 
                 <div className="form-group">
                     <label className="control-label col-sm-3">
-                    <span className="red">*</span>是否进口:
+                        <span className="red">*</span>是否进口:
                     </label>
                     <div className="col-sm-6">
                         <RadioGroup name="IsForeign" inline={true} value={values.IsForeign} onChange={
@@ -267,7 +239,7 @@ class GoodEditor extends React.Component {
 
                 <div className="form-group">
                     <label className="control-label col-sm-3">
-                    <span className="red">*</span>批准文号:
+                        <span className="red">*</span>批准文号:
                     </label>
                     <div className="col-sm-6">
                         <Field name="ApprovalNumber" id="ApprovalNumber" />
@@ -275,9 +247,21 @@ class GoodEditor extends React.Component {
                     <p className="text-danger">{errors.ApprovalNumber}</p>
                 </div>
 
+
                 <div className="form-group">
                     <label className="control-label col-sm-3">
-                    <span className="red">*</span>默认成本
+                        <span className="red">*</span>生产厂商
+                    </label>
+                    <div className="col-sm-6">
+                        <Field name="Manufacturer" id="Manufacturer" />
+                    </div>
+                    <p className="text-danger">{errors.Manufacturer}</p>
+                </div>
+
+
+                <div className="form-group">
+                    <label className="control-label col-sm-3">
+                        <span className="red">*</span>默认成本
                     </label>
                     <div className="col-sm-6">
                         <Field name="DefaultCostPrice" id="DefaultCostPrice" />
@@ -287,7 +271,7 @@ class GoodEditor extends React.Component {
 
                 <div className="form-group">
                     <label className="control-label col-sm-3">
-                    <span className="red">*</span>默认价格
+                        <span className="red">*</span>默认价格
                     </label>
                     <div className="col-sm-6">
                         <Field name="DefaultPrice" id="DefaultPrice" />
@@ -297,7 +281,7 @@ class GoodEditor extends React.Component {
 
                 <div className="form-group">
                     <label className="control-label col-sm-3">
-                    <span className="red">*</span>权限价格
+                        <span className="red">*</span>权限价格
                     </label>
                     <div className="col-sm-6">
                         <Field name="LimitPrice" id="LimitPrice" />
@@ -307,12 +291,41 @@ class GoodEditor extends React.Component {
 
                 <div className="form-group">
                     <label className="control-label col-sm-3">
-                    <span className="red">*</span>生产厂商
+                        <span className="red">*</span>中标价:
                     </label>
                     <div className="col-sm-6">
-                        <Field name="Manufacturer" id="Manufacturer" />
+                        <Field name="BidPrice" id="BidPrice" />
                     </div>
-                    <p className="text-danger">{errors.Manufacturer}</p>
+                    <p className="text-danger">{errors.BidPrice}</p>
+                </div>
+
+                <div className="form-group">
+                    <label className="control-label col-sm-3">
+                        <span className="red">*</span>竞争情况:
+                    </label>
+                    <div className="col-sm-6">
+                        <Field name="Competion" id="Competion" />
+                    </div>
+                    <p className="text-danger">{errors.Competion}</p>
+                </div>
+
+                <div className="form-group">
+                    <label className="control-label col-sm-3">
+                        <span className="red">*</span>医保情况:
+                    </label>
+                    <div className="col-sm-6">
+                        <Field name="Medicare" id="Medicare" />
+                    </div>
+                    <p className="text-danger">{errors.Medicare}</p>
+                </div>
+
+                <div className="form-group">
+                    <label className="control-label col-sm-3">
+                        备注:
+                    </label>
+                    <div className="col-sm-6">
+                        <Field name="Remark" id="Remark" />
+                    </div>
                 </div>
 
                 <div className="form-group">

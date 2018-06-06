@@ -4,6 +4,7 @@ import Store from './Reducer';
 import { Form, Field, createFormControl } from 'form-lib';
 import { SchemaModel, StringType } from 'rsuite-schema';
 import { Icon } from 'rsuite';
+import { Pager } from './Pager'
 
 /**
  * 销售订单页面
@@ -200,6 +201,13 @@ class OrderList extends React.Component {
                 <tbody>
                     {mListJsx}
                 </tbody>
+                <tfoot>
+                    <tr>
+                        <td>
+                            {/* <Pager /> */}
+                        </td>
+                    </tr>
+                </tfoot>
             </table>
             {loading}
         </div>)
