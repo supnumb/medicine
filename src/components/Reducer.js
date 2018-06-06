@@ -76,6 +76,7 @@ const defaultState = {
         isFetching: false,
         receipt: null,
         KeyWord: "",
+        Status: [0, 1],
         Page: 0,
         Limit: 10
     },
@@ -133,7 +134,11 @@ function ReceiptsListReducer(state = defaultState.receiptList, action) {
                 isFetching: false,
                 vendor: null
             });
-
+        case "SET_SETTLE_STATUS":
+            return Object.assign({}, state, {
+                isFetching: true,
+                Status: action.payload
+            })
         default:
             return state;
     }

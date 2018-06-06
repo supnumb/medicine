@@ -70,7 +70,6 @@ class ReceiptGoodList extends React.Component {
             });
 
             this.setState({ goods });
-
         } else {
             this.setState({ goods: [] });
         }
@@ -92,8 +91,8 @@ class ReceiptGoodList extends React.Component {
                             console.log({ date: Moment(date).format("YYYY-MM-DD") });
                             g.ExpiredDate = Moment(date).format("YYYY-MM-DD");
                             this.setState({ goods });
-                        }} placeholder="有效期"/>
-                        
+                        }} placeholder="有效期" />
+
                     </td>
                     <td>
 
@@ -106,6 +105,9 @@ class ReceiptGoodList extends React.Component {
                     <td><input onChange={(event) => {
                         this.onTextChanged(event, g);
                     }} style={{ "width": "80px" }} type="text" id="BatchNo" value={g.BatchNo} placeholder="批号" /></td>
+                    <td>{g.Dimension}</td>
+                    <td>{g.Unit}</td>
+                    <td>{g.Manufacturer}</td>
                     <td>
                         <a href="#" onClick={() => {
                             this.setState({ receiptGood: null })
@@ -118,10 +120,14 @@ class ReceiptGoodList extends React.Component {
                     <td>{g.GoodID} </td>
                     <td>{g.Name}</td>
                     <td>{g.OfficalName}</td>
+                    <td>{g.Dimension}</td>
+                    <td>{g.Unit}</td>
+                    <td>{g.Manufacturer}</td>
                     <td>{g.ExpiredDate}</td>
                     <td>{g.CostPrice}</td>
                     <td>{g.Quantity}</td>
                     <td>{g.BatchNo}</td>
+                   
                     <td>
                         <a href="#" onClick={() => {
                             this.setState({ receiptGood: g })
@@ -139,6 +145,9 @@ class ReceiptGoodList extends React.Component {
                         <th>ID</th>
                         <th>药品名</th>
                         <th>通用名</th>
+                        <th>规格</th>
+                        <th>单位</th>
+                        <th>厂家</th>
                         <th>有效期</th>
                         <th>进价</th>
                         <th>数量</th>
@@ -151,7 +160,7 @@ class ReceiptGoodList extends React.Component {
                 </tbody>
                 <tfoot>
                     <tr>
-                        <td colSpan="7"> <button style={{ "float": "right" }} onClick={() => {
+                        <td colSpan="11"> <button style={{ "float": "right" }} onClick={() => {
                             if (this.props.onAddGood) {
                                 this.props.onAddGood();
                             }

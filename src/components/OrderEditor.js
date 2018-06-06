@@ -45,6 +45,8 @@ class OrderEditor extends React.Component {
         let { order } = nextProps;
         let { order: oldOrder } = this.props;
 
+        console.log({ order, oldOrder });
+
         if (oldOrder) {
             if (order && order.ID != oldOrder.ID) {
                 this.loadOrderDetailFromDB(order);
@@ -62,6 +64,8 @@ class OrderEditor extends React.Component {
         } } = this.props;
 
         Store.dispatch({ type: "SWITCH_SELECTOR_SHOW", payload: false })
+
+        console.log({ state });
 
         if (state) {
             this.loadOrderDetailFromDB(state);
@@ -162,11 +166,11 @@ class OrderEditor extends React.Component {
                 'Content-Type': 'application/json'
             }
         }).then(res => res.json()).then(json => {
-            console.log({ json });
+            // console.log({ json });
             if (json.code == 0) {
 
                 let employees = json.data.map((e) => ({ "value": e.ID, "label": e.Name, "data": e }));
-                console.log(employees);
+                // console.log(employees);
 
                 Store.dispatch({ type: "FETCH_EMPLOYEE_DONE", payload: employees });
                 // this.setState({ employees: employees })
@@ -238,7 +242,7 @@ class OrderEditor extends React.Component {
                 'Content-Type': 'application/json'
             }
         }).then(res => res.json()).then(json => {
-            console.log(json);
+            console.log({ json });
 
             if (json.code == 0) {
                 json.data.MobilPhone = json.data.Telephone;
@@ -289,7 +293,6 @@ class OrderEditor extends React.Component {
         } = this.state;
 
         console.log({ values, orderGoods });
-
 
         let goodSelector = ("");
 
@@ -358,11 +361,14 @@ class OrderEditor extends React.Component {
                                     Store.dispatch({ type: "SET_VALUES", payload: values });
                                 }
                             }>
-                                <Radio value={1}>微信</Radio>
-                                <Radio value={2}>支付宝</Radio>
                                 <Radio value={3}>现金</Radio>
-                                <Radio value={4}>货到付款</Radio>
+                                <Radio value={6}>刷卡</Radio>
                                 <Radio value={5}>二维码</Radio>
+                                <Radio value={2}>支付宝</Radio>
+                                <Radio value={1}>微信</Radio>
+                                <Radio value={7}>公司微信</Radio>
+                                <Radio value={8}>网上转账</Radio>
+                                <Radio value={4}>货到付款</Radio>
                             </RadioGroup>
                         </div>
                     </div>
@@ -412,6 +418,16 @@ class OrderEditor extends React.Component {
 
                     <div className="form-group">
                         <label className="control-label col-md-2">
+                            代收费用
+                        </label>
+                        <div className="col-md-4 ">
+                            <Field name="DeliverReceiptFee" id="DeliverReceiptFee" />
+                        </div>
+                        <p className="text-danger">{errors.DeliverReceiptFee}</p>
+                    </div>
+
+                    <div className="form-group">
+                        <label className="control-label col-md-2">
                             保价费用
                         </label>
                         <div className="col-md-4 ">
@@ -425,7 +441,7 @@ class OrderEditor extends React.Component {
                             是否收到
                         </label>
                         <div className="col-md-6">
-                            <RadioGroup defaultValue={0} value={values.DeliveryReceive} name="DeliveryReceive" id="DeliveryReceive" inline={true} onChange={
+                            <RadioGroup value={values.DeliveryReceive} name="DeliveryReceive" id="DeliveryReceive" inline={true} onChange={
                                 (value, event) => {
                                     values.DeliveryReceive = value;
                                     Store.dispatch({ type: "SET_VALUES", payload: values });
@@ -435,9 +451,9 @@ class OrderEditor extends React.Component {
                                     // console.log(value, event);
                                 }
                             }>
-                                <Radio value="0">不明确</Radio>
-                                <Radio value="1">未收到</Radio>
-                                <Radio value="2">已经收到</Radio>
+                                <Radio value={0}>不明确</Radio>
+                                <Radio value={1}>未收到</Radio>
+                                <Radio value={2}>已经收到</Radio>
                             </RadioGroup>
                         </div>
                     </div>

@@ -32,13 +32,10 @@ exports.cash = (req, res, next) => {
 
         const dt = new Date();
 
-        console.log(dt.getMonth());
-
         dt.setMonth(dt.getMonth() - 1);
 
         StartTime = moment(dt).format('YYYY-MM-DD');
         EndTime = moment(new Date()).format('YYYY-MM-DD');
-
     }
 
 

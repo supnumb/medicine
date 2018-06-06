@@ -78,7 +78,8 @@ class IntentionList extends React.Component {
         let listJsx = intentions.map((i, index) => (<tr key={index}>
             <td>{i.ID}</td>
             <td>{i.Goods}</td>
-            <td>{i.OperatorID}</td>
+            <td>{i.Tags}</td>
+            <td>{i.OperatorName}</td>
             <td>{i.UpdateTime}</td>
         </tr>));
 
@@ -91,6 +92,7 @@ class IntentionList extends React.Component {
                     <tr>
                         <th>ID</th>
                         <th>意向单详情</th>
+                        <th>标签</th>
                         <th>药师</th>
                         <th>时间</th>
                     </tr>

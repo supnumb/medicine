@@ -13,12 +13,12 @@ function Receipt() {
         _receiptQuantity: "select count(r.ID) as Quantity from Receipts r,ReceiptGoods p,Goods g,Vendors v,Members m  where r.ID=p.ReceiptID and p.GoodID=g.ID and r.VendorID=v.ID and r.OperatorID=m.ID and r.Date>=:StartTime and r.Date<=:EndTime and concat(r.ID,g.Name) like :KeyWord;",
 
         //列表
-        _search: "select r.*,m.name as EmployeeName,group_concat(g.Name) as Goods,p.Amount,p.CostPrice,v.Contact,v.Telephone,v.Address from Receipts r,ReceiptGoods p,Goods g,Vendors v,Members m  where r.ID=p.ReceiptID and p.GoodID=g.ID and r.VendorID=v.ID and r.OperatorID=m.ID and r.Date>=:StartTime and r.Date<=:EndTime and concat(r.ID,g.Name) like :KeyWord group by r.ID order by r.Date desc limit :Page,:Limit;",
+        _search: "SELECT r.*, m. NAME AS EmployeeName , group_concat(g. NAME) AS Goods , p.Amount , p.CostPrice , v.Contact , v.Telephone , v.Address FROM Receipts r INNER JOIN ReceiptGoods p ON r.ID = p.ReceiptID INNER JOIN Goods g ON p.GoodID = g.ID INNER JOIN Vendors v ON r.VendorID = v.ID INNER JOIN Members m ON r.OperatorID = m.ID WHERE r.Date >=:StartTime AND r.Date <=:EndTime AND concat( r.VendorName , g.NAME , v.Telephone , v.Address , v.Contact) LIKE :KeyWord and r.Status in (:Status) GROUP BY r.ID ORDER BY r.Date DESC LIMIT :Page,:Limit;",
 
         //详情
         _ReceiptInfo: "select r.*,v.Name,v.Telephone,v.Address,v.Contact,v.Remark from Receipts r left join Vendors v on r.VendorID=v.ID left join Members m on r.OperatorID=m.ID where r.ID=:ID;",
 
-        _ReceiptGoodInfo: "select r.*,g.* from ReceiptGoods r left join Goods g on r.GoodID=g.ID where r.ReceiptID=:ID;",
+        _ReceiptGoodInfo: "select r.*,g.* from ReceiptGoods r inner join Goods g on r.GoodID=g.ID where r.ReceiptID=:ID;",
 
         //结算
         _settle: "update Receipts set status=1 where ID=:ID "
@@ -46,11 +46,11 @@ function ReceiptTran() {
  * 4、增加库存记录信息
  * 
  */
-ReceiptTran.prototype.add = function(Obj, callback) {
+ReceiptTran.prototype.add = function (Obj, callback) {
 
     let tran = pool.getTran();
 
-    tran.beginTransaction(function(err) {
+    tran.beginTransaction(function (err) {
 
         if (err) {
             return callback(err, null);
@@ -62,7 +62,7 @@ ReceiptTran.prototype.add = function(Obj, callback) {
 
         let StockChange_add = 'insert into StockChangeRecords (OperatorID,GoodID,DeltaQuantity,Remark,Type,RelatedObjectID,SalePrice) values ';
 
-        tran.query(Receipt_add, Obj, function(err, rows) {
+        tran.query(Receipt_add, Obj, function (err, rows) {
 
             if (err) {
                 tran.rollback(() => {
@@ -72,7 +72,7 @@ ReceiptTran.prototype.add = function(Obj, callback) {
 
             const ReceiptID = rows.insertId;
 
-            async.eachSeries(ReceiptGoods, function(item, cb) {
+            async.eachSeries(ReceiptGoods, function (item, cb) {
 
                 let { GoodID, CostPrice, Quantity, ExpiryDate, BatchNo } = item;
 
@@ -90,15 +90,15 @@ ReceiptTran.prototype.add = function(Obj, callback) {
                     ValiableQuantity,
                     ExpiryDate,
                     BatchNo
-                }, function(err, arrs) {
+                }, function (err, arrs) {
 
                     if (err) {
                         return cb(err, null);
                     }
 
-                    StockChange_add = StockChange_add + `(${OperatorID},${GoodID},${Quantity},'药品入库统计',1,${ReceiptID },0),`;
+                    StockChange_add = StockChange_add + `(${OperatorID},${GoodID},${Quantity},'药品入库统计',1,${ReceiptID},0),`;
 
-                    pool.query(Stock_update, { Quantity, GoodID }, function(err, rows) {
+                    pool.query(Stock_update, { Quantity, GoodID }, function (err, rows) {
 
                         if (err) {
                             return cb(err, null);
@@ -106,7 +106,7 @@ ReceiptTran.prototype.add = function(Obj, callback) {
 
                         if (rows.affectedRows == 0) {
 
-                            pool.query(Stock_add, { Quantity, GoodID }, function(err, rows) {
+                            pool.query(Stock_add, { Quantity, GoodID }, function (err, rows) {
 
                                 if (err) {
                                     return cb(err, null);
@@ -126,7 +126,7 @@ ReceiptTran.prototype.add = function(Obj, callback) {
                 });
 
 
-            }, function(err) {
+            }, function (err) {
 
                 if (err) {
                     tran.rollback(() => {
@@ -136,7 +136,7 @@ ReceiptTran.prototype.add = function(Obj, callback) {
 
                     StockChange_add = StockChange_add.slice(0, StockChange_add.length - 1);
 
-                    pool.query(StockChange_add, {}, function(err, rows) {
+                    pool.query(StockChange_add, {}, function (err, rows) {
 
                         if (err) {
                             tran.rollback(() => {
@@ -144,7 +144,7 @@ ReceiptTran.prototype.add = function(Obj, callback) {
                             });
                         }
 
-                        tran.commit(function(err) {
+                        tran.commit(function (err) {
 
                             if (err) {
                                 console.log("提交事务失败", err);
@@ -178,11 +178,11 @@ ReceiptTran.prototype.add = function(Obj, callback) {
  * 4、增加库存记录信息
  * 
  */
-ReceiptTran.prototype.update = function(Obj, callback) {
+ReceiptTran.prototype.update = function (Obj, callback) {
 
     let tran = pool.getTran();
 
-    tran.beginTransaction(function(err) {
+    tran.beginTransaction(function (err) {
 
         if (err) {
             return callback(err, null);
@@ -194,7 +194,7 @@ ReceiptTran.prototype.update = function(Obj, callback) {
 
         let StockChange_add = 'insert into StockChangeRecords (OperatorID,GoodID,DeltaQuantity,Remark,Type,RelatedObjectID,SalePrice) values ';
 
-        tran.query(Receipt_cancel, Obj, function(err, rows) {
+        tran.query(Receipt_cancel, Obj, function (err, rows) {
 
             if (err) {
                 tran.rollback(() => {
@@ -204,7 +204,7 @@ ReceiptTran.prototype.update = function(Obj, callback) {
 
             const ReceiptID = ID;
 
-            async.eachSeries(ReceiptGoods, function(item, cb) {
+            async.eachSeries(ReceiptGoods, function (item, cb) {
 
                 let { GoodID, CostPrice, Quantity, ReturnQuantity, ExpiryDate, BatchNo } = item;
 
@@ -216,7 +216,7 @@ ReceiptTran.prototype.update = function(Obj, callback) {
                     ReceiptID,
                     GoodID,
                     ReturnQuantity
-                }, function(err, arrs) {
+                }, function (err, arrs) {
 
                     if (err) {
                         return cb(err, null);
@@ -226,9 +226,9 @@ ReceiptTran.prototype.update = function(Obj, callback) {
                         return cb({ message: `${GoodID}商品数量不足！` }, null);
                     }
 
-                    StockChange_add += `(${OperatorID},${GoodID},${ReturnQuantity},'药品退回统计',4,${ReceiptID },0) `;
+                    StockChange_add += `(${OperatorID},${GoodID},${ReturnQuantity},'药品退回统计',4,${ReceiptID},0) `;
 
-                    tran.query(Stock_update, { ReturnQuantity, GoodID }, function(err, rows) {
+                    tran.query(Stock_update, { ReturnQuantity, GoodID }, function (err, rows) {
 
                         if (err) {
                             return cb(err, null);
@@ -236,7 +236,7 @@ ReceiptTran.prototype.update = function(Obj, callback) {
 
                         if (rows.affectedRows == 0) {
 
-                            tran.query(Stock_add, { Quantity, GoodID }, function(err, rows) {
+                            tran.query(Stock_add, { Quantity, GoodID }, function (err, rows) {
 
                                 if (err) {
                                     return cb(err, null);
@@ -255,14 +255,14 @@ ReceiptTran.prototype.update = function(Obj, callback) {
                 });
 
 
-            }, function(err) {
+            }, function (err) {
 
                 if (err) {
                     tran.rollback(() => {
                         return callback(err, null);
                     });
                 } else {
-                    tran.query(StockChange_add, {}, function(err, rows) {
+                    tran.query(StockChange_add, {}, function (err, rows) {
 
                         if (err) {
                             tran.rollback(() => {
@@ -270,7 +270,7 @@ ReceiptTran.prototype.update = function(Obj, callback) {
                             });
                         }
 
-                        tran.commit(function(err) {
+                        tran.commit(function (err) {
 
                             if (err) {
                                 console.log("提交事务失败", err);
@@ -303,19 +303,18 @@ ReceiptTran.prototype.update = function(Obj, callback) {
  * @param  {Date}   StartTime 开始时间
  * @param  {Date}   EndTime 结束时间
  */
-Receipt.prototype.search = function(KeyWord, Page, Limit, StartTime, EndTime, callback) {
+Receipt.prototype.search = function (KeyWord, Page, Limit, StartTime, EndTime, Status, callback) {
 
     const that = this;
 
     async.parallel([
 
-        function(cb) {
-
+        function (cb) {
             that._receiptQuantity({
                 KeyWord: `%${KeyWord}%`,
                 StartTime,
                 EndTime,
-            }, function(err, db) {
+            }, function (err, db) {
 
                 if (err) {
                     return cb(err, null);
@@ -327,15 +326,15 @@ Receipt.prototype.search = function(KeyWord, Page, Limit, StartTime, EndTime, ca
 
         },
 
-        function(cb) {
-
+        function (cb) {
             that._search({
                 KeyWord: `%${KeyWord}%`,
                 Page,
                 Limit,
                 StartTime,
                 EndTime,
-            }, function(err, db) {
+                Status
+            }, function (err, db) {
 
                 if (err) {
                     return cb(err, null);
@@ -347,7 +346,7 @@ Receipt.prototype.search = function(KeyWord, Page, Limit, StartTime, EndTime, ca
 
         }
 
-    ], function(err, result) {
+    ], function (err, result) {
 
         if (err) {
             return callback(err, null);
@@ -357,7 +356,7 @@ Receipt.prototype.search = function(KeyWord, Page, Limit, StartTime, EndTime, ca
 
         const rows = result[1];
 
-        rows.forEach(function(element, index) {
+        rows.forEach(function (element, index) {
 
             rows[index].Date = moment(rows[index].Date).format('YYYY-MM-DD');
             rows[index].CreateTime = moment(rows[index].CreateTime).format('YYYY-MM-DD HH:mm:ss');
@@ -374,16 +373,16 @@ Receipt.prototype.search = function(KeyWord, Page, Limit, StartTime, EndTime, ca
  * 入库单详情
  * @param  {Number} ID 入库单ID
  */
-Receipt.prototype.receiptInfo = function(ID, callback) {
+Receipt.prototype.receiptInfo = function (ID, callback) {
 
     let that = this;
 
     async.parallel([
-        function(cb) {
+        function (cb) {
 
             that._ReceiptInfo({
                 ID: ID
-            }, function(err, rows) {
+            }, function (err, rows) {
 
                 if (err) {
                     return cb(err, null);
@@ -394,11 +393,11 @@ Receipt.prototype.receiptInfo = function(ID, callback) {
             });
 
         },
-        function(cb) {
+        function (cb) {
 
             that._ReceiptGoodInfo({
                 ID: ID
-            }, function(err, rows) {
+            }, function (err, rows) {
 
                 if (err) {
                     return cb(err, null);
@@ -409,7 +408,7 @@ Receipt.prototype.receiptInfo = function(ID, callback) {
             });
 
         }
-    ], function(err, result) {
+    ], function (err, result) {
 
         if (err) {
             return callback(err, null);;
@@ -428,7 +427,7 @@ Receipt.prototype.receiptInfo = function(ID, callback) {
             data[0].UpdateTime = moment(data[0].UpdateTime).format('YYYY-MM-DD HH:mm:ss');
         }
 
-        ReceiptGood.forEach(function(element, index) {
+        ReceiptGood.forEach(function (element, index) {
 
             ReceiptGood[index].ExpiryDate = moment(ReceiptGood[index].ExpiryDate).format('YYYY-MM-DD');
 
@@ -448,11 +447,11 @@ Receipt.prototype.receiptInfo = function(ID, callback) {
  * 入库单结算
  * @param  {Number} ID 结算ID
  */
-Receipt.prototype.settle = function(ID, callback) {
+Receipt.prototype.settle = function (ID, callback) {
 
     this._settle({
         ID
-    }, function(err, rows) {
+    }, function (err, rows) {
 
         if (err) {
             return callback(err, null);

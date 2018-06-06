@@ -215,7 +215,6 @@ class ReceiptEditor extends React.Component {
                 state: oldReceipt
             }
         } = this.props;
-        console.log({ receipt });
         if (oldReceipt) {
             if (receipt && receipt.ID != oldReceipt.ID) {
                 this.loadReceiptDetailFromDB(receipt);
@@ -276,8 +275,6 @@ class ReceiptEditor extends React.Component {
 
     render() {
         let { receipt, values, errors, receiptGoods, employees, vendors, isShowGoodSelector, isFetching, message } = this.state;
-
-        console.log({ message });
 
         let loading = isFetching ? (<Icon icon='spinner' spin />) : ("");
 

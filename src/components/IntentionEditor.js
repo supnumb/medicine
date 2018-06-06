@@ -38,9 +38,6 @@ class IntentionEditor extends React.Component {
             return;
         }
 
-        console.log("ssss");
-
-
         this.setState({ isFetching: true });
 
         let { values } = this.state;
@@ -50,7 +47,8 @@ class IntentionEditor extends React.Component {
 
         let postData = {
             MemberID: member.ID,
-            Goods: values.Goods
+            Goods: values.Goods,
+            Tags: values.Tags
         }
 
         fetch('/api/intention/save', {
@@ -115,15 +113,19 @@ class IntentionEditor extends React.Component {
                         标签
                     </label>
                     <div>
-                        <RadioGroup name="IsForeign" inline={true} value={values.IsForeign} onChange={
+                        <RadioGroup name="Tags" inline={true} value={values.Tags} defaultValue={"咨询"} onChange={
                             (value) => {
                                 let { values } = this.state;
-                                values.IsForeign = value;
+                                values.Tags = value;
                                 this.setState({ values })
                             }
                         }>
-                            <Radio value="0">已经放弃</Radio>
-                            <Radio value="1">准备购买</Radio>
+                            <Radio value="咨询">咨询</Radio>
+                            <Radio value="待跟踪">待跟踪</Radio>
+                            <Radio value="意向">意向</Radio>
+                            <Radio value="成交">成交</Radio>
+                            <Radio value="重复购买">重复购买</Radio>
+                            <Radio value="不再需要">不再需要</Radio>
                         </RadioGroup>
                     </div>
                 </div>

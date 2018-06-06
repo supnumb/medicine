@@ -140,7 +140,9 @@ class OrderList extends React.Component {
             <td>{o.DeliveryFee}</td>
             <td>{o.DeliverCode}</td>
             <td>{o.DeliverReceiptFee}</td>
+            <td>{o.DeliveryReceiveLabel}</td>
             <td>{o.EmployeeName}</td>
+            <td>{o.Date}</td>
 
             <td style={{
                 "width": "80px"
@@ -194,7 +196,9 @@ class OrderList extends React.Component {
                         <th>快递费</th>
                         <th>快递单</th>
                         <th>代收</th>
+                        <th>是否收到</th>
                         <th>销售员</th>
+                        <th>日期</th>
                         <th>操作</th>
                     </tr>
                 </thead>

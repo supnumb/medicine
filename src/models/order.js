@@ -51,16 +51,16 @@ function OrderTran() {
  * 订单记录搜索
  * @param  {String} MemberID 会员ID
  */
-Order.prototype.search = function(MemberID, callback) {
+Order.prototype.search = function (MemberID, callback) {
 
     this._search({
         MemberID
-    }, function(err, rows) {
+    }, function (err, rows) {
         if (err) {
             return callback(err, null);
         }
 
-        rows.forEach(function(element, index) {
+        rows.forEach(function (element, index) {
 
             rows[index].CreateTime = moment(rows[index].CreateTime).format('YYYY-MM-DD HH:mm:ss');
             rows[index].UpdateTime = moment(rows[index].UpdateTime).format('YYYY-MM-DD HH:mm:ss');
@@ -79,19 +79,18 @@ Order.prototype.search = function(MemberID, callback) {
  * @param  {Date}   StartTime 开始时间
  * @param  {Date}   EndTime 结束时间
  */
-Order.prototype.orderList = function(KeyWord, Page, Limit, StartTime, EndTime, callback) {
+Order.prototype.orderList = function (KeyWord, Page, Limit, StartTime, EndTime, callback) {
 
     const that = this;
 
     async.parallel([
 
-        function(cb) {
-
+        function (cb) {
             that._orderQuantity({
                 KeyWord: `%${KeyWord}%`,
                 StartTime,
                 EndTime
-            }, function(err, db) {
+            }, function (err, db) {
                 if (err) {
                     return cb(err, null);
                 }
@@ -99,17 +98,16 @@ Order.prototype.orderList = function(KeyWord, Page, Limit, StartTime, EndTime, c
                 cb(null, db[0]);
 
             });
-
         },
 
-        function(cb) {
+        function (cb) {
             that._orderList({
                 KeyWord: `%${KeyWord}%`,
                 Page,
                 Limit,
                 StartTime,
                 EndTime
-            }, function(err, db) {
+            }, function (err, db) {
                 if (err) {
                     return cb(err, null);
                 }
@@ -119,7 +117,7 @@ Order.prototype.orderList = function(KeyWord, Page, Limit, StartTime, EndTime, c
 
         }
 
-    ], function(err, result) {
+    ], function (err, result) {
 
         if (err) {
             return callback(err, null);
@@ -129,28 +127,57 @@ Order.prototype.orderList = function(KeyWord, Page, Limit, StartTime, EndTime, c
 
         const rows = result[1];
 
-        rows.forEach(function(element, index) {
+
+
+        rows.forEach(function (element, index) {
             //支付方式 1、微信，2、支付宝，3、现金，4、货到付款，5、二维码
             let PayStyleLabel = '';
 
             switch (element.PayStyle) {
                 case 1:
                     PayStyleLabel = '微信';
+                    break;
                 case 2:
                     PayStyleLabel = '支付宝';
+                    break;
                 case 3:
                     PayStyleLabel = '现金';
+                    break;
                 case 4:
                     PayStyleLabel = '货到付款';
+                    break;
                 case 5:
                     PayStyleLabel = '二维码';
+                    break;
+                case 6:
+                    PayStyleLabel = '刷卡';
+                    break;
+                case 7:
+                    PayStyleLabel = '公司微信';
+                    break;
+                case 8:
+                    PayStyleLabel = '网上转账';
+                    break;
+            }
+
+            switch (element.DeliveryReceive) {
+                case 0:
+                    rows[index].DeliveryReceiveLabel = "不明确";
+                    break;
+                case 1:
+                    rows[index].DeliveryReceiveLabel = "未收到";
+                    break;
+                case 2:
+                    rows[index].DeliveryReceiveLabel = "已经收到";
+                    break;
+
             }
 
             rows[index].PayStyleLabel = PayStyleLabel;
 
             rows[index].Date = moment(rows[index].Date).format('YYYY-MM-DD');
-            rows[index].CreateTime = moment(rows[index].CreateTime).format('YYYY-MM-DD HH:mm:ss');
-            rows[index].UpdateTime = moment(rows[index].UpdateTime).format('YYYY-MM-DD HH:mm:ss');
+            rows[index].CreateTime = moment(rows[index].CreateTime).format('YY-MM-DD HH:mm:ss');
+            rows[index].UpdateTime = moment(rows[index].UpdateTime).format('YY-MM-DD HH:mm:ss');
 
         });
 
@@ -161,16 +188,16 @@ Order.prototype.orderList = function(KeyWord, Page, Limit, StartTime, EndTime, c
 /**
  * 订单记录详情
  */
-Order.prototype.orderInfo = function(ID, callback) {
+Order.prototype.orderInfo = function (ID, callback) {
 
     const that = this;
 
     async.parallel([
 
-        function(cb) {
+        function (cb) {
             that._orderInfo({
                 ID
-            }, function(err, db) {
+            }, function (err, db) {
                 if (err) {
                     return cb(err, null);
                 }
@@ -180,11 +207,11 @@ Order.prototype.orderInfo = function(ID, callback) {
 
         },
 
-        function(cb) {
+        function (cb) {
 
             that._orderGood({
                 ID
-            }, function(err, db) {
+            }, function (err, db) {
                 if (err) {
                     return cb(err, null);
                 }
@@ -194,7 +221,7 @@ Order.prototype.orderInfo = function(ID, callback) {
 
         }
 
-    ], function(err, result) {
+    ], function (err, result) {
 
         if (err) {
             return callback(err, null);
@@ -244,13 +271,13 @@ Order.prototype.orderInfo = function(ID, callback) {
  * 9、添加库存变动记录
  */
 
-OrderTran.prototype.edit = function(Obj, callback) {
+OrderTran.prototype.edit = function (Obj, callback) {
 
     let tran = pool.getTran();
 
     const { ID, OperatorID, Goods } = Obj;
 
-    tran.beginTransaction(function(err) {
+    tran.beginTransaction(function (err) {
 
         if (err) {
             return callback(err, null);
@@ -258,7 +285,7 @@ OrderTran.prototype.edit = function(Obj, callback) {
 
         if (!ID) {
 
-            let Order_add = 'insert into Orders (MemberID,OperatorID,EmployeeID,Address,Connact,Telephone,TotalAmount,ReceiptAmount,PayStyle,DeliveryCompany,DeliveryFee,DeliverCode,DeliverReceiptFee,Remark,Date,CreateTime) values (:MemberID,:OperatorID,:EmployeeID,:Address,:Connact,:Telephone,:TotalAmount,:ReceiptAmount,:PayStyle,:DeliveryCompany,:DeliveryFee,:DeliverCode,:DeliverReceiptFee,:Remark,:Date,now())';
+            let Order_add = 'insert into Orders (MemberID,OperatorID,EmployeeID,Address,Connact,Telephone,TotalAmount,ReceiptAmount,PayStyle,DeliveryCompany,DeliveryFee,DeliverCode,DeliverReceiptFee,DeliveryInsure,Remark,Date,CreateTime,DeliveryReceive) values (:MemberID,:OperatorID,:EmployeeID,:Address,:Connact,:Telephone,:TotalAmount,:ReceiptAmount,:PayStyle,:DeliveryCompany,:DeliveryFee,:DeliverCode,:DeliverReceiptFee,:DeliveryInsure,:Remark,:Date,now(),:DeliveryReceive)';
 
             let ReceiptGood_search = 'select ID,ReceiptID,GoodID,CostPrice,ValiableQuantity from ReceiptGoods where GoodID=:GoodID and ValiableQuantity>0;';
 
@@ -274,7 +301,7 @@ OrderTran.prototype.edit = function(Obj, callback) {
 
             let StockChangeRecord_add = 'insert into StockChangeRecords (OperatorID,GoodID,DeltaQuantity,Remark,Type,RelatedObjectID,SalePrice,CreateTime) values ';
 
-            tran.query(Order_add, Obj, function(err, rows) {
+            tran.query(Order_add, Obj, function (err, rows) {
 
                 if (err) {
                     return callback(err, null);
@@ -284,7 +311,7 @@ OrderTran.prototype.edit = function(Obj, callback) {
 
                 let ReceiptGoodIDs = '';
 
-                async.eachSeries(Goods, function(item, cb) {
+                async.eachSeries(Goods, function (item, cb) {
 
                     let { GoodID, Name, Quantity, FinalPrice } = item;
 
@@ -298,7 +325,7 @@ OrderTran.prototype.edit = function(Obj, callback) {
 
                     pool.query(ReceiptGood_search, {
                         GoodID: GoodID
-                    }, function(err, arrs) {
+                    }, function (err, arrs) {
 
                         if (err) {
                             return cb(err, null);
@@ -311,7 +338,7 @@ OrderTran.prototype.edit = function(Obj, callback) {
                                 if (Quantity_num > 0) {
                                     Flag = 1;
                                 }
-                               
+
                                 TotalCostPrice += arrs[i].CostPrice * Quantity_num;
                                 arrs[i].ValiableQuantity = arrs[i].ValiableQuantity - Quantity_num;
                                 ReceiptQuantity += Quantity_num;
@@ -320,9 +347,9 @@ OrderTran.prototype.edit = function(Obj, callback) {
                                 ReceiptGoodIDs += arrs[i].ID + ",";
                                 ReceiptGood_update += ` when ID=${arrs[i].ID} then ${arrs[i].ValiableQuantity} `;
                                 ReceiptGood_update_child += ` when ID=${arrs[i].ID} then ${Flag} `;
-                          
+
                             } else {
-                          
+
                                 TotalCostPrice += arrs[i].CostPrice * arrs[i].ValiableQuantity;
                                 Quantity_num -= arrs[i].ValiableQuantity;
                                 ReceiptQuantity += arrs[i].ValiableQuantity + ",";
@@ -331,7 +358,7 @@ OrderTran.prototype.edit = function(Obj, callback) {
                                 ReceiptGoodIDs += arrs[i].ID + ",";
                                 ReceiptGood_update += ` when ID=${arrs[i].ID} then 0, `;
                                 ReceiptGood_update_child += ` when ID=${arrs[i].ID} then 1 `;
-                          
+
                             }
                         }
 
@@ -352,7 +379,7 @@ OrderTran.prototype.edit = function(Obj, callback) {
                     });
 
 
-                }, function(err) {
+                }, function (err) {
 
                     if (err) {
                         tran.rollback(() => {
@@ -380,23 +407,9 @@ OrderTran.prototype.edit = function(Obj, callback) {
 
                         async.parallel([
 
-                            function(cb) {
+                            function (cb) {
 
-                                tran.query(OrderGood_add, {}, function(err, db) {
-
-                                    if (err) {
-                                        return cb(err, null);
-                                    }
-
-                                    cb(null, db);
-
-                                });
-
-                            },
-
-                            function(cb) {
-
-                                tran.query(ReceiptGood_update, {}, function(err, db) {
+                                tran.query(OrderGood_add, {}, function (err, db) {
 
                                     if (err) {
                                         return cb(err, null);
@@ -408,9 +421,9 @@ OrderTran.prototype.edit = function(Obj, callback) {
 
                             },
 
-                            function(cb) {
+                            function (cb) {
 
-                                tran.query(Stock_update, {}, function(err, db) {
+                                tran.query(ReceiptGood_update, {}, function (err, db) {
 
                                     if (err) {
                                         return cb(err, null);
@@ -422,9 +435,23 @@ OrderTran.prototype.edit = function(Obj, callback) {
 
                             },
 
-                            function(cb) {
+                            function (cb) {
 
-                                tran.query(StockChangeRecord_add, {}, function(err, db) {
+                                tran.query(Stock_update, {}, function (err, db) {
+
+                                    if (err) {
+                                        return cb(err, null);
+                                    }
+
+                                    cb(null, db);
+
+                                });
+
+                            },
+
+                            function (cb) {
+
+                                tran.query(StockChangeRecord_add, {}, function (err, db) {
 
                                     if (err) {
                                         return cb(err, null);
@@ -436,7 +463,7 @@ OrderTran.prototype.edit = function(Obj, callback) {
 
                             }
 
-                        ], function(err, result) {
+                        ], function (err, result) {
 
 
                             if (err) {
@@ -445,7 +472,7 @@ OrderTran.prototype.edit = function(Obj, callback) {
                             }
 
 
-                            tran.commit(function(err) {
+                            tran.commit(function (err) {
 
                                 if (err) {
                                     console.log("提交事务失败", err);
@@ -467,7 +494,7 @@ OrderTran.prototype.edit = function(Obj, callback) {
 
         } else {
 
-            let Order_update = 'update Orders set MemberID=:MemberID,OperatorID=:OperatorID,Address=:Address,Connact=:Connact,Telephone=:Telephone,TotalAmount=:TotalAmount,ReceiptAmount=:ReceiptAmount,PayStyle=:PayStyle,DeliveryCompany=:DeliveryCompany,DeliveryFee=:DeliveryFee,DeliverCode=:DeliverCode,DeliverReceiptFee=:DeliverReceiptFee,Remark=:Remark,Date=:Date where ID=:ID';
+            let Order_update = 'update Orders set MemberID=:MemberID,OperatorID=:OperatorID,Address=:Address,Connact=:Connact,Telephone=:Telephone,TotalAmount=:TotalAmount,ReceiptAmount=:ReceiptAmount,PayStyle=:PayStyle,DeliveryCompany=:DeliveryCompany,DeliveryFee=:DeliveryFee,DeliverCode=:DeliverCode,DeliverReceiptFee=:DeliverReceiptFee,DeliveryInsure=:DeliveryInsure,Remark=:Remark,Date=:Date,DeliveryReceive=:DeliveryReceive where ID=:ID';
 
             let OrderGood_search = 'select ID,GoodID,Quantity,ReceiptGoodID,ReceiptQuantity from OrderGoods where OrderID=:ID;';
 
@@ -479,7 +506,7 @@ OrderTran.prototype.edit = function(Obj, callback) {
 
             const OrderID = ID;
 
-            tran.query(Order_update, Obj, function(err, rows) {
+            tran.query(Order_update, Obj, function (err, rows) {
 
                 if (err) {
                     tran.rollback(() => {
@@ -497,7 +524,7 @@ OrderTran.prototype.edit = function(Obj, callback) {
                     update_Stock_Saled = '';
 
 
-                pool.query(OrderGood_search, { ID }, function(err, rows) {
+                pool.query(OrderGood_search, { ID }, function (err, rows) {
 
                     for (let i = 0; i < rows.length; i++) {
 
@@ -522,7 +549,7 @@ OrderTran.prototype.edit = function(Obj, callback) {
                         let ReceiptGoodIDArr = ReceiptGoodID.split(",");
                         let ReceiptQuantityArr = ReceiptQuantity.split(",");
 
-                        ReceiptGoodIDArr.forEach(function(element, index) {
+                        ReceiptGoodIDArr.forEach(function (element, index) {
                             update_ReceiptGoodID += `${element},`;
                             update_ReceiptQuantity += `ValiableQuantity+${ReceiptQuantityArr[index]},`;
                         });
@@ -540,7 +567,7 @@ OrderTran.prototype.edit = function(Obj, callback) {
                     ReceiptGood_update += ` ELT (ID,${update_ReceiptQuantity}) where ID in (${update_ReceiptGoodID});`;
                     Stock_update += ` ELT (GoodID,${update_Stock_Valiable}),SaledQuantity= ELT (GoodID,${update_Stock_Saled}) where ID in (${update_Stock});`;
 
-                    rows.forEach(function(element, index) {
+                    rows.forEach(function (element, index) {
 
                         if (!element.log) {
                             del_arr.push(element);
@@ -548,7 +575,7 @@ OrderTran.prototype.edit = function(Obj, callback) {
 
                     });
 
-                    Goods.forEach(function(element, index) {
+                    Goods.forEach(function (element, index) {
 
                         if (!element.log) {
                             add_arr.push(element);
@@ -574,7 +601,7 @@ OrderTran.prototype.edit = function(Obj, callback) {
                     //console.log("Stock_update", Stock_update);
 
                     if (add_arr.length == 0 && upd_arr.length == 0 && del_arr.length == 0) {
-                        tran.commit(function(err) {
+                        tran.commit(function (err) {
 
                             if (err) {
                                 console.log("提交事务失败", err);
@@ -589,23 +616,9 @@ OrderTran.prototype.edit = function(Obj, callback) {
 
                         async.parallel([
 
-                            function(cb) {
+                            function (cb) {
 
-                                pool.query(OrderGood_delete, { OrderID }, function(err, db) {
-
-                                    if (err) {
-                                        return cb(err, null);
-                                    }
-
-                                    cb(null, db);
-
-                                });
-
-                            },
-
-                            function(cb) {
-
-                                pool.query(ReceiptGood_update, {}, function(err, db) {
+                                pool.query(OrderGood_delete, { OrderID }, function (err, db) {
 
                                     if (err) {
                                         return cb(err, null);
@@ -617,9 +630,23 @@ OrderTran.prototype.edit = function(Obj, callback) {
 
                             },
 
-                            function(cb) {
+                            function (cb) {
 
-                                pool.query(Stock_update, {}, function(err, db) {
+                                pool.query(ReceiptGood_update, {}, function (err, db) {
+
+                                    if (err) {
+                                        return cb(err, null);
+                                    }
+
+                                    cb(null, db);
+
+                                });
+
+                            },
+
+                            function (cb) {
+
+                                pool.query(Stock_update, {}, function (err, db) {
 
                                     if (err) {
                                         return cb(err, null);
@@ -631,7 +658,7 @@ OrderTran.prototype.edit = function(Obj, callback) {
 
                             }
 
-                        ], function(err, result) {
+                        ], function (err, result) {
 
                             if (err) {
                                 return callback(err, null);
@@ -651,7 +678,7 @@ OrderTran.prototype.edit = function(Obj, callback) {
 
                             let ReceiptGoodIDs = '';
 
-                            async.eachSeries(Goods, function(item, cb) {
+                            async.eachSeries(Goods, function (item, cb) {
 
                                 let { GoodID, Name, Quantity, FinalPrice } = item;
 
@@ -665,7 +692,7 @@ OrderTran.prototype.edit = function(Obj, callback) {
 
                                 pool.query(ReceiptGood_search, {
                                     GoodID: GoodID
-                                }, function(err, arrs) {
+                                }, function (err, arrs) {
 
                                     if (err) {
                                         return cb(err, null);
@@ -710,7 +737,7 @@ OrderTran.prototype.edit = function(Obj, callback) {
                                 });
 
 
-                            }, function(err) {
+                            }, function (err) {
 
                                 if (err) {
                                     tran.rollback(() => {
@@ -738,23 +765,9 @@ OrderTran.prototype.edit = function(Obj, callback) {
 
                                     async.parallel([
 
-                                        function(cb) {
+                                        function (cb) {
 
-                                            tran.query(OrderGood_add, {}, function(err, db) {
-
-                                                if (err) {
-                                                    return cb(err, null);
-                                                }
-
-                                                cb(null, db);
-
-                                            });
-
-                                        },
-
-                                        function(cb) {
-
-                                            tran.query(ReceiptGood_update, {}, function(err, db) {
+                                            tran.query(OrderGood_add, {}, function (err, db) {
 
                                                 if (err) {
                                                     return cb(err, null);
@@ -766,9 +779,9 @@ OrderTran.prototype.edit = function(Obj, callback) {
 
                                         },
 
-                                        function(cb) {
+                                        function (cb) {
 
-                                            tran.query(Stock_update, {}, function(err, db) {
+                                            tran.query(ReceiptGood_update, {}, function (err, db) {
 
                                                 if (err) {
                                                     return cb(err, null);
@@ -780,9 +793,23 @@ OrderTran.prototype.edit = function(Obj, callback) {
 
                                         },
 
-                                        function(cb) {
+                                        function (cb) {
 
-                                            tran.query(StockChangeRecord_add, {}, function(err, db) {
+                                            tran.query(Stock_update, {}, function (err, db) {
+
+                                                if (err) {
+                                                    return cb(err, null);
+                                                }
+
+                                                cb(null, db);
+
+                                            });
+
+                                        },
+
+                                        function (cb) {
+
+                                            tran.query(StockChangeRecord_add, {}, function (err, db) {
 
                                                 if (err) {
                                                     return cb(err, null);
@@ -794,7 +821,7 @@ OrderTran.prototype.edit = function(Obj, callback) {
 
                                         }
 
-                                    ], function(err, result) {
+                                    ], function (err, result) {
 
 
                                         if (err) {
@@ -803,7 +830,7 @@ OrderTran.prototype.edit = function(Obj, callback) {
                                         }
 
 
-                                        tran.commit(function(err) {
+                                        tran.commit(function (err) {
 
                                             if (err) {
                                                 console.log("提交事务失败", err);
@@ -835,11 +862,11 @@ OrderTran.prototype.edit = function(Obj, callback) {
 };
 
 
-OrderTran.prototype.cancel = function(ID, callback) {
+OrderTran.prototype.cancel = function (ID, callback) {
 
     let tran = pool.getTran();
 
-    tran.beginTransaction(function(err) {
+    tran.beginTransaction(function (err) {
 
         if (err) {
             return callback(err, null);
@@ -855,7 +882,7 @@ OrderTran.prototype.cancel = function(ID, callback) {
 
         const OrderID = ID;
 
-        tran.query(Order_update, { ID }, function(err, rows) {
+        tran.query(Order_update, { ID }, function (err, rows) {
 
             if (err) {
                 tran.rollback(() => {
@@ -873,7 +900,7 @@ OrderTran.prototype.cancel = function(ID, callback) {
                 update_Stock_Saled = '';
 
 
-            pool.query(OrderGood_search, { ID }, function(err, rows) {
+            pool.query(OrderGood_search, { ID }, function (err, rows) {
 
                 for (let i = 0; i < rows.length; i++) {
 
@@ -882,7 +909,7 @@ OrderTran.prototype.cancel = function(ID, callback) {
                     let ReceiptGoodIDArr = ReceiptGoodID.split(",");
                     let ReceiptQuantityArr = ReceiptQuantity.split(",");
 
-                    ReceiptGoodIDArr.forEach(function(element, index) {
+                    ReceiptGoodIDArr.forEach(function (element, index) {
                         update_ReceiptGoodID += `${element},`;
                         update_ReceiptQuantity += `ValiableQuantity+${ReceiptQuantityArr[index]},`;
                     });
@@ -902,7 +929,7 @@ OrderTran.prototype.cancel = function(ID, callback) {
 
                 if (rows.length == 0) {
 
-                    tran.commit(function(err) {
+                    tran.commit(function (err) {
 
                         if (err) {
                             console.log("提交事务失败", err);
@@ -917,9 +944,9 @@ OrderTran.prototype.cancel = function(ID, callback) {
 
                     async.parallel([
 
-                        function(cb) {
+                        function (cb) {
 
-                            tran.query(ReceiptGood_update, {}, function(err, db) {
+                            tran.query(ReceiptGood_update, {}, function (err, db) {
 
                                 if (err) {
                                     return cb(err, null);
@@ -931,9 +958,9 @@ OrderTran.prototype.cancel = function(ID, callback) {
 
                         },
 
-                        function(cb) {
+                        function (cb) {
 
-                            tran.query(Stock_update, {}, function(err, db) {
+                            tran.query(Stock_update, {}, function (err, db) {
 
                                 if (err) {
                                     return cb(err, null);
@@ -945,13 +972,13 @@ OrderTran.prototype.cancel = function(ID, callback) {
 
                         }
 
-                    ], function(err, result) {
+                    ], function (err, result) {
 
                         if (err) {
                             return callback(err, null);
                         }
 
-                        tran.commit(function(err) {
+                        tran.commit(function (err) {
 
                             if (err) {
                                 console.log("提交事务失败", err);
@@ -982,17 +1009,17 @@ OrderTran.prototype.cancel = function(ID, callback) {
 }
 
 
-Order.prototype.cash = function(StartTime, EndTime, callback) {
+Order.prototype.cash = function (StartTime, EndTime, callback) {
 
     this._cash({
         StartTime,
         EndTime
-    }, function(err, rows) {
+    }, function (err, rows) {
         if (err) {
             return callback(err, null);
         }
 
-        rows.forEach(function(element, index) {
+        rows.forEach(function (element, index) {
 
             rows[index].CreateTime = moment(rows[index].CreateTime).format('YYYY-MM-DD HH:mm:ss');
             rows[index].UpdateTime = moment(rows[index].UpdateTime).format('YYYY-MM-DD HH:mm:ss');
@@ -1005,17 +1032,17 @@ Order.prototype.cash = function(StartTime, EndTime, callback) {
 }
 
 
-Order.prototype.rate = function(StartTime, EndTime, callback) {
+Order.prototype.rate = function (StartTime, EndTime, callback) {
 
     this._rate({
         StartTime,
         EndTime
-    }, function(err, rows) {
+    }, function (err, rows) {
         if (err) {
             return callback(err, null);
         }
 
-        rows.forEach(function(element, index) {
+        rows.forEach(function (element, index) {
 
             rows[index].CreateTime = moment(rows[index].CreateTime).format('YYYY-MM-DD HH:mm:ss');
             rows[index].UpdateTime = moment(rows[index].UpdateTime).format('YYYY-MM-DD HH:mm:ss');
@@ -1027,20 +1054,20 @@ Order.prototype.rate = function(StartTime, EndTime, callback) {
 
 }
 
-Order.prototype.good = function(StartTime, EndTime, callback) {
+Order.prototype.good = function (StartTime, EndTime, callback) {
 
     this._good({
         StartTime,
         EndTime
-    }, function(err, rows) {
+    }, function (err, rows) {
         if (err) {
             return callback(err, null);
         }
 
-        rows.forEach(function(element, index) {
+        rows.forEach(function (element, index) {
 
-            rows[index].CreateTime = moment(rows[index].CreateTime).format('YYYY-MM-DD HH:mm:ss');
-            rows[index].UpdateTime = moment(rows[index].UpdateTime).format('YYYY-MM-DD HH:mm:ss');
+            rows[index].CreateTime = moment(rows[index].CreateTime).format('YY-MM-DD HH:mm:ss');
+            rows[index].UpdateTime = moment(rows[index].UpdateTime).format('YY-MM-DD HH:mm:ss');
 
         });
 

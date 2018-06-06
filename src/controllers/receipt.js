@@ -40,7 +40,7 @@ exports.save = (req, res, next) => {
 
     if (ID && ID > 0) {
 
-        ReceiptTran.update(ReceiptData, function(err, mem) {
+        ReceiptTran.update(ReceiptData, function (err, mem) {
 
             if (err && err.message) {
                 return res.send({ code: 2, message: err.message });
@@ -56,7 +56,7 @@ exports.save = (req, res, next) => {
 
     } else {
 
-        ReceiptTran.add(ReceiptData, function(err, mem) {
+        ReceiptTran.add(ReceiptData, function (err, mem) {
 
             if (err && err.message) {
                 return res.status(200).send({ code: 2, message: err.message });
@@ -97,7 +97,7 @@ exports.update = (req, res, next) => {
 
     ReceiptData.OperatorID = req.session ? req.session.user.ID : 1;
 
-    ReceiptTran.update(ReceiptData, function(err, mem) {
+    ReceiptTran.update(ReceiptData, function (err, mem) {
 
         if (err && err.message) {
             return res.send({ code: 2, message: err.message });
@@ -126,7 +126,9 @@ exports.update = (req, res, next) => {
  */
 exports.receiptList = (req, res, next) => {
 
-    let { KeyWord = '', Page = 0, Limit = 10, StartTime = '2018-01-01', EndTime = '' } = req.body;
+    console.log(req.body);
+
+    let { KeyWord = '', Page = 0, Limit = 10, StartTime = '2018-01-01', EndTime = '', Status = [0, 1] } = req.body;
 
     if (Page > 0) {
         Page = (Page - 1) * Limit;
@@ -136,7 +138,7 @@ exports.receiptList = (req, res, next) => {
         EndTime = moment(new Date()).format('YYYY-MM-DD 23:59:59');
     }
 
-    Receipt.search(KeyWord, Page, Limit, StartTime, EndTime, function(err, mem) {
+    Receipt.search(KeyWord, Page, Limit, StartTime, EndTime, Status, function (err, mem) {
 
         if (err) {
             return res.send({ code: 2, message: "数据库出错" });
@@ -166,7 +168,7 @@ exports.receiptInfo = (req, res, next) => {
         return res.status(200).send({ code: 2, message: "订单ID参数不匹配!" });
     };
 
-    Receipt.receiptInfo(ID, function(err, mem) {
+    Receipt.receiptInfo(ID, function (err, mem) {
 
         if (err) {
             return res.send({ code: 2, message: "数据库操作错误！" });
@@ -195,7 +197,7 @@ exports.settle = (req, res, next) => {
         return res.status(200).send({ code: 2, message: "入库单ID参数不匹配!" });
     };
 
-    Receipt.settle(ID, function(err, mem) {
+    Receipt.settle(ID, function (err, mem) {
 
         if (err) {
             return res.send({ code: 2, message: "数据库出错" });

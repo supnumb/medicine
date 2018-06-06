@@ -9,19 +9,19 @@ function Intention() {
     var _action = {
 
         //添加
-        _add: "insert into Intentions (MemberID,OperatorID,Goods,CreateTime) values (:MemberID,:OperatorID,:Goods,curdate());",
+        _add: "insert into Intentions (MemberID,OperatorID,Goods,Tags,CreateTime) values (:MemberID,:OperatorID,:Goods,:Tags,curdate());",
 
         //删除
-        _delete: "update Intentions set Status=0 where ID=:ID;",
+        _delete: "update Intentions set Status=-1 where ID=:ID;",
 
         //修改
-        _update: "update Intentions set Goods=:Goods,OperatorID=:OperatorID,Status=:Status where ID=:ID;",
+        _update: "update Intentions set Goods=:Goods,OperatorID=:OperatorID,Status=:Status,Tags=:Tags where ID=:ID;",
 
         //总数
         _intentionQuantity: "select count(1) as Quantity from Intentions i where i.CreateTime>=:StartTime and i.CreateTime<=:EndTime and i.Goods like :KeyWord;",
 
         //列表
-        _intentionList: "select i.*,m.Name from Intentions i left join Members m on i.MemberID=m.ID where i.CreateTime>=:StartTime and i.CreateTime<=:EndTime and i.Goods like :KeyWord order by i.ID desc limit :Page,:Limit;",
+        _intentionList: "select AA.*,BB.Name,CC.Name as OperatorName from Intentions AS AA inner join Members AS BB on AA.MemberID=BB.ID inner join Members as CC on cc.ID=AA.OperatorID where i.CreateTime>=:StartTime and i.CreateTime<=:EndTime and i.Goods like :KeyWord order by i.ID desc limit :Page,:Limit;",
 
         //详情
         _intentionInfo: "select * from Intentions where ID=:ID;",
@@ -44,13 +44,14 @@ function Intention() {
  * @param  {String} OperatorID 操作员ID
  * @param  {String} Goods 意向商品
  */
-Intention.prototype.add = function(MemberID, OperatorID, Goods, callback) {
+Intention.prototype.add = function (MemberID, OperatorID, Goods, Tags, callback) {
 
     this._add({
         MemberID,
         OperatorID,
-        Goods
-    }, function(err, rows) {
+        Goods,
+        Tags
+    }, function (err, rows) {
         if (err) {
             return callback(err, null);
         }
@@ -63,11 +64,11 @@ Intention.prototype.add = function(MemberID, OperatorID, Goods, callback) {
  * 删除意向记录
  * @param  {String} ID 会员ID
  */
-Intention.prototype.delete = function(ID, callback) {
+Intention.prototype.delete = function (ID, callback) {
 
     this._delete({
         ID
-    }, function(err, rows) {
+    }, function (err, rows) {
         if (err) {
             return callback(err, null);
         }
@@ -81,14 +82,15 @@ Intention.prototype.delete = function(ID, callback) {
  * @param  {String} ID 会员ID
  * @param  {String} Goods 意向商品
  */
-Intention.prototype.update = function(ID, OperatorID, Goods, Status, callback) {
+Intention.prototype.update = function (ID, OperatorID, Goods, Status, Tags, callback) {
 
     this._update({
         ID,
         OperatorID,
         Goods,
-        Status
-    }, function(err, rows) {
+        Status,
+        Tags
+    }, function (err, rows) {
         if (err) {
             return callback(err, null);
         }
@@ -103,19 +105,19 @@ Intention.prototype.update = function(ID, OperatorID, Goods, Status, callback) {
  * @param  {Number} Page 第几页
  * @param  {Number} Limit 每页几条
  */
-Intention.prototype.intentionList = function(KeyWord, Page, Limit, StartTime, EndTime, callback) {
+Intention.prototype.intentionList = function (KeyWord, Page, Limit, StartTime, EndTime, callback) {
 
     const that = this;
 
     async.parallel([
 
-        function(cb) {
+        function (cb) {
 
             that._intentionQuantity({
                 KeyWord: `%${KeyWord}%`,
                 StartTime,
                 EndTime,
-            }, function(err, db) {
+            }, function (err, db) {
 
                 if (err) {
                     return cb(err, null);
@@ -127,7 +129,7 @@ Intention.prototype.intentionList = function(KeyWord, Page, Limit, StartTime, En
 
         },
 
-        function(cb) {
+        function (cb) {
 
             that._intentionList({
                 KeyWord: `%${KeyWord}%`,
@@ -135,7 +137,7 @@ Intention.prototype.intentionList = function(KeyWord, Page, Limit, StartTime, En
                 Limit,
                 StartTime,
                 EndTime,
-            }, function(err, db) {
+            }, function (err, db) {
 
                 if (err) {
                     return cb(err, null);
@@ -147,7 +149,7 @@ Intention.prototype.intentionList = function(KeyWord, Page, Limit, StartTime, En
 
         }
 
-    ], function(err, result) {
+    ], function (err, result) {
 
         if (err) {
             return callback(err, null);
@@ -157,7 +159,7 @@ Intention.prototype.intentionList = function(KeyWord, Page, Limit, StartTime, En
 
         const rows = result[1];
 
-        rows.forEach(function(element, index) {
+        rows.forEach(function (element, index) {
 
             rows[index].CreateTime = moment(rows[index].CreateTime).format('YYYY-MM-DD');
             rows[index].UpdateTime = moment(rows[index].UpdateTime).format('YYYY-MM-DD HH:mm:ss');
@@ -173,16 +175,16 @@ Intention.prototype.intentionList = function(KeyWord, Page, Limit, StartTime, En
  * 意向记录搜索
  * @param  {String} MemberID 会员ID
  */
-Intention.prototype.search = function(MemberID, callback) {
+Intention.prototype.search = function (MemberID, callback) {
 
     this._search({
         MemberID
-    }, function(err, rows) {
+    }, function (err, rows) {
         if (err) {
             return callback(err, null);
         }
 
-        rows.forEach(function(element, index) {
+        rows.forEach(function (element, index) {
 
             rows[index].CreateTime = moment(rows[index].CreateTime).format('YYYY-MM-DD');
             rows[index].UpdateTime = moment(rows[index].UpdateTime).format('MM-DD HH:mm');

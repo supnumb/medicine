@@ -17,7 +17,7 @@ describe("#药品基础数据模块测试", function() {
 
     let ID = 0;
 
-    it.only("##009 雇员保存销售单 应该返回成功，Code=0", function(done) {
+    it("##009 雇员保存销售单 应该返回成功，Code=0", function(done) {
         let orderData = {
 
             "DeliveryCode": "",
@@ -121,8 +121,8 @@ describe("#药品基础数据模块测试", function() {
         });
     })
 
-    it("##010.ADD 得到指定销售单详细信息：销售单信息、销售单药品信息 应该返回成功，Code=0", function(done) {
-        ID = ID || 123;
+    it.only("##010.ADD 得到指定销售单详细信息：销售单信息、销售单药品信息 应该返回成功，Code=0", function(done) {
+        ID = ID || 197;
 
         agent.post('/api/order/info').send({ ID }).expect(200).end(function(err, res) {
             if (err) {

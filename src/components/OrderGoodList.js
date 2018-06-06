@@ -85,6 +85,7 @@ class OrderGoodList extends React.Component {
                         }} />
                     </td>
                     <td>{og.GoodSumPrice}</td>
+                    <td>{og.Manufacturer}</td>
                     <td>
                         <a href="#" onClick={() => {
                             let { orderGoods } = this.state;
@@ -102,6 +103,8 @@ class OrderGoodList extends React.Component {
                     <td>{og.DefaultPrice || og.FinalPrice}</td>
                     <td>{og.Quantity}</td>
                     <td>{og.GoodSumPrice}</td>
+                    <td>{og.Manufacturer}</td>
+
                     <td>
                         <a href="#" onClick={() => {
                             this.setState({ orderGood: og })
@@ -122,6 +125,7 @@ class OrderGoodList extends React.Component {
                         <th>售价</th>
                         <th>数量</th>
                         <th>金额</th>
+                        <th>厂家</th>
                         <th>操作</th>
                     </tr>
                 </thead>

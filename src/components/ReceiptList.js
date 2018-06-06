@@ -1,6 +1,6 @@
 import React from 'react';
 import Store from './Reducer';
-import { Icon } from 'rsuite';
+import { Icon, Radio, RadioGroup } from 'rsuite';
 import { Form, Field, createFormControl } from 'form-lib';
 import { SchemaModel, StringType } from 'rsuite-schema';
 
@@ -20,24 +20,29 @@ class ReceiptList extends React.Component {
         this.loadReceiptsFromDB = this._loadReceiptsFromDB.bind(this);
     }
 
-    _loadReceiptsFromDB(event) {
+    _loadReceiptsFromDB(event, status) {
+
         let {
             receiptList: {
                 KeyWord,
                 Page,
                 Limit,
+                Status
             }
         } = this.state;
 
         if (event) {
-            KeyWord = $("#KeyWord").val();
+            KeyWord = $("#Keyword").val();
             Page: 0
         }
+
+        Status = status == null ? Status : status;
 
         let data = {
             KeyWord,
             Page,
-            Limit
+            Limit,
+            Status
         };
 
         Store.dispatch({ type: "FETCH_RECEIPTS", payload: data });
@@ -52,7 +57,7 @@ class ReceiptList extends React.Component {
             }
         }).then(res => res.json()).then(json => {
             console.log(json);
-            
+
             if (json.code == 0) {
                 Store.dispatch({ type: "FETCH_RECEIPTS_DONE", payload: json.data })
             } else {
@@ -72,12 +77,12 @@ class ReceiptList extends React.Component {
     }
 
     render() {
-
         let {
             receiptList: {
                 receipts,
                 receipt,
-                isFetching
+                isFetching,
+                Status
             }
         } = this.state;
 
@@ -94,10 +99,8 @@ class ReceiptList extends React.Component {
         let listJsx = receipts.map((r, index) => (<tr key={index}>
             <td>{r.ID}</td>
             <td>{r.VendorName}</td>
-            <td>{r.Contact}</td>
-            <td>{r.Telephone}</td>
+            <td>{r.Goods}</td>
             <td>{r.Amount}</td>
-            <td>{r.EmployeeName}</td>
             <td>{r.Date}</td>
             <td>
                 <a href="#" onClick={() => {
@@ -126,10 +129,12 @@ class ReceiptList extends React.Component {
                             <div className="form-group">
                                 <Field name="Keyword" id="Keyword" />
                                 &nbsp;&nbsp;
-                                <button onClick={this.submit} className="btn btn-primary">
+
+                                <button onClick={this.loadReceiptsFromDB} className="btn btn-primary" loading={isFetching ? "loading" : ""}>
                                     查询
                                 </button>
-                                &nbsp;&nbsp;
+                                &nbsp;
+
                                 <button onClick={() => {
                                     this.props.history.push({
                                         pathname: "/receipt/editor",
@@ -141,16 +146,23 @@ class ReceiptList extends React.Component {
                             </div>
                         </Form>
                     </div>
+                    <RadioGroup name="Status" id="Status" value={Status} inline={true} onChange={(value) => {
+                        Store.dispatch({ type: "SET_SETTLE_STATUS", payload: value });
+                        this.loadReceiptsFromDB(null, value)
+                    }}>
+                        <Radio value={[0, 1]} inline={true} >所有</Radio>
+                        <Radio value={0} inline={true}   >未结算</Radio>
+                        <Radio value={1} inline={true}   >已结算</Radio>
+                    </RadioGroup>
                 </div>
+
                 <table className="table table-striped table-hover">
                     <thead>
                         <tr>
                             <th>ID</th>
                             <th>供应商</th>
-                            <th>联系人</th>
-                            <th>电话</th>
+                            <th>药品</th>
                             <th>金额</th>
-                            <th>药师</th>
                             <th>日期</th>
                             <th>操作</th>
                         </tr>
