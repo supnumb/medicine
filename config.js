@@ -1,6 +1,6 @@
 var config = {
 
-    DB_PRO: {
+    DB_TEST: {
         host: 'www.loclive.cn',
         connectionLimit: 50,
         user: "root",
@@ -17,14 +17,15 @@ var config = {
     //     password: "p1@32I",
     //     database: "Medicine"
     // }
-    // DB_PRO: {
-    //     host: 'maria_medicine',
-    //     connectionLimit: 50,
-    //     user: "root",
-    //     port: "3306",
-    //     password: "p1@32I",
-    //     database: "Medicine"
-    // }
+
+    DB_PRO: {
+        host: 'maria_medicine',
+        connectionLimit: 50,
+        user: "root",
+        port: "3306",
+        password: "p1@32I",
+        database: "Medicine"
+    }
 };
 
 module.exports = config;

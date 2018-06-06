@@ -29,7 +29,7 @@ class OrderList extends React.Component {
         this.props.history.push("/order/editor");
     }
 
-    _loadOrderListFromDB() {
+    _loadOrderListFromDB(event) {
 
         let {
             orderList: {
@@ -40,12 +40,14 @@ class OrderList extends React.Component {
         } = this.state;
 
         if (event) {
-            KeyWord = $("#Keyword").val();
-            Page = 3;
+            KeyWord = $("#KeyWord").val();
+            Page = 0;
             Limit = 10;
         }
 
         let postData = { KeyWord, Page, Limit }
+
+        console.log(postData);
 
         Store.dispatch({ type: "FETCH_ORDERS", payload: postData });
 
@@ -53,7 +55,10 @@ class OrderList extends React.Component {
             body: JSON.stringify(postData),
             method: 'POST',
             mode: 'same-origin',
-            credentials: 'same-origin'
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json'
+            }
         }).then(res => res.json()).then(json => {
             console.log(json);
             if (json.code == 0) {
@@ -68,50 +73,6 @@ class OrderList extends React.Component {
 
     componentDidMount() {
         this.loadOrderListFromDB();
-    }
-
-    _loadOrdersFromDB(event) {
-        let {
-            orderList: {
-                KeyWord,
-                Page,
-                Limit,
-            }
-        } = this.state;
-
-        if (event) {
-            KeyWord = $("#KeyWord").val();
-            Page: 0
-        }
-
-        let data = {
-            KeyWord,
-            Page,
-            Limit
-        };
-
-        Store.dispatch({ type: "FETCH_ORDERS", payload: data });
-
-        fetch('/api/order/search', {
-            body: JSON.stringify(data),
-            method: 'POST',
-            mode: 'same-origin',
-            credentials: 'same-origin'
-            ,
-            headers: {
-                'Content-Type': 'application/json'
-            }
-
-        }).then(res => res.json()).then(json => {
-            console.log(json);
-            if (json.code == 0) {
-                Store.dispatch({ type: "FETCH_ORDERS_DONE", payload: json.data })
-            } else {
-                alert(json.message);
-            }
-        }).catch(err => {
-            console.error(err);
-        })
     }
 
     componentWillUnmount() {
@@ -168,7 +129,7 @@ class OrderList extends React.Component {
                         <div className="form-group">
                             <Field name="KeyWord" id="KeyWord" />
                             &nbsp;&nbsp;
-                            <button onClick={this.loadOrdersFromDB} className="btn btn-primary">
+                            <button onClick={this.loadOrderListFromDB} className="btn btn-primary">
                                 查询
                             </button>
                             &nbsp;

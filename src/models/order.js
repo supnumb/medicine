@@ -13,7 +13,7 @@ function Order() {
         _search: "select * from Orders where MemberID=:MemberID;",
 
         //订单记录列表
-        _orderList: "select o.*,m.Name,m.MobilPhone,(select name from Members where ID=o.EmployeeID) as EmployeeName,(select name from Members where ID=o.OperatorID) as OperatorName,GROUP_CONCAT(g.GoodName) as GoodNames from Orders o left join Members m on o.MemberID=m.ID left join OrderGoods g on o.ID=g.OrderID where m.MobilPhone like :KeyWord group by o.ID order by o.UpdateTime desc limit :Page,:Limit;",
+        _orderList: "SELECT o.*, m.Name , m.MobilPhone ,( SELECT NAME FROM Members WHERE ID = o.EmployeeID) AS EmployeeName ,(SELECT NAME FROM Members WHERE ID = o.OperatorID) AS OperatorName , GROUP_CONCAT(g.GoodName) AS GoodNames FROM Orders o INNER JOIN Members m ON o.MemberID = m.ID LEFT JOIN OrderGoods g ON o.ID = g.OrderID WHERE CONCAT(m.Name, m.MobilPhone, o.Connact, o.Address) LIKE :KeyWord GROUP BY o.ID ORDER BY o.UpdateTime DESC LIMIT :Page,:Limit;",
 
         //订单记录详情
         _orderInfo: "select * from OrderView where ID=:ID;",

@@ -1,19 +1,24 @@
 var mysql = require("mysql");
 const config = require('../../config');
 
-let pool = mysql.createPool(config.DB_PRO);
-let _conn = mysql.createConnection(config.DB_PRO);
+let pool = mysql.createPool(config.DB_TEST);
+let _conn = mysql.createConnection(config.DB_TEST);
+
+if (process.env.NODE_ENV === 'production') {
+    pool = mysql.createPool(config.DB_PRO);
+    _conn = mysql.createConnection(config.DB_PRO);
+}
 
 /**
  * 当一个连接被创建时发生
  */
-pool.on("connection", function(connection) {
+pool.on("connection", function (connection) {
 
     // console.log("pool", pool);
-    connection.config.queryFormat = function(query, values) {
+    connection.config.queryFormat = function (query, values) {
         if (!values)
             return query;
-        return query.replace(/\:(\w+)/g, function(txt, key) {
+        return query.replace(/\:(\w+)/g, function (txt, key) {
             if (values.hasOwnProperty(key)) {
                 return this.escape(values[key]);
             }
@@ -26,21 +31,21 @@ pool.on("connection", function(connection) {
 });
 
 var db = {
-    query: function(sql, values, callback) {
+    query: function (sql, values, callback) {
 
         //console.log("sql", sql);
 
         /**
          * 执行查询操作
          */
-        pool.getConnection(function(err, conn) {
+        pool.getConnection(function (err, conn) {
 
             // console.log("conn", conn);
 
             if (err)
                 console.log("POOL ==> " + err);
 
-            conn.query(sql, values, function(err, rows) {
+            conn.query(sql, values, function (err, rows) {
                 if (err) {
                     console.log("QUERY  ==> " + err);
                     console.log(values);
@@ -53,15 +58,15 @@ var db = {
         });
     },
 
-    end: function(callback) {
+    end: function (callback) {
         pool.end(callback);
     },
 
-    getTran: function() {
-        _conn.config.queryFormat = function(query, values) {
+    getTran: function () {
+        _conn.config.queryFormat = function (query, values) {
             if (!values)
                 return query;
-            return query.replace(/\:(\w+)/g, function(txt, key) {
+            return query.replace(/\:(\w+)/g, function (txt, key) {
                 if (values.hasOwnProperty(key)) {
                     return this.escape(values[key]);
                 }
@@ -78,24 +83,24 @@ var db = {
      * @param     sql      查询的SQL语句
      * @param  callback 查询成功之后的回调函数
      */
-    queryTran: function(sql, callback) {
-        _conn.beginTransaction(function(err) {
+    queryTran: function (sql, callback) {
+        _conn.beginTransaction(function (err) {
             if (err) {
                 return callback(err);
             }
 
-            _conn.query(sql, function(err, result) {
+            _conn.query(sql, function (err, result) {
                 if (err) {
                     console.log("POOL ==> " + sql);
 
-                    _conn.rollback(function() {
+                    _conn.rollback(function () {
                         callback(err);
                     })
                 }
 
-                _conn.commit(function(err) {
+                _conn.commit(function (err) {
                     if (err) {
-                        _conn.rollback(function() {
+                        _conn.rollback(function () {
                             callback(err);
                         });
                     } else {
@@ -116,11 +121,11 @@ function dd(DB_NAME) {
         _conn = mysql.createConnection(config.DB_SPIDER);
     }
 
-    pool.on("connection", function(connection) {
-        connection.config.queryFormat = function(query, values) {
+    pool.on("connection", function (connection) {
+        connection.config.queryFormat = function (query, values) {
             if (!values)
                 return query;
-            return query.replace(/\:(\w+)/g, function(txt, key) {
+            return query.replace(/\:(\w+)/g, function (txt, key) {
                 if (values.hasOwnProperty(key)) {
                     return this.escape(values[key]);
                 }
@@ -131,17 +136,17 @@ function dd(DB_NAME) {
         connection.query('SET SESSION auto_increment_increment=1');
     });
 
-    this.query = function(sql, values, callback) {
+    this.query = function (sql, values, callback) {
 
         /**
          * 执行查询操作
          */
-        pool.getConnection(function(err, conn) {
+        pool.getConnection(function (err, conn) {
 
             if (err)
                 console.log("POOL ==> " + err);
 
-            conn.query(sql, values, function(err, rows) {
+            conn.query(sql, values, function (err, rows) {
                 if (err) {
                     console.log("QUERY  ==> " + err);
                 } else if (callback) {
@@ -152,25 +157,25 @@ function dd(DB_NAME) {
         });
     };
 
-    this.end = function(callback) {
+    this.end = function (callback) {
         pool.end(callback);
     };
 
-    this.queryTran = function(sql, callback) {
-        _conn.beginTransaction(function(err) {
+    this.queryTran = function (sql, callback) {
+        _conn.beginTransaction(function (err) {
             if (err)
                 throw err;
 
-            _conn.query(sql, function(err, result) {
+            _conn.query(sql, function (err, result) {
                 if (err) {
-                    _conn.rollback(function() {
+                    _conn.rollback(function () {
                         throw err;
                     })
                 }
 
-                _conn.commit(function(err) {
+                _conn.commit(function (err) {
                     if (err) {
-                        _conn.rollback(function() {
+                        _conn.rollback(function () {
                             throw err;
                         });
                     } else {
