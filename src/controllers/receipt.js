@@ -30,6 +30,10 @@ exports.save = (req, res, next) => {
 
     let { ID, VendorName, VendorID, Date, ReceiptGoods } = req.body;
 
+
+    console.log(req.body);
+
+
     if (!VendorName || !VendorID || !Date || ReceiptGoods.length == 0) {
         return res.status(200).send({ code: 2, message: "VendorName|VendorID|Date|ReceiptGoods参数不匹配！" });
     };

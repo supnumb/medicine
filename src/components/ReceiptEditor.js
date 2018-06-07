@@ -260,7 +260,7 @@ class ReceiptEditor extends React.Component {
                     receiptGoods.push({
                         GoodID: sg.ID,
                         Quantity: 1,
-                        ExpiryDate: "",
+                        ExpiryDate: Moment().add(0, 'days').format("YYYY-MM-DD"),
                         BatchNo: "",
                         CostPrice: sg.DefaultCostPrice,
                         Name: sg.Name,

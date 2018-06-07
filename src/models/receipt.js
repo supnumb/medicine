@@ -211,14 +211,15 @@ ReceiptTran.prototype.update = function (Obj, callback) {
 
                 let { GoodID, CostPrice, Quantity, ReturnQuantity, ExpiryDate, BatchNo } = item;
 
-                let ReceiptGood_update = 'update ReceiptGoods set Quantity=Quantity-:ReturnQuantity,ValiableQuantity=ValiableQuantity-:ReturnQuantity,ReturnQuantity=:ReturnQuantity where ReceiptID=:ReceiptID and GoodID=:GoodID and ValiableQuantity>=:ReturnQuantity';
+                let ReceiptGood_update = 'update ReceiptGoods set Quantity=Quantity-:ReturnQuantity,ValiableQuantity=ValiableQuantity-:ReturnQuantity,ReturnQuantity=:ReturnQuantity,ExpiryDate=:ExpiryDate where ReceiptID=:ReceiptID and GoodID=:GoodID and ValiableQuantity>=:ReturnQuantity';
                 let Stock_update = 'update Stocks set TotalQuantity=TotalQuantity-:ReturnQuantity,ValiableQuantity=ValiableQuantity-:ReturnQuantity where GoodID=:GoodID;';
                 let Stock_add = 'insert into Stocks (GoodID,TotalQuantity,ValiableQuantity,CreateTime) values (:GoodID,:Quantity,:Quantity,now());';
 
                 tran.query(ReceiptGood_update, {
                     ReceiptID,
                     GoodID,
-                    ReturnQuantity
+                    ReturnQuantity,
+                    ExpiryDate
                 }, function (err, arrs) {
 
                     if (err) {
@@ -437,12 +438,7 @@ Receipt.prototype.receiptInfo = function (ID, callback) {
         });
 
         return callback(null, { data, ReceiptGood });
-
     });
-
-
-
-
 };
 
 

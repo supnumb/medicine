@@ -42,12 +42,11 @@ class ReceiptGoodList extends React.Component {
 
     componentWillReceiveProps(nextProps) {
         let { goods } = nextProps;
-        // console.log({ goods });
 
         if (goods) {
             goods.forEach(g => {
-                if (!g.ExpiredDate) {
-                    g.ExpiredDate = Moment().add(90, 'days').calendar();
+                if (!g.ExpiryDate) {
+                    g.ExpiryDate = Moment().add(90, 'days').calendar();
                 }
             });
 
@@ -64,8 +63,8 @@ class ReceiptGoodList extends React.Component {
 
         if (goods) {
             goods.forEach(g => {
-                if (!g.ExpiredDate) {
-                    g.ExpiredDate = Moment().add(90, 'days').calendar();
+                if (!g.ExpiryDate) {
+                    g.ExpiryDate = Moment().add(90, 'days').calendar();
                 }
             });
 
@@ -89,9 +88,8 @@ class ReceiptGoodList extends React.Component {
                     <td>{g.Unit}</td>
                     <td>{g.Manufacturer}</td>
                     <td>
-                        <DatePicker name="Date" id="Date" value={Moment(g.ExpiredDate)} onChange={(date) => {
-                            console.log({ date: Moment(date).format("YYYY-MM-DD") });
-                            g.ExpiredDate = Moment(date).format("YYYY-MM-DD");
+                        <DatePicker name="Date" id="Date" value={Moment(g.ExpiryDate)} onChange={(date) => {
+                            g.ExpiryDate = Moment(date).format("YYYY-MM-DD");
                             this.setState({ goods });
                         }} placeholder="有效期" />
 
@@ -107,7 +105,9 @@ class ReceiptGoodList extends React.Component {
                         this.onTextChanged(event, g);
                     }} style={{ "width": "80px" }} type="text" id="BatchNo" value={g.BatchNo} placeholder="批号" /></td>
 
-
+                    <td><input onChange={(event) => {
+                        this.onTextChanged(event, g);
+                    }} style={{ "width": "30px" }} type="text" id="ReturnQuantity" value={g.ReturnQuantity} /></td>
                     <td>
                         <a href="#" onClick={() => {
                             this.setState({ receiptGood: null })
@@ -122,10 +122,11 @@ class ReceiptGoodList extends React.Component {
                     <td>{g.Dimension}</td>
                     <td>{g.Unit}</td>
                     <td>{g.Manufacturer}</td>
-                    <td>{g.ExpiredDate}</td>
+                    <td>{g.ExpiryDate}</td>
                     <td>{g.CostPrice}</td>
                     <td>{g.Quantity}</td>
                     <td>{g.BatchNo}</td>
+                    <td></td>
 
                     <td>
                         <a href="#" onClick={() => {
@@ -150,6 +151,7 @@ class ReceiptGoodList extends React.Component {
                         <th>进价</th>
                         <th>数量</th>
                         <th>批号</th>
+                        <th>退回</th>
                         <th>操作</th>
                     </tr>
                 </thead>
