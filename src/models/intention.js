@@ -9,7 +9,7 @@ function Intention() {
     var _action = {
 
         //添加
-        _add: "insert into Intentions (MemberID,OperatorID,Goods,Tags,CreateTime) values (:MemberID,:OperatorID,:Goods,:Tags,curdate());",
+        _add: "insert into Intentions (MemberID,OperatorID,Goods,OtherGoods,Tags,CreateTime) values (:MemberID,:OperatorID,:Goods,:OtherGoods,:Tags,curdate());",
 
         //删除
         _delete: "update Intentions set Status=-1 where ID=:ID;",
@@ -44,13 +44,14 @@ function Intention() {
  * @param  {String} OperatorID 操作员ID
  * @param  {String} Goods 意向商品
  */
-Intention.prototype.add = function (MemberID, OperatorID, Goods, Tags, callback) {
+Intention.prototype.add = function (MemberID, OperatorID, Goods, OtherGoods, Tags, callback) {
 
     this._add({
         MemberID,
         OperatorID,
-        Goods,
-        Tags
+        Goods: Goods.join(','),
+        Tags,
+        OtherGoods
     }, function (err, rows) {
         if (err) {
             return callback(err, null);

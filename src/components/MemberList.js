@@ -84,10 +84,10 @@ class MemberList extends React.Component {
         Store.dispatch({ type: "MEMBER_EDITOR_CANCEL" });
     }
 
-    _onIntentionOrInviteSaveCompleted(data){
-if(data.code==0){
-    
-}
+    _onIntentionOrInviteSaveCompleted(data) {
+        if (data.code == 0) {
+
+        }
     }
 
     componentDidMount() {
@@ -136,10 +136,9 @@ if(data.code==0){
             <td style={{
                 "width": "60px"
             }}>{m.Name}</td>
-            <td>{m.City}</td>
             <td>{m.MobilPhone}</td>
-            <td>{m.IntentionGoods}</td>
-            <td>{m.IntentionQuantity}</td>
+            <td>{m.Tags}</td>
+            <td>{m.Goods}</td>
             <td>{m.VisitQuantity}</td>
             <td>{m.OrderQuantity}</td>
             <td style={{
@@ -191,9 +190,8 @@ if(data.code==0){
                         <tr>
                             <th>ID</th>
                             <th>客人姓名</th>
-                            <th>城市</th>
                             <th>电话</th>
-                            <th>意向标签</th>
+                            <th>意向</th>
                             <th>意向商品</th>
                             <th>回访</th>
                             <th>成单</th>

@@ -183,7 +183,7 @@ Visit.prototype.search = function(MemberID, callback) {
         rows.forEach(function(element, index) {
 
             rows[index].CreateTime = moment(rows[index].CreateTime).format('YYYY-MM-DD');
-            rows[index].UpdateTime = moment(rows[index].UpdateTime).format('MM-DD HH:mm');
+            rows[index].UpdateTime = moment(rows[index].UpdateTime).format('YYYY-MM-DD HH:mm');
 
         });
 

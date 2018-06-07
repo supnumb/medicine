@@ -45,8 +45,6 @@ class GoodList extends React.Component {
             }
         } = this.state;
 
-        console.log(event);
-
         if (event) {
             KeyWord = $("#Keyword").val();
             Page = 0;
@@ -54,8 +52,6 @@ class GoodList extends React.Component {
         }
 
         let params = { KeyWord, Page, Limit };
-
-        console.log(params);
 
         Store.dispatch({ type: "FETCH_GOODS", payload: params });
 
@@ -113,10 +109,11 @@ class GoodList extends React.Component {
             <td>{g.OfficalName}</td>
             <td>{g.Dimension}</td>
             <td>{g.Unit}</td>
-            <td>{g.DefaultCostPrice}</td>
+            <td>{g.Manufacturer}</td>
+            <td>{g.DefaultPrice}</td>
             <td>{g.Translation}</td>
             <td>{g.PeriodTreatment}</td>
-            <td>{g.Manufacturer}</td>
+
             <td>{g.UseWay}</td>
 
             <td style={{
@@ -151,9 +148,7 @@ class GoodList extends React.Component {
                                 Store.dispatch({ type: "SET_ADD_MODE" })
                             }}>添加</button>
                         </Form>
-
                     </div>
-
                 </div>
 
                 <table className="table table-striped table-hover">
@@ -164,10 +159,10 @@ class GoodList extends React.Component {
                             <th>通用名</th>
                             <th>规格</th>
                             <th>单位</th>
-                            <th>默认成本</th>
+                            <th>生产商</th>
+                            <th>默认价格</th>
                             <th>适应症</th>
                             <th>疗程</th>
-                            <th>生产商</th>
                             <th>用法</th>
                             <th>进口</th>
                         </tr>

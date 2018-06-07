@@ -82,7 +82,7 @@ class InviteList extends React.Component {
         let listJsx = invists.map((i, index) => (<tr key={index}>
             <td>{i.ID}</td>
             <td>{i.Remarks}</td>
-            <td>{i.OperatorID}</td>
+            <td>{i.OperatorName}</td>
             <td>{i.UpdateTime}</td>
         </tr>));
 

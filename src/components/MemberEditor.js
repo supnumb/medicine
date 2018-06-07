@@ -56,12 +56,12 @@ class MemberEditor extends React.Component {
             method: 'POST',
             mode: 'same-origin',
             credentials: 'same-origin',
-            headers:{
+            headers: {
                 'Content-Type': 'application/json'
             }
         }).then(res => res.json()).then(json => {
             console.log(json);
-            
+
             if (json.code == 0) {
                 if (this.props.onSaveCompleted) {
                     this.props.onSaveCompleted(json);
@@ -218,7 +218,7 @@ class MemberEditor extends React.Component {
 
                 <div className="form-group">
                     <label className="control-label col-sm-3">
-                        好友
+                        药师
                     </label>
                     <div className="col-sm-6">
                         <Field name="FriendName" id="FriendName" />

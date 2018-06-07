@@ -2,13 +2,13 @@ import React from 'react';
 import Store from './Reducer'
 
 import IntentionList from './IntentionList';
-import { Icon, RadioGroup, Radio } from 'rsuite';
+import { Icon, RadioGroup, Radio, CheckPicker } from 'rsuite';
 
 import { Form, Field, createFormControl } from 'form-lib';
-import { SchemaModel, StringType } from 'rsuite-schema';
+import { SchemaModel, StringType, ArrayType } from 'rsuite-schema';
 const TextareaField = createFormControl('textarea');
 
-const model = SchemaModel({ Goods: StringType().isRequired('请输入意向药品') });
+const model = SchemaModel({ Goods: ArrayType().rangeLength(1, 5, '请选择意向药品(1~5)') });
 
 /**
  * 会员意向编辑组件
@@ -19,35 +19,71 @@ class IntentionEditor extends React.Component {
         super(props);
 
         this.state = {
-            values: {},
+            values: { Tags: "咨询" },
             errors: {},
             isFetching: false,
-            updateIntention: null
+            updateIntention: null,
+            goods: []
         };
 
-        this.loadObjectDetail = this._loadObjectDetail.bind(this);
         this.submitIntention = this._submitIntention.bind(this);
+        this.loadGoodListFromDB = this._loadGoodListFromDB.bind(this);
     }
 
-    _loadObjectDetail() { }
+
+    _loadGoodListFromDB(keyword) {
+        let data = { KeyWord: keyword, Page: 0, Limit: 1000 };
+
+        fetch('/api/good/search', {
+            body: JSON.stringify(data),
+            method: 'POST',
+            mode: 'same-origin',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(res => res.json()).then(json => {
+            if (json.code == 0) {
+                let _goods = json.data.map(g => { return { value: g.ID, label: g.Name } })
+                this.setState({ goods: _goods, isFetching: false });
+            } else {
+                alert(json.message);
+                this.setState({ isFetching: false })
+            }
+        }).catch(err => {
+            console.error(err);
+            this.setState({ isFetching: false })
+        })
+    }
 
     _submitIntention() {
-
         if (!this.form.check()) {
-            this.setState({ message: "请输入意向药品" });
+            alert("请选择意向商品")
             return;
         }
 
         this.setState({ isFetching: true });
 
-        let { values } = this.state;
+        let { values, goods } = this.state;
         let { member } = this.props;
 
-        console.log(values);
+        let selected = goods.filter(g => {
+
+            for (let i = 0; i < values.Goods.length; i++) {
+                if (g.value === values.Goods[i]) {
+                    return true;
+                }
+            }
+
+            return false;
+        });
+
+        let _goodsStr = selected.map(s => s.label);
 
         let postData = {
             MemberID: member.ID,
-            Goods: values.Goods,
+            Goods: _goodsStr,
+            OtherGoods: values.OtherGoods || '',
             Tags: values.Tags
         }
 
@@ -63,10 +99,11 @@ class IntentionEditor extends React.Component {
             console.log(json);
 
             if (json.code == 0) {
+
                 if (this.props.onSaveCompleted) {
-                    this.setState({ updateIntention: json.data, values: { Goods: "" }, isFetching: false });
+                    this.setState({ updateIntention: json.data, values: { Goods: [] }, isFetching: false });
                 } else {
-                    this.setState({ updateIntention: json.data, values: { Goods: "" }, isFetching: false });
+                    this.setState({ updateIntention: json.data, values: { Goods: [] }, isFetching: false });
                     alert(json.message)
                 }
             } else {
@@ -92,11 +129,15 @@ class IntentionEditor extends React.Component {
         if (member) {
             this.setState({ values: member });
         }
+
+        this.loadGoodListFromDB();
     }
 
     render() {
         let { member } = this.props;
-        let { values, errors, isFetching, updateIntention } = this.state;
+        let { values, errors, isFetching, updateIntention, goods } = this.state;
+
+        console.log({ values });
 
         return (<div id="IntentionEditor">
             <IntentionList member={member} updateIntention={updateIntention} />
@@ -134,14 +175,25 @@ class IntentionEditor extends React.Component {
                     <label>
                         意向药品
                     </label>
-                    <Field name="Goods" id="Goods" accepter={TextareaField} />
+                    <CheckPicker data={goods} onSelect={(value, item, event) => {
+                        values.Goods = value;
+                        this.setState({ values })
+                    }} />
                     <Field type="hidden" name="MemberID"></Field>
                     <p className="text-danger">{errors.Remark}</p>
                 </div>
 
                 <div className="form-group">
-                    <button disabled={isFetching} onClick={this.submitIntention} className="btn btn-primary">
-                        保存
+                    <label>
+                        其它药品
+                    </label>
+                    <Field name="OtherGoods" id="OtherGoods" accepter={TextareaField} />
+                    <p className="text-danger">{errors.Remark}</p>
+                </div>
+
+                <div className="form-group">
+                    <button onClick={this.submitIntention} className="btn btn-primary">
+                        {isFetching ? "正在保存..." : "保存"}
                     </button>
                     &nbsp;&nbsp;
                     <button className="btn btn-default" onClick={this.cancel}>取消</button>

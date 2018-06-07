@@ -40,7 +40,7 @@ class IntentionList extends React.Component {
         if (oldUpdate) {
             if (updateIntention.insertId != oldUpdate.insertId) {
                 this.loadIntentionsFromDB(member);
-            }else if(oldMember.ID != member.ID){
+            } else if (oldMember.ID != member.ID) {
                 this.loadIntentionsFromDB(member);
             }
         } else if (oldMember.ID != member.ID) {
@@ -78,9 +78,10 @@ class IntentionList extends React.Component {
         let listJsx = intentions.map((i, index) => (<tr key={index}>
             <td>{i.ID}</td>
             <td>{i.Goods}</td>
+            <td>{i.OtherGoods}</td>
             <td>{i.Tags}</td>
             <td>{i.OperatorName}</td>
-            <td>{i.UpdateTime}</td>
+            <td>{i.CreateTime}</td>
         </tr>));
 
         return (<div id="IntentionList">
@@ -91,10 +92,11 @@ class IntentionList extends React.Component {
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>意向单详情</th>
+                        <th>意向药品</th>
+                        <th>其它</th>
                         <th>标签</th>
                         <th>药师</th>
-                        <th>时间</th>
+                        <th>日期</th>
                     </tr>
                 </thead>
                 <tbody>

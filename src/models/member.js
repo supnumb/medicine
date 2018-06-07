@@ -33,7 +33,7 @@ function Member() {
         _memberQuantity: "select count(m.ID) as Quantity from Members m  where m.Flag=:Flag and m.Status=1 and m.CreateTime>=:StartTime and m.CreateTime<=:EndTime and m.MobilPhone like :MobilPhone and concat(m.Name,m.Address) like :KeyWord;",
 
         //会员列表
-        _memberList: "select m.*,count(distinct i.ID) as IntentionQuantity,count(distinct v.ID) as VisitQuantity,count(distinct o.ID) as OrderQuantity from Members m left join Intentions i on m.ID=i.MemberID left join Visits v on m.ID=v.MemberID left join Orders o on m.ID=o.MemberID where m.Flag=:Flag and m.Status=1 and m.CreateTime>=:StartTime and m.CreateTime<=:EndTime and m.MobilPhone like :MobilPhone and concat(m.Name,m.Address) like :KeyWord group by m.ID order by m.UpdateTime desc limit :Page,:Limit;",
+        _memberList: "SELECT m.*, count(DISTINCT v.ID) AS VisitQuantity , count(DISTINCT o.ID) AS OrderQuantity FROM( SELECT AA.*, BB.Tags , BB.Goods FROM Members AS AA LEFT JOIN Intentions AS BB ON BB.ID =( SELECT MAX(ID) FROM Intentions WHERE MemberID = AA.ID)) m LEFT JOIN Visits v ON m.ID = v.MemberID LEFT JOIN Orders o ON m.ID = o.MemberID WHERE m.Flag =:Flag AND m.STATUS = 1 AND m.CreateTime >=:StartTime AND m.CreateTime <=:EndTime  AND concat(m.MobilPhone,m.Name,m.Address) LIKE :KeyWord GROUP BY m.ID ORDER BY m.UpdateTime DESC LIMIT :Page,:Limit;",
 
         //会员详情
         _memberInfo: "select * from Members where ID=:ID;",
@@ -55,11 +55,11 @@ function Member() {
  * @param  {String} MobilPhone 电话号码
  * @param  {Function} callback 回调,返回单条用户信息
  */
-Member.prototype.check = function(MobilPhone, callback) {
+Member.prototype.check = function (MobilPhone, callback) {
 
     this._getByTel({
         MobilPhone: MobilPhone
-    }, function(err, rows) {
+    }, function (err, rows) {
         if (err) {
             return callback(err, null);
         }
@@ -73,11 +73,11 @@ Member.prototype.check = function(MobilPhone, callback) {
  * @param  {Number} ID 雇员ID
  * @param  {Function} callback 回调,返回单条用户信息
  */
-Member.prototype.checkByID = function(ID, callback) {
+Member.prototype.checkByID = function (ID, callback) {
 
     this._getByID({
         ID
-    }, function(err, rows) {
+    }, function (err, rows) {
         if (err) {
             return callback(err, null);
         }
@@ -90,9 +90,9 @@ Member.prototype.checkByID = function(ID, callback) {
  * @param  {Object} obj 会员信息
  * @param  {Function} callback 回调
  */
-Member.prototype.addMember = function(Obj, callback) {
+Member.prototype.addMember = function (Obj, callback) {
 
-    this._add(Obj, function(err, rows) {
+    this._add(Obj, function (err, rows) {
         if (err) {
             return callback(err, null);
         }
@@ -106,11 +106,11 @@ Member.prototype.addMember = function(Obj, callback) {
  * @param  {Int} ID 会员ID
  * @param  {Function} callback 回调
  */
-Member.prototype.deleteMember = function(ID, callback) {
+Member.prototype.deleteMember = function (ID, callback) {
 
     this._delete({
         ID: ID
-    }, function(err, rows) {
+    }, function (err, rows) {
         if (err) {
             return callback(err, null);
         }
@@ -124,9 +124,9 @@ Member.prototype.deleteMember = function(ID, callback) {
  * @param  {Object} Obj 会员信息
  * @param  {Function} callback 回调
  */
-Member.prototype.updateMember = function(Obj, callback) {
+Member.prototype.updateMember = function (Obj, callback) {
 
-    this._update(Obj, function(err, rows) {
+    this._update(Obj, function (err, rows) {
         if (err) {
             return callback(err, null);
         }
@@ -143,13 +143,13 @@ Member.prototype.updateMember = function(Obj, callback) {
  * @param  {Number} Limit 每页显示几条
  * @param  {Function} callback 回调
  */
-Member.prototype.memberList = function(KeyWord, MobilPhone, Page, Limit, OrderBy, StartTime, EndTime, callback) {
+Member.prototype.memberList = function (KeyWord, MobilPhone, Page, Limit, OrderBy, StartTime, EndTime, callback) {
 
     const that = this;
 
     async.parallel([
 
-        function(cb) {
+        function (cb) {
 
             that._memberQuantity({
                 Flag: 0,
@@ -160,7 +160,7 @@ Member.prototype.memberList = function(KeyWord, MobilPhone, Page, Limit, OrderBy
                 OrderBy: ` m.${OrderBy}`,
                 StartTime,
                 EndTime,
-            }, function(err, db) {
+            }, function (err, db) {
 
                 if (err) {
                     return cb(err, null);
@@ -172,7 +172,7 @@ Member.prototype.memberList = function(KeyWord, MobilPhone, Page, Limit, OrderBy
 
         },
 
-        function(cb) {
+        function (cb) {
 
             that._memberList({
                 Flag: 0,
@@ -183,7 +183,7 @@ Member.prototype.memberList = function(KeyWord, MobilPhone, Page, Limit, OrderBy
                 OrderBy: `m.${OrderBy}`,
                 StartTime,
                 EndTime,
-            }, function(err, db) {
+            }, function (err, db) {
 
                 if (err) {
                     return cb(err, null);
@@ -195,7 +195,7 @@ Member.prototype.memberList = function(KeyWord, MobilPhone, Page, Limit, OrderBy
 
         }
 
-    ], function(err, result) {
+    ], function (err, result) {
 
         if (err) {
             return callback(err, null);
@@ -205,7 +205,7 @@ Member.prototype.memberList = function(KeyWord, MobilPhone, Page, Limit, OrderBy
 
         const rows = result[1];
 
-        rows.forEach(function(element, index) {
+        rows.forEach(function (element, index) {
 
             if (element.Gender == 1) {
                 rows[index].Gender = "男";
@@ -235,11 +235,11 @@ Member.prototype.memberList = function(KeyWord, MobilPhone, Page, Limit, OrderBy
  * @param  {Number} ID 会员ID
  * @param  {Function} callback 回调
  */
-Member.prototype.memberInfo = function(ID, callback) {
+Member.prototype.memberInfo = function (ID, callback) {
 
     this._memberInfo({
         ID: ID
-    }, function(err, rows) {
+    }, function (err, rows) {
         if (err) {
             return callback(err, null);
         }
@@ -258,17 +258,17 @@ Member.prototype.memberInfo = function(ID, callback) {
  * @param  {String} KeyWord 关键字
  * @param  {Function} callback 回调
  */
-Member.prototype.employeeList = function(KeyWord, callback) {
+Member.prototype.employeeList = function (KeyWord, callback) {
 
     this._employeeList({
         KeyWord: `%${KeyWord}%`,
-    }, function(err, rows) {
+    }, function (err, rows) {
 
         if (err) {
             return callback(err, null);
         }
 
-        rows.forEach(function(element, index) {
+        rows.forEach(function (element, index) {
 
             if (element.Gender == 1) {
                 rows[index].Gender = "男";
@@ -293,9 +293,9 @@ Member.prototype.employeeList = function(KeyWord, callback) {
  * @param  {Object} obj 会员信息
  * @param  {Function} callback 回调
  */
-Member.prototype.addEmployee = function(Obj, callback) {
+Member.prototype.addEmployee = function (Obj, callback) {
 
-    this._addEmployee(Obj, function(err, rows) {
+    this._addEmployee(Obj, function (err, rows) {
         if (err) {
             return callback(err, null);
         }
@@ -311,9 +311,9 @@ Member.prototype.addEmployee = function(Obj, callback) {
  * @param  {String} Password 密码
  * @param  {Function} callback 回调
  */
-Member.prototype.alterpass = function(ID, Password, callback) {
+Member.prototype.alterpass = function (ID, Password, callback) {
 
-    this._alterpass({ ID, Password }, function(err, rows) {
+    this._alterpass({ ID, Password }, function (err, rows) {
         if (err) {
             return callback(err, null);
         }

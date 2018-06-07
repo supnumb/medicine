@@ -424,7 +424,7 @@ exports.visitList = (req, res, next) => {
 exports.addIntention = (req, res, next) => {
     // console.log(req.body);
 
-    let { MemberID, Goods, Tags } = req.body;
+    let { MemberID, Goods, Tags, OtherGoods="" } = req.body;
 
     if (!MemberID || !Goods || !Tags) {
         return res.send({ code: 2, message: "请选择意向标签和意向药品" });
@@ -434,8 +434,7 @@ exports.addIntention = (req, res, next) => {
         req.session.user.ID :
         1;
 
-    Intention.add(MemberID, OperatorID, Goods, Tags, function (err, mem) {
-
+    Intention.add(MemberID, OperatorID, Goods, OtherGoods, Tags, function (err, mem) {
         if (err) {
             return res.send({ code: 2, message: "数据库出错" });
         };
