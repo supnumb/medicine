@@ -89,7 +89,8 @@ class ManagerRouter extends React.Component {
                 console.log("加载雇员详细信息", json);
                 this.setState({ employee: json.data })
             } else {
-                this.props.history.push("/employee_signin");
+                alert(json.message);
+                // this.props.history.push("/employee_signin");
             }
         }).catch(err => console.log(err));
     }

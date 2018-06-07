@@ -96,7 +96,7 @@ class EmployeeSignIn extends React.Component {
 
                     <div className="form-group">
                         <p className="text-danger">{message}</p>
-                        <button className="btn btn-primary" onClick={this.signin}>登录</button>
+                        <button className="btn btn-primary" disabled={isFetching} onClick={this.signin}>{isFetching ? "登录中..." : "登录"}</button>
                     </div>
                 </Form>
             </fieldset>

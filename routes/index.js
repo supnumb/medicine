@@ -4,21 +4,21 @@ const member = require('../src/controllers/member');
 
 
 /* GET home page. */
-router.get('/memberList', function (req, res, next) {
-    res.render('index');
-});
+// router.get('/memberList', function (req, res, next) {
+//     res.render('index');
+// });
 
-router.get('/memberAdd', function (req, res, next) {
-    res.render('memberAdd');
-});
+// router.get('/memberAdd', function (req, res, next) {
+//     res.render('memberAdd');
+// });
 
-router.get('/orderAdd', function (req, res, next) {
-    res.render('orderAdd');
-});
+// router.get('/orderAdd', function (req, res, next) {
+//     res.render('orderAdd');
+// });
 
-router.get('/orderList', function (req, res, next) {
-    res.render('orderList');
-});
+// router.get('/orderList', function (req, res, next) {
+//     res.render('orderList');
+// });
 
 router.get('/employee_signin/', function (req, res, next) {
     res.render('employee_signin');
