@@ -85,8 +85,8 @@ class ManagerRouter extends React.Component {
             mode: 'same-origin',
             credentials: 'same-origin'
         }).then(res => res.json()).then(json => {
+            console.log({ json });
             if (json.code == 0) {
-                console.log("加载雇员详细信息", json);
                 this.setState({ employee: json.data })
             } else {
                 alert(json.message);

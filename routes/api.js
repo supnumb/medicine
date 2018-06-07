@@ -22,7 +22,7 @@ router.post('/employee/search', member.checkUser, employee.search);
 router.post('/employee/save', member.checkUser, employee.addEmployee);
 
 // 雇员详情
-router.get('/employee/profile', member.checkUser, employee.profile);
+router.get('/employee/profile', employee.profile);
 
 //管理员重置密码
 router.post('/employee/alterpass', member.checkUser, employee.alterpass);
