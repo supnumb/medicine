@@ -89,8 +89,6 @@ class ManagerRouter extends React.Component {
                 console.log("加载雇员详细信息", json);
                 this.setState({ employee: json.data })
             } else {
-                console.log(this);
-
                 this.props.history.push("/employee_signin");
             }
         }).catch(err => console.log(err));
@@ -98,8 +96,6 @@ class ManagerRouter extends React.Component {
 
     render() {
         let { employee } = this.state;
-
-        console.log(employee);
 
         return (<Router>
             <div>
