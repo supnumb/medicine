@@ -85,7 +85,9 @@ class ReceiptGoodList extends React.Component {
                 return (<tr key={index}>
                     <td>{g.GoodID} </td>
                     <td>{g.Name}</td>
-                    <td>{g.OfficalName}</td>
+                    <td>{g.Dimension}</td>
+                    <td>{g.Unit}</td>
+                    <td>{g.Manufacturer}</td>
                     <td>
                         <DatePicker name="Date" id="Date" value={Moment(g.ExpiredDate)} onChange={(date) => {
                             console.log({ date: Moment(date).format("YYYY-MM-DD") });
@@ -95,7 +97,6 @@ class ReceiptGoodList extends React.Component {
 
                     </td>
                     <td>
-
                         <input onChange={(event) => {
                             this.onTextChanged(event, g);
                         }} style={{ "width": "40px" }} type="text" id="CostPrice" value={g.CostPrice} placeholder="成本价" /></td>
@@ -105,9 +106,8 @@ class ReceiptGoodList extends React.Component {
                     <td><input onChange={(event) => {
                         this.onTextChanged(event, g);
                     }} style={{ "width": "80px" }} type="text" id="BatchNo" value={g.BatchNo} placeholder="批号" /></td>
-                    <td>{g.Dimension}</td>
-                    <td>{g.Unit}</td>
-                    <td>{g.Manufacturer}</td>
+
+
                     <td>
                         <a href="#" onClick={() => {
                             this.setState({ receiptGood: null })
@@ -119,7 +119,6 @@ class ReceiptGoodList extends React.Component {
                 return (<tr key={index}>
                     <td>{g.GoodID} </td>
                     <td>{g.Name}</td>
-                    <td>{g.OfficalName}</td>
                     <td>{g.Dimension}</td>
                     <td>{g.Unit}</td>
                     <td>{g.Manufacturer}</td>
@@ -127,7 +126,7 @@ class ReceiptGoodList extends React.Component {
                     <td>{g.CostPrice}</td>
                     <td>{g.Quantity}</td>
                     <td>{g.BatchNo}</td>
-                   
+
                     <td>
                         <a href="#" onClick={() => {
                             this.setState({ receiptGood: g })
@@ -144,7 +143,6 @@ class ReceiptGoodList extends React.Component {
                     <tr>
                         <th>ID</th>
                         <th>药品名</th>
-                        <th>通用名</th>
                         <th>规格</th>
                         <th>单位</th>
                         <th>厂家</th>

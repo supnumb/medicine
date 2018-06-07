@@ -18,6 +18,7 @@ class ReceiptList extends React.Component {
         this.state = Store.getState();
 
         this.loadReceiptsFromDB = this._loadReceiptsFromDB.bind(this);
+        this.settle = this._settle.bind(this);
     }
 
     _loadReceiptsFromDB(event, status) {
@@ -68,6 +69,30 @@ class ReceiptList extends React.Component {
         })
     }
 
+    _settle(receiptID) {
+
+        let data = { ID: receiptID };
+
+        fetch('/api/receipt/settle', {
+            body: JSON.stringify(data),
+            method: 'POST',
+            mode: 'same-origin',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(res => res.json()).then(json => {
+            console.log(json);
+            if (json.code == 0) {
+                // this.setState({ values: json.data });
+                this.loadReceiptsFromDB();
+                alert(json.message);
+            } else { alert(json.message) }
+        }).catch(err => {
+            console.error(err);
+        })
+    }
+
     componentDidMount() {
         this.loadReceiptsFromDB();
     }
@@ -112,12 +137,15 @@ class ReceiptList extends React.Component {
                 }}>编辑</a>
                 &nbsp;
                   <a href="#" onClick={() => {
-                    this.props.history.push({
-                        pathname: "/receipt/settle",
-                        state: r
-                    })
+                    this.settle(r.ID, r.Status === 0 ? 1 : 0)
+                    // this.props.history.push({
+                    //     pathname: "/receipt/settle",
+                    //     state: r
+                    // })
                     // Store.dispatch({type: "CHECKED_RECEIPT", payload: r})
-                }}>结算</a>
+                }}>{
+                        r.Status === 1 ? "已结算" : "未结算"
+                    } </a>
             </td>
         </tr>));
         return (<div id="ReceiptList">

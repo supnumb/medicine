@@ -191,16 +191,16 @@ exports.receiptInfo = (req, res, next) => {
  */
 exports.settle = (req, res, next) => {
 
-    let { ID } = req.body;
+    let { ID, Status = 1 } = req.body;
 
     if (!ID) {
         return res.status(200).send({ code: 2, message: "入库单ID参数不匹配!" });
     };
 
-    Receipt.settle(ID, function (err, mem) {
+    Receipt.settle(ID, Status, function (err, mem) {
 
         if (err) {
-            return res.send({ code: 2, message: "数据库出错" });
+            return res.send({ code: 2, message: "数据库出错", data: err });
         };
 
         return res.send({ code: 0, message: "入库单结算操作成功！", data: mem });

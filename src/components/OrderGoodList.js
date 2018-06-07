@@ -134,7 +134,7 @@ class OrderGoodList extends React.Component {
                 </tbody>
                 <tfoot>
                     <tr>
-                        <td colSpan="8" >
+                        <td colSpan="9" >
                             <button style={{
                                 "float": "right"
                             }} onClick={this.props.onShowSelectorZone}>添加药品</button>

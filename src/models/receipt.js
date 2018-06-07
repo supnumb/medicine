@@ -21,7 +21,7 @@ function Receipt() {
         _ReceiptGoodInfo: "select r.*,g.* from ReceiptGoods r inner join Goods g on r.GoodID=g.ID where r.ReceiptID=:ID;",
 
         //结算
-        _settle: "update Receipts set status=1 where ID=:ID "
+        _settle: "update Receipts set status=:Status where ID=:ID "
 
     };
 
@@ -68,7 +68,10 @@ ReceiptTran.prototype.add = function (Obj, callback) {
                 tran.rollback(() => {
                     return callback(err, null);
                 });
+
+                return;
             }
+
 
             const ReceiptID = rows.insertId;
 
@@ -447,10 +450,11 @@ Receipt.prototype.receiptInfo = function (ID, callback) {
  * 入库单结算
  * @param  {Number} ID 结算ID
  */
-Receipt.prototype.settle = function (ID, callback) {
+Receipt.prototype.settle = function (ID, Status, callback) {
 
     this._settle({
-        ID
+        ID,
+        Status
     }, function (err, rows) {
 
         if (err) {

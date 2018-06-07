@@ -7,8 +7,6 @@ class SiteIndex extends React.Component {
         super(props);
     }
 
- 
-
     render() {
         return (<div>
             默认页面
