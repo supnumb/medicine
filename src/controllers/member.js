@@ -34,7 +34,7 @@ exports.checkUser = (req, res, next) => {
             return res.status(422).send({ code: 99, message: "该操作需要您先进行登录！" });
         } else {
 
-            res.redirect('/employee_signin/' + encodeURIComponent(refer));
+            res.redirect('/employee_signin/');
         }
     }
 }
@@ -424,7 +424,7 @@ exports.visitList = (req, res, next) => {
 exports.addIntention = (req, res, next) => {
     // console.log(req.body);
 
-    let { MemberID, Goods, Tags, OtherGoods="" } = req.body;
+    let { MemberID, Goods, Tags, OtherGoods = "" } = req.body;
 
     if (!MemberID || !Goods || !Tags) {
         return res.send({ code: 2, message: "请选择意向标签和意向药品" });
