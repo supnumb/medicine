@@ -58,11 +58,11 @@ exports.save = (req, res, next) => {
 
     } else {
 
-        console.log({ReceiptData});
+        console.log({ ReceiptData });
         ReceiptTran.add(ReceiptData, function (err, mem) {
 
             if (err && err.message) {
-                console.log({err});
+                console.log({ err });
 
                 return res.status(200).send({ code: 2, message: err.message });
             }
@@ -141,7 +141,7 @@ exports.receiptList = (req, res, next) => {
     }
 
     if (!EndTime) {
-        EndTime = moment(new Date()).format('YYYY-MM-DD 23:59:59');
+        EndTime = moment().add(90, 'd').format('YYYY-MM-DD 23:59:59');
     }
 
     Receipt.search(KeyWord, Page, Limit, StartTime, EndTime, Status, function (err, mem) {
@@ -151,11 +151,7 @@ exports.receiptList = (req, res, next) => {
         };
 
         const { Quantity, rows } = mem;
-
-        // console.log(mem);
-
         return res.send({ code: 0, message: '查询入库单列表操作成功！', Quantity, data: rows });
-
     });
 }
 
