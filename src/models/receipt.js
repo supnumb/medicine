@@ -146,7 +146,6 @@ ReceiptTran.prototype.add = function (Obj, callback) {
 
                     console.log({ StockChange_add });
 
-
                     pool.query(StockChange_add, {}, function (err, rows) {
                         if (err) {
                             console.log("提交进货单库存更新失败");
@@ -317,7 +316,6 @@ Receipt.prototype.search = function (KeyWord, Page, Limit, StartTime, EndTime, S
     const that = this;
 
     async.parallel([
-
         function (cb) {
             that._receiptQuantity({
                 KeyWord: `%${KeyWord}%`,
@@ -328,31 +326,31 @@ Receipt.prototype.search = function (KeyWord, Page, Limit, StartTime, EndTime, S
                 if (err) {
                     return cb(err, null);
                 }
-
                 cb(null, db[0]);
-
             });
 
         },
 
         function (cb) {
-            that._search({
+            let param = {
                 KeyWord: `%${KeyWord}%`,
                 Page,
                 Limit,
                 StartTime,
                 EndTime,
                 Status
-            }, function (err, db) {
+            };
+
+            console.log({ "查询进货单": param });
+
+            that._search(param, function (err, db) {
 
                 if (err) {
                     return cb(err, null);
                 }
 
                 cb(null, db);
-
             });
-
         }
 
     ], function (err, result) {

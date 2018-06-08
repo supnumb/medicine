@@ -5,23 +5,23 @@ var should = require('should');
 //Amount, CostPrice, Quantity, ExpiryDate, BatchNo
 let receiptData = {
     ID: 0,
-    VendorName: '惠州新星',
-    VendorID: 46,
-    Contact: '李大龙',
-    Telephone: '13910043860',
-    Date: '2018-06-15',
-    ReceiptAmount: 500,
-    TotalAmount: 500,
+    VendorName: '哈药集团',
+    VendorID: 43,
+    Contact: '张三',
+    Telephone: '11111111111',
+    Date: '2018-06-09',
+    ReceiptAmount: 15,
+    TotalAmount: 15,
     ReceiptGoods:
         [{
-            GoodID: 43,
+            GoodID: 42,
             Quantity: 1,
             ExpiryDate: '2018-06-08',
             BatchNo: '',
-            CostPrice: 500,
-            Name: '凯美纳',
-            OfficalName: '盐酸埃克替尼片',
-            Amount: 500
+            CostPrice: 15,
+            Name: '正天乄',
+            OfficalName: '正天事',
+            Amount: 15
         }]
 }
 
