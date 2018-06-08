@@ -4,25 +4,33 @@ var agent = supertest.agent(app);
 var should = require('should');
 //Amount, CostPrice, Quantity, ExpiryDate, BatchNo
 let receiptData = {
-    VendorName: "哈药集团",
-    VendorID: 5,
-    Date: '2018-05-06',
-    EmployeeID: 1,
-    ReceiptGoods: [{
-        GoodID: 42,
-        CostPrice: 10,
-        Quantity: 10,
-        ExpiryDate: '2020-10-31',
-        BatchNo: "12004532"
-    }]
-};
+    ID: 0,
+    VendorName: '惠州新星',
+    VendorID: 46,
+    Contact: '李大龙',
+    Telephone: '13910043860',
+    Date: '2018-06-15',
+    ReceiptAmount: 500,
+    TotalAmount: 500,
+    ReceiptGoods:
+        [{
+            GoodID: 43,
+            Quantity: 1,
+            ExpiryDate: '2018-06-08',
+            BatchNo: '',
+            CostPrice: 500,
+            Name: '凯美纳',
+            OfficalName: '盐酸埃克替尼片',
+            Amount: 500
+        }]
+}
 
 let ID = 0;
 
-describe("# 进货单模块单元测试", function() {
+describe("# 进货单模块单元测试", function () {
 
-    before(function(done) {
-        agent.post('/api/employee/signin').send({ login_name: "13511111111", password: "super1111" }).expect(200).end(function(err, res) {
+    before(function (done) {
+        agent.post('/api/employee/signin').send({ login_name: "13511111111", password: "super1111" }).expect(200).end(function (err, res) {
             if (err) {
                 console.log(err);
             }
@@ -31,9 +39,9 @@ describe("# 进货单模块单元测试", function() {
         })
     })
 
-    it("##017 添加入库单，应该返回成功：Code=0", function(done) {
+    it.only("##017 添加入库单，应该返回成功：Code=0", function (done) {
 
-        agent.post('/api/receipt/save').send(receiptData).expect(200).end(function(err, res) {
+        agent.post('/api/receipt/save').send(receiptData).expect(200).end(function (err, res) {
             if (err) {
                 return done(err);
             }
@@ -42,9 +50,9 @@ describe("# 进货单模块单元测试", function() {
         });
     })
 
-    it.only("###026.01 得到指定入库单的详情信息,入库单基本信息，入库单关联的商品信息，应该返回：Code=0", function(done) {
+    it("###026.01 得到指定入库单的详情信息,入库单基本信息，入库单关联的商品信息，应该返回：Code=0", function (done) {
         let ID = 65;
-        agent.post(`/api/receipt/detail`).send({ ID }).expect(200).end(function(err, res) {
+        agent.post(`/api/receipt/detail`).send({ ID }).expect(200).end(function (err, res) {
             if (err) {
                 return done(err);
             }
@@ -56,13 +64,13 @@ describe("# 进货单模块单元测试", function() {
         });
     })
 
-    it("###026.02 入库单结算，应该返回：Code=0", function(done) {
+    it("###026.02 入库单结算，应该返回：Code=0", function (done) {
         let ID = 18;
         let goods = [];
         agent.post(`/api/receipt/settle`).send({
             ID,
             goods
-        }).expect(200).end(function(err, res) {
+        }).expect(200).end(function (err, res) {
             if (err) {
                 return done(err);
             }
@@ -79,8 +87,8 @@ describe("# 进货单模块单元测试", function() {
         });
     })
 
-    it("###024 按药品名称、供应商名称查询入库单，应该返回：Code=0", function(done) {
-        agent.post(`/api/receipt/search`).send({ KeyWord: "" }).expect(200).end(function(err, res) {
+    it("###024 按药品名称、供应商名称查询入库单，应该返回：Code=0", function (done) {
+        agent.post(`/api/receipt/search`).send({ KeyWord: "" }).expect(200).end(function (err, res) {
             if (err) {
                 return done(err);
             }
@@ -90,7 +98,7 @@ describe("# 进货单模块单元测试", function() {
         });
     })
 
-    it("###025 进货单退回（支持部分退回），应该返回：Code=0", function(done) {
+    it("###025 进货单退回（支持部分退回），应该返回：Code=0", function (done) {
         let receiptData = {
             ID: 13,
             VendorName: "哈药集团",
@@ -105,7 +113,7 @@ describe("# 进货单模块单元测试", function() {
                 BatchNo: "12004532"
             }]
         };
-        agent.post(`/api/receipt/return`).send(receiptData).expect(200).end(function(err, res) {
+        agent.post(`/api/receipt/return`).send(receiptData).expect(200).end(function (err, res) {
             if (err) {
                 return done(err);
             }
@@ -116,7 +124,7 @@ describe("# 进货单模块单元测试", function() {
         });
     })
 
-    it("##018 保存库存调整单单，应该返回成功：Code=0", function(done) {
+    it("##018 保存库存调整单单，应该返回成功：Code=0", function (done) {
         let adjustmentData = {
             StockGoods: [{
                 GoodID: 1,
@@ -126,7 +134,7 @@ describe("# 进货单模块单元测试", function() {
 
 
         };
-        agent.post('/api/receipt/adjustmeno').send(adjustmentData).expect(200).end(function(err, res) {
+        agent.post('/api/receipt/adjustmeno').send(adjustmentData).expect(200).end(function (err, res) {
             if (err) {
                 return done(err);
             }

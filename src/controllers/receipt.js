@@ -30,9 +30,7 @@ exports.save = (req, res, next) => {
 
     let { ID, VendorName, VendorID, Date, ReceiptGoods } = req.body;
 
-
     console.log(req.body);
-
 
     if (!VendorName || !VendorID || !Date || ReceiptGoods.length == 0) {
         return res.status(200).send({ code: 2, message: "VendorName|VendorID|Date|ReceiptGoods参数不匹配！" });
@@ -60,13 +58,17 @@ exports.save = (req, res, next) => {
 
     } else {
 
+        console.log({ReceiptData});
         ReceiptTran.add(ReceiptData, function (err, mem) {
 
             if (err && err.message) {
+                console.log({err});
+
                 return res.status(200).send({ code: 2, message: err.message });
             }
 
             if (err) {
+                console.log(err);
                 return res.send({ code: 2, message: "数据库出错" });
             };
 

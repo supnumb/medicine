@@ -65,6 +65,8 @@ ReceiptTran.prototype.add = function (Obj, callback) {
         tran.query(Receipt_add, Obj, function (err, rows) {
 
             if (err) {
+                console.log({ err });
+
                 tran.rollback(() => {
                     return callback(err, null);
                 });
@@ -72,6 +74,7 @@ ReceiptTran.prototype.add = function (Obj, callback) {
                 return;
             }
 
+            console.log({ rows });
 
             const ReceiptID = rows.insertId;
 
@@ -96,6 +99,7 @@ ReceiptTran.prototype.add = function (Obj, callback) {
                 }, function (err, arrs) {
 
                     if (err) {
+                        console.error(err);
                         return cb(err, null);
                     }
 
@@ -104,14 +108,16 @@ ReceiptTran.prototype.add = function (Obj, callback) {
                     pool.query(Stock_update, { Quantity, GoodID }, function (err, rows) {
 
                         if (err) {
+                            console.error(err);
                             return cb(err, null);
                         }
 
                         if (rows.affectedRows == 0) {
-
                             pool.query(Stock_add, { Quantity, GoodID }, function (err, rows) {
 
                                 if (err) {
+                                    console.error(err);
+
                                     return cb(err, null);
                                 }
 
@@ -120,18 +126,17 @@ ReceiptTran.prototype.add = function (Obj, callback) {
                             });
 
                         } else {
+                            console.log({ "更新库存失败": rows });
                             return cb(null, 1);
                         }
-
-
                     });
 
                 });
 
-
             }, function (err) {
 
                 if (err) {
+                    console.error({ "事务操作失败": err });
                     tran.rollback(() => {
                         return callback(err, null);
                     });
@@ -139,33 +144,33 @@ ReceiptTran.prototype.add = function (Obj, callback) {
 
                     StockChange_add = StockChange_add.slice(0, StockChange_add.length - 1);
 
-                    pool.query(StockChange_add, {}, function (err, rows) {
+                    console.log({ StockChange_add });
 
+
+                    pool.query(StockChange_add, {}, function (err, rows) {
                         if (err) {
+                            console.log("提交进货单库存更新失败");
+                            console.error({ err });
+
                             tran.rollback(() => {
                                 return callback(err, null);
                             });
                         }
 
                         tran.commit(function (err) {
-
                             if (err) {
                                 console.log("提交事务失败", err);
                                 tran.rollback();
                                 return callback(err, null);
                             }
 
+                            console.log("提交进货单库存成功");
+
                             return callback(null, 1);
-
                         });
-
-
                     });
                 }
-
-
             });
-
         });
 
     });
