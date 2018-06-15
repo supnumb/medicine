@@ -13,7 +13,7 @@ function Receipt() {
         _receiptQuantity: "select count(r.ID) as Quantity from Receipts r,ReceiptGoods p,Goods g,Vendors v,Members m  where r.ID=p.ReceiptID and p.GoodID=g.ID and r.VendorID=v.ID and r.OperatorID=m.ID and r.Date>=:StartTime and r.Date<=:EndTime and concat(r.ID,g.Name) like :KeyWord;",
 
         //列表
-        _search: "SELECT r.*, m. NAME AS EmployeeName , group_concat(g. NAME) AS Goods , p.Amount , p.CostPrice , v.Contact , v.Telephone , v.Address FROM Receipts r INNER JOIN ReceiptGoods p ON r.ID = p.ReceiptID INNER JOIN Goods g ON p.GoodID = g.ID INNER JOIN Vendors v ON r.VendorID = v.ID INNER JOIN Members m ON r.OperatorID = m.ID WHERE r.Date >=:StartTime AND r.Date <=:EndTime AND concat( r.VendorName , g.NAME , v.Telephone , v.Address , v.Contact) LIKE :KeyWord and r.Status in (:Status) GROUP BY r.ID ORDER BY r.Date DESC LIMIT :Page,:Limit;",
+        _search: "SELECT r.*, m. NAME AS EmployeeName , group_concat(g. NAME) AS Goods ,(p.CostPrice*(p.Quantity-p.ReturnQuantity) p.Amount , p.CostPrice , v.Contact , v.Telephone , v.Address FROM Receipts r INNER JOIN ReceiptGoods p ON r.ID = p.ReceiptID INNER JOIN Goods g ON p.GoodID = g.ID INNER JOIN Vendors v ON r.VendorID = v.ID INNER JOIN Members m ON r.OperatorID = m.ID WHERE r.Date >=:StartTime AND r.Date <=:EndTime AND concat( r.VendorName , g.NAME , v.Telephone , v.Address , v.Contact) LIKE :KeyWord and r.Status in (:Status) GROUP BY r.ID ORDER BY r.Date DESC LIMIT :Page,:Limit;",
 
         //详情
         _ReceiptInfo: "select r.*,v.Name,v.Telephone,v.Address,v.Contact,v.Remark from Receipts r left join Vendors v on r.VendorID=v.ID left join Members m on r.OperatorID=m.ID where r.ID=:ID;",
@@ -178,6 +178,7 @@ ReceiptTran.prototype.add = function (Obj, callback) {
 
 /**
  * 入库单退回
+ * 
  * @param  {Object} Obj 入库单信息
  * 1、修改入库单信息
  * 2、修改子入库信息
@@ -186,6 +187,9 @@ ReceiptTran.prototype.add = function (Obj, callback) {
  * 
  */
 ReceiptTran.prototype.update = function (Obj, callback) {
+
+    //TODO:这块逻辑有问题，修改进货单时，增加商品的情况没考虑； 
+    //TODO:这块逻辑需要重新写一下。
 
     let tran = pool.getTran();
 
@@ -212,9 +216,9 @@ ReceiptTran.prototype.update = function (Obj, callback) {
             const ReceiptID = ID;
 
             async.eachSeries(ReceiptGoods, function (item, cb) {
-
                 let { GoodID, CostPrice, Quantity, ReturnQuantity, ExpiryDate, BatchNo } = item;
 
+                //更新库存
                 let ReceiptGood_update = 'update ReceiptGoods set Quantity=Quantity-:ReturnQuantity,ValiableQuantity=ValiableQuantity-:ReturnQuantity,ReturnQuantity=:ReturnQuantity,ExpiryDate=:ExpiryDate where ReceiptID=:ReceiptID and GoodID=:GoodID and ValiableQuantity>=:ReturnQuantity';
                 let Stock_update = 'update Stocks set TotalQuantity=TotalQuantity-:ReturnQuantity,ValiableQuantity=ValiableQuantity-:ReturnQuantity where GoodID=:GoodID;';
                 let Stock_add = 'insert into Stocks (GoodID,TotalQuantity,ValiableQuantity,CreateTime) values (:GoodID,:Quantity,:Quantity,now());';
@@ -365,6 +369,7 @@ Receipt.prototype.search = function (KeyWord, Page, Limit, StartTime, EndTime, S
 
         rows.forEach(function (element, index) {
 
+            // rows[index].Amount = element.CostPrice * (element.Quantity - element.ReturnQuantity || 0)
             rows[index].Date = moment(rows[index].Date).format('YYYY-MM-DD');
             rows[index].CreateTime = moment(rows[index].CreateTime).format('YYYY-MM-DD HH:mm:ss');
             rows[index].UpdateTime = moment(rows[index].UpdateTime).format('YYYY-MM-DD HH:mm:ss');

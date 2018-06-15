@@ -29,8 +29,10 @@ class ReceiptGoodList extends React.Component {
 
         let { goods } = this.props;
 
+        console.log(goods, g);
+
         goods.forEach(good => {
-            if (good.ID == g.ID) {
+            if (good.GoodID == g.GoodID) {
                 good[id] = value;
             }
         })

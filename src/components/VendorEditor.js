@@ -43,7 +43,9 @@ class VendorEditor extends React.Component {
         }).then(res => res.json()).then(json => {
             console.log({ json });
             if (json.code == 0) {
+
                 this.props.onSaveCompleted();
+                alert(json.message);
             }
         }).catch(err => {
             console.error(err);

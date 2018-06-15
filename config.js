@@ -1,5 +1,10 @@
 var config = {
 
+    RedisConfig: {
+        redis_port: "6379",
+        redis_host: "127.0.0.1",
+    },
+
     DB_TEST: {
         host: 'www.loclive.cn',
         connectionLimit: 50,

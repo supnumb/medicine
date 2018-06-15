@@ -4,8 +4,10 @@ var path = require('path');
 var ejs = require('ejs');
 var cookieParser = require('cookie-parser');
 var session = require('express-session');
-//var RedisStore = require('connect-redis')(session);
+var RedisStore = require('connect-redis')(session);
 var logger = require('morgan');
+
+let { RedisConfig } = require("./config");
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -13,7 +15,7 @@ var apiRouter = require('./routes/api');
 
 var app = express();
 
-// view engine setup
+// view engine setup    
 // app.set('views', path.join(__dirname, 'views'));
 // app.set('view engine', 'ejs');
 // app.set('views', path.join(__dirname, 'view/'));
@@ -34,16 +36,11 @@ app.use(session({
     cookie: { maxAge: 1000 * 60 * 60 * 24 * 30 },
     resave: false,
     saveUninitialized: true,
-    // store: new RedisStore({
-    //     port: "",
-    //     host: "",
-    //     pass: "",
-    //     db: 2
-    // })
+    store: new RedisStore({ port: RedisConfig.redis_port, host: RedisConfig.redis_host })
 }));
 
 
-app.use(express.static(path.join(__dirname, 'public'),{maxAge:5*60*1000}));
+app.use(express.static(path.join(__dirname, 'public'), { maxAge: 5 * 60 * 1000 }));
 
 app.use('/users', usersRouter);
 app.use('/api', apiRouter);
