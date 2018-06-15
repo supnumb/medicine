@@ -31,6 +31,7 @@ var config = {
         password: "p1@32I",
         database: "Medicine"
     },
+    
     REDIS_TEST: {
         host: '127.0.0.1',
         port: "6379",

@@ -7,9 +7,6 @@ var session = require('express-session');
 var RedisStore = require('connect-redis')(session);
 var logger = require('morgan');
 var config = require('./config');
-
-let { RedisConfig } = require("./config");
-
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var apiRouter = require('./routes/api');
@@ -33,6 +30,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 let redisConfig = config.GetCache();
+
+console.log({ redisConfig });
 
 app.use(session({
     secret: 'medicineWeb',
