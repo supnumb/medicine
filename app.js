@@ -7,13 +7,16 @@ var session = require('express-session');
 var RedisStore = require('connect-redis')(session);
 var logger = require('morgan');
 var config = require('./config');
+
+let { RedisConfig } = require("./config");
+
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var apiRouter = require('./routes/api');
 
 var app = express();
 
-// view engine setup
+// view engine setup    
 // app.set('views', path.join(__dirname, 'views'));
 // app.set('view engine', 'ejs');
 // app.set('views', path.join(__dirname, 'view/'));

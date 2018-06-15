@@ -337,7 +337,7 @@ class ReceiptEditor extends React.Component {
                             进货日期&nbsp;<span className="red">*</span>
                         </label>
                         <div className="col-md-4">
-                            <DatePicker name="Date" id="Date" value={Moment(values.Date)} onChange={(date) => {
+                            <DatePicker name="Date" placeholder="选择进货日期" id="Date" value={Moment(values.Date)} onChange={(date) => {
                                 let { values } = this.state;
                                 values.Date = Moment(date).format("YYYY-MM-DD");
                                 console.log(date);
