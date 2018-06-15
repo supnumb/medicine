@@ -1,13 +1,8 @@
 var mysql = require("mysql");
 const config = require('../../config');
-
-let pool = mysql.createPool(config.DB_TEST);
-let _conn = mysql.createConnection(config.DB_TEST);
-
-if (process.env.NODE_ENV === 'production') {
-    pool = mysql.createPool(config.DB_PRO);
-    _conn = mysql.createConnection(config.DB_PRO);
-}
+let dbConfig = config.GetDB();
+let pool = mysql.createPool(dbConfig);
+let _conn = mysql.createConnection(dbConfig);
 
 /**
  * 当一个连接被创建时发生

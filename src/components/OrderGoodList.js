@@ -34,6 +34,8 @@ class OrderGoodList extends React.Component {
 
         g[id] = value;
 
+        console.log(id, value);
+
         let { orderGoods } = this.state;
 
         orderGoods.forEach(good => {
@@ -66,6 +68,8 @@ class OrderGoodList extends React.Component {
 
         let loading = isFetching ? (<Icon icon='spinner' spin />) : ("");
 
+        console.log({ orderGood });
+
         let listJsx = orderGoods.map((og, index) => {
 
             if (orderGood && orderGood.ID == og.ID) {
@@ -75,12 +79,10 @@ class OrderGoodList extends React.Component {
                     <td>{og.Dimension}</td>
                     <td>{og.Unit}</td>
                     <td>
-                        <input style={{ "width": "60px" }} id="Price" value={og.DefaultPrice || og.FinalPrice} onChange={(event) => { this.onTextChanged(event, og); }} />
+                        <input style={{ "width": "60px" }} id="FinalPrice" value={og.FinalPrice || og.DefaultPrice} onChange={(event) => { this.onTextChanged(event, og); }} />
                     </td>
                     <td>
                         <input style={{ "width": "60px" }} id="Quantity" value={og.Quantity} onChange={(event) => {
-                            console.log("start");
-
                             this.onTextChanged(event, og);
                         }} />
                     </td>
