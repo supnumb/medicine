@@ -40,7 +40,10 @@ const { Order, OrderTran } = require('../models/index');
  */
 exports.edit = (req, res, next) => {
 
-    let { ID, MemberID, OperatorID = 1, EmployeeID, Address, MemberName: Connact, Telephone, ReceiptAmount, PayStyle, DeliveryCompany = '', DeliveryFee = '', DeliverCode = '', DeliverReceiptFee = '', DeliveryReceive = 0, DeliveryInsure = '', Remark = '', Goods } = req.body;
+    //TODO:兼容错误，默认操作为当前登录用户
+    let { user } = req.session;
+
+    let { ID, MemberID, OperatorID = user.ID, EmployeeID, Address, MemberName: Connact, Telephone, ReceiptAmount = 0, PayStyle = 3, DeliveryCompany = '', DeliveryFee = 0, DeliverCode = '', DeliverReceiptFee = 0, DeliveryReceive = 0, DeliveryInsure = 0, Remark = '', Goods } = req.body;
 
     console.log(req.body);
 

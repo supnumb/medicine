@@ -71,6 +71,7 @@ class OrderEditor extends React.Component {
                     DeliveryCode: "",
                     DeliveryCompany: "",
                     DeliveryFee: 0,
+                    DeliverReceiptFee: 0,
                     orderGoods: [],
                     MobilPhone: "",
                     Address: "",
