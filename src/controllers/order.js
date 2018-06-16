@@ -40,7 +40,9 @@ const { Order, OrderTran } = require('../models/index');
  */
 exports.edit = (req, res, next) => {
 
-    let { ID, MemberID, OperatorID = 1, EmployeeID, Address, Connact, Telephone, ReceiptAmount, PayStyle, DeliveryCompany = '', DeliveryFee = '', DeliverCode = '', DeliverReceiptFee = '', DeliveryReceive = 0, DeliveryInsure = '', Remark = '', Goods } = req.body;
+    let { ID, MemberID, OperatorID = 1, EmployeeID, Address, MemberName: Connact, Telephone, ReceiptAmount, PayStyle, DeliveryCompany = '', DeliveryFee = '', DeliverCode = '', DeliverReceiptFee = '', DeliveryReceive = 0, DeliveryInsure = '', Remark = '', Goods } = req.body;
+
+    console.log(req.body);
 
     if (!MemberID || !EmployeeID || !Address || !Connact || !Telephone || !ReceiptAmount || !PayStyle || Goods.length == 0) {
         return res.send({ code: 2, message: "参数不完整" });

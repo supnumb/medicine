@@ -73,7 +73,8 @@ class OrderEditor extends React.Component {
                     DeliveryFee: 0,
                     orderGoods: [],
                     MobilPhone: "",
-                    Address: ""
+                    Address: "",
+                    PayStyle: 3
                 }
             });
         }
@@ -217,13 +218,14 @@ class OrderEditor extends React.Component {
             }
         }).then(res => res.json()).then(json => {
             console.log(json);
-
+            Store.dispatch({ type: "FETCH_SUBMIT_ORDER_DONE" })
             if (json.code == 0) {
                 this.props.history.push('/orders')
             } else {
                 alert(json.message)
             }
         }).catch(err => {
+            Store.dispatch({ type: "FETCH_SUBMIT_ORDER_DONE" })
             console.error(err);
         });
     }
@@ -378,9 +380,6 @@ class OrderEditor extends React.Component {
                         <div className="col-md-6">
                             <RadioGroup value={values.DeliveryCompany} name="DeliveryCompany" id="DeliveryCompany" inline={true} onChange={
                                 (value, event) => {
-                                    // values.PayStyle = value;
-                                    // Store.dispatch({ type: "SET_VALUES", payload: values });
-
                                     values.DeliveryCompany = value;
                                     Store.dispatch({ type: "SET_VALUES", payload: values });
                                 }
@@ -443,10 +442,6 @@ class OrderEditor extends React.Component {
                                 (value, event) => {
                                     values.DeliveryReceive = value;
                                     Store.dispatch({ type: "SET_VALUES", payload: values });
-
-                                    // values.PayStyle = value;
-                                    // Store.dispatch({ type: "SET_VALUES", payload: values });
-                                    // console.log(value, event);
                                 }
                             }>
                                 <Radio value={0}>不明确</Radio>

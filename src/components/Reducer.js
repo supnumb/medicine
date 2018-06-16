@@ -26,7 +26,7 @@ const defaultState = {
     orderEditor: {
         order: {},
         orderGoods: [],
-        values: {},
+        values: { PayStyle: 3 },
         errors: {},
         isFetching: false,
         message: "",
@@ -312,6 +312,10 @@ function OrderEditorReducer(state = defaultState.orderEditor, action) {
         case "FETCH_SUBMIT_ORDER":
             return Object.assign({}, state, {
                 isFetching: true
+            });
+        case "FETCH_SUBMIT_ORDER_DONE":
+            return Object.assign({}, state, {
+                isFetching: false
             });
         case "SWITCH_SELECTOR_SHOW":
             return Object.assign({}, state, {
