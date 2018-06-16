@@ -40,32 +40,26 @@ const { Order, OrderTran } = require('../models/index');
  */
 exports.edit = (req, res, next) => {
 
-    console.log(req.body);
-
-    let { ID, MemberID, OperatorID = 1, EmployeeID, Address, Connact, Telephone, TotalAmount, ReceiptAmount, PayStyle, DeliveryCompany = '', DeliveryFee = '', DeliverCode = '', DeliverReceiptFee = '', DeliveryReceive = 0, DeliveryInsure = '', Remark = '', Goods } = req.body;
+    let { ID, MemberID, OperatorID = 1, EmployeeID, Address, Connact, Telephone, ReceiptAmount, PayStyle, DeliveryCompany = '', DeliveryFee = '', DeliverCode = '', DeliverReceiptFee = '', DeliveryReceive = 0, DeliveryInsure = '', Remark = '', Goods } = req.body;
 
     if (!MemberID || !EmployeeID || !Address || !Connact || !Telephone || !ReceiptAmount || !PayStyle || Goods.length == 0) {
         return res.send({ code: 2, message: "参数不完整" });
     };
 
+    let { TotalAmount } = Order.calc(Goods);
+
     const orderData = { ID, MemberID, EmployeeID, OperatorID, Address, Connact, Telephone, TotalAmount, ReceiptAmount, PayStyle, DeliveryCompany, DeliveryFee, DeliverCode, DeliverReceiptFee, DeliveryInsure, Remark, Date: new Date(), Goods, DeliveryReceive };
 
     console.log(orderData);
 
-    OrderTran.edit(orderData, function (err, mem) {
-
-        if (err && err.message) {
-            return res.send({ code: 2, message: err.message });
-        }
-
+    // OrderTran.edit(orderData, function (err, mem) {
+    Order.edit(orderData, function (err, mem) {
         if (err) {
-            return res.send({ code: 2, message: "数据库操作有误！" });
+            console.error(err);
+            return res.send({ code: 2, message: "数据库操作有误！", data: err });
         };
 
-        // console.log(mem);
-
         return res.send({ code: 0, message: "编辑销售订单操作成功！", data: { ID: mem.ID } });
-
     });
 }
 

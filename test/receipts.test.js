@@ -4,7 +4,7 @@ var agent = supertest.agent(app);
 var should = require('should');
 //Amount, CostPrice, Quantity, ExpiryDate, BatchNo
 let receiptData = {
-    ID: 0,
+    ID: 103,
     VendorName: '哈药集团',
     VendorID: 43,
     Contact: '张三',
@@ -14,14 +14,14 @@ let receiptData = {
     TotalAmount: 15,
     ReceiptGoods:
         [{
-            GoodID: 42,
-            Quantity: 1,
-            ExpiryDate: '2018-06-08',
-            BatchNo: '',
-            CostPrice: 15,
-            Name: '正天乄',
-            OfficalName: '正天事',
-            Amount: 15
+            GoodID: 43,
+            Quantity: 80,
+            ExpiryDate: '2018-10-08',
+            BatchNo: 'A12345678',
+            CostPrice: 55,
+            Name: 'Y01',
+            OfficalName: '测试药品',
+            ReturnQuantity: 0
         }]
 }
 
@@ -40,11 +40,13 @@ describe("# 进货单模块单元测试", function () {
     })
 
     it.only("##017 添加入库单，应该返回成功：Code=0", function (done) {
-
         agent.post('/api/receipt/save').send(receiptData).expect(200).end(function (err, res) {
             if (err) {
                 return done(err);
             }
+
+            console.log(res.text);
+
             res.text.should.containEql("0");
             done();
         });

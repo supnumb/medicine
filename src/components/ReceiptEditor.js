@@ -111,7 +111,6 @@ class ReceiptEditor extends React.Component {
     }
 
     _onSelectVendor(data) {
-
         if (data.length > 0) {
             let vendor = JSON.parse(data[0].data);
             let { values } = this.state;
@@ -120,8 +119,6 @@ class ReceiptEditor extends React.Component {
     }
 
     _loadVendorListFromDB(keyword) {
-        // console.log(keyword);
-
         let data = { KeyWord: keyword };
 
         this.setState({ isFetching: true });
@@ -149,31 +146,6 @@ class ReceiptEditor extends React.Component {
     }
 
     /**
-     * 加载所有雇员列表
-     */
-    // _loadEmployeesFromDB() {
-
-    //     fetch('/api/employee/search', {
-    //         method: 'POST',
-    //         mode: 'same-origin',
-    //         credentials: 'same-origin',
-    //         headers: {
-    //             'Content-Type': 'application/json'
-    //         }
-    //     }).then(res => res.json()).then(json => {
-    //         // console.log({ json });
-    //         if (json.code == 0) {
-    //             let employees = json.data.map((e) => ({ "value": e.ID, "label": e.Name, "data": e }));
-    //             this.setState({ employees: employees })
-    //         } else {
-    //             alert(json.message);
-    //         }
-    //     }).catch(err => {
-    //         console.error(err);
-    //     })
-    // }
-
-    /**
      * 加载进货单的详细信息
      * @param {Object} receipt 进货单简单对象
      */
@@ -194,6 +166,7 @@ class ReceiptEditor extends React.Component {
 
             if (json.code == 0) {
                 json.data.VendorName = json.data.Name;
+
                 this.setState({ receipt: json.data, values: json.data, receiptGoods: json.ReceiptGoodData });
             } else {
                 alert(json.message);
@@ -232,8 +205,6 @@ class ReceiptEditor extends React.Component {
                 state: receipt
             }
         } = this.props;
-
-        console.log({ receipt });
 
         if (receipt) {
             this.setState({ values: receipt });
@@ -276,6 +247,8 @@ class ReceiptEditor extends React.Component {
     render() {
         let { receipt, values, errors, receiptGoods, employees, vendors, isShowGoodSelector, isFetching, message } = this.state;
 
+        let isEditabled = receipt && (receipt.Status == 1 || receipt.Flag == 1);
+
         let loading = isFetching ? (<Icon icon='spinner' spin />) : ("");
 
         let goodSelectorJsx = ("");
@@ -298,7 +271,7 @@ class ReceiptEditor extends React.Component {
                             供应商&nbsp;<span className="red">*</span>
                         </label>
                         <div className="col-md-4">
-                            <AsyncTypeahead useCache={true} id="VendorName" name="VendorName" inputProps={{
+                            <AsyncTypeahead disabled={isEditabled} useCache={true} id="VendorName" name="VendorName" inputProps={{
                                 name: "Name",
                                 id: "ID"
                             }} defaultInputValue={values.VendorID} value={values.VendorID} placeholder={values.VendorName} onSearch={this.loadVendorListFromDB} labelKey="label" onChange={this.onSelectVendor} isLoading={isFetching} options={vendors} />
@@ -310,7 +283,7 @@ class ReceiptEditor extends React.Component {
                             联系人&nbsp;<span className="red">*</span>
                         </label>
                         <div className="col-md-4">
-                            <Field name="Contact" id="Contact" placeholder="联系人" />
+                            <Field disabled={isEditabled} name="Contact" id="Contact" placeholder="联系人" />
                         </div>
                         <p className="text-danger">{errors.Contact}</p>
                     </div>
@@ -319,7 +292,7 @@ class ReceiptEditor extends React.Component {
                             电话&nbsp;<span className="red">*</span>
                         </label>
                         <div className="col-md-4">
-                            <Field name="Telephone" id="Telephone" placeholder="电话" />
+                            <Field disabled={isEditabled} name="Telephone" id="Telephone" placeholder="电话" />
                         </div>
                         <p className="text-danger">{errors.Telephone}</p>
                     </div>
@@ -346,7 +319,7 @@ class ReceiptEditor extends React.Component {
                         </div>
                     </div>
 
-                    <ReceiptGoodList goods={receiptGoods} onAddGood={() => {
+                    <ReceiptGoodList isEditabled={isEditabled} goods={receiptGoods} onAddGood={() => {
                         this.setState({ isShowGoodSelector: true })
                     }} />
 

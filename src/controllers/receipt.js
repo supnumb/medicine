@@ -14,7 +14,7 @@
 
 const moment = require('moment');
 
-const { Receipt, ReceiptTran } = require('../models/index');
+const { Receipt } = require('../models/index');
 
 /**
  * 入库单添加、修改
@@ -27,10 +27,7 @@ const { Receipt, ReceiptTran } = require('../models/index');
  * @param  {Function} next 管道操作，传递到下一步
  */
 exports.save = (req, res, next) => {
-
     let { ID, VendorName, VendorID, Date, ReceiptGoods } = req.body;
-
-    console.log(req.body);
 
     if (!VendorName || !VendorID || !Date || ReceiptGoods.length == 0) {
         return res.status(200).send({ code: 2, message: "VendorName|VendorID|Date|ReceiptGoods参数不匹配！" });
@@ -38,46 +35,51 @@ exports.save = (req, res, next) => {
 
     const ReceiptData = { ID, VendorName, VendorID, Date, ReceiptGoods };
 
-    ReceiptData.OperatorID = req.session ? req.session.user.ID : 1;
+    let { user } = req.session;
+
+    ReceiptData.OperatorID = user.ID;
 
     if (ID && ID > 0) {
-
-        ReceiptTran.update(ReceiptData, function (err, mem) {
-
-            if (err && err.message) {
-                return res.send({ code: 2, message: err.message });
+        Receipt.receiptInfo(ID, (err, rows) => {
+            if (err) {
+                console.error(err);
+                return res.send({ code: 2, message: "数据库出错" });
             }
 
-            if (err) {
-                return res.send({ code: 2, message: "数据库出错" });
-            };
+            //判断入库单能不能修改
+            if (rows) {
+                let { data: [receiptInfo] } = rows;
 
-            return res.send({ code: 0, message: "返回入库单操作成功！", data: mem });
+                if (receiptInfo.Status == 1 || receiptInfo.Flag == 1) {
+                    return res.send({ code: 3, message: "进货单已经结算或已经销售，不能修改" })
+                }
 
-        });
+                // console.log({ ReceiptData });
+
+                Receipt.update(ReceiptData, function (err, mem) {
+                    if (err) {
+                        return res.send({ code: 3, message: "数据库出错", data: err });
+                    };
+
+                    return res.send({ code: 0, message: "返回入库单操作成功！", data: mem });
+                });
+
+            } else {
+                return res.send({ code: 2, message: "订单已经被删除，请重新查询" });
+            }
+        })
 
     } else {
-
-        console.log({ ReceiptData });
-        ReceiptTran.add(ReceiptData, function (err, mem) {
-
-            if (err && err.message) {
-                console.log({ err });
-
-                return res.status(200).send({ code: 2, message: err.message });
-            }
+        Receipt.add(ReceiptData, function (err, mem) {
 
             if (err) {
                 console.log(err);
-                return res.send({ code: 2, message: "数据库出错" });
+                return res.send({ code: 2, message: "数据库出错", data: err });
             };
 
             return res.status(200).send({ code: 0, message: "添加入库单操作成功！", data: mem });
-
         });
-
     }
-
 }
 
 /**

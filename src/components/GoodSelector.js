@@ -85,7 +85,7 @@ class GoodSelector extends React.Component {
                 <td>{g.Name}</td>
                 <td>{g.FormOfDrug}</td>
                 <td>{g.Dimension}</td>
-                <td>{g.Unit}</td>
+                <td>{g.DefaultPrice}</td>
                 <td>{g.ValiableQuantity}</td>
             </tr>);
         })
@@ -95,7 +95,7 @@ class GoodSelector extends React.Component {
             <div>
                 <input type="text" id="keyword" /> <button onClick={() => {
                     let keyword = $("#keyword").val();
-                    console.log(keyword);
+                    // console.log(keyword);
                     this.loadGoodsFromDB(keyword)
                 }}>查询</button>
             </div>

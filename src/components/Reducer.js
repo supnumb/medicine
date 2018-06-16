@@ -306,7 +306,8 @@ function OrderEditorReducer(state = defaultState.orderEditor, action) {
             return Object.assign({}, state, {
                 isFetching: false,
                 values: action.payload,
-                order: action.payload
+                order: action.payload,
+                orderGoods: []
             });
         case "FETCH_SUBMIT_ORDER":
             return Object.assign({}, state, {

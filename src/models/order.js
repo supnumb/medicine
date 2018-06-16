@@ -42,6 +42,10 @@ function Order() {
     Base.apply(this, arguments);
 };
 
+
+
+
+
 function OrderTran() {
 
 }
@@ -272,7 +276,6 @@ Order.prototype.orderInfo = function (ID, callback) {
  */
 
 OrderTran.prototype.edit = function (Obj, callback) {
-
     let tran = pool.getTran();
 
     const { ID, OperatorID, Goods } = Obj;
@@ -284,7 +287,6 @@ OrderTran.prototype.edit = function (Obj, callback) {
         }
 
         if (!ID) {
-
             let Order_add = 'insert into Orders (MemberID,OperatorID,EmployeeID,Address,Connact,Telephone,TotalAmount,ReceiptAmount,PayStyle,DeliveryCompany,DeliveryFee,DeliverCode,DeliverReceiptFee,DeliveryInsure,Remark,Date,CreateTime,DeliveryReceive) values (:MemberID,:OperatorID,:EmployeeID,:Address,:Connact,:Telephone,:TotalAmount,:ReceiptAmount,:PayStyle,:DeliveryCompany,:DeliveryFee,:DeliverCode,:DeliverReceiptFee,:DeliveryInsure,:Remark,:Date,now(),:DeliveryReceive)';
 
             let ReceiptGood_search = 'select ID,ReceiptID,GoodID,CostPrice,ValiableQuantity from ReceiptGoods where GoodID=:GoodID and ValiableQuantity>0;';
@@ -301,6 +303,7 @@ OrderTran.prototype.edit = function (Obj, callback) {
 
             let StockChangeRecord_add = 'insert into StockChangeRecords (OperatorID,GoodID,DeltaQuantity,Remark,Type,RelatedObjectID,SalePrice,CreateTime) values ';
 
+            // Step 1:添加订单
             tran.query(Order_add, Obj, function (err, rows) {
 
                 if (err) {
@@ -308,21 +311,18 @@ OrderTran.prototype.edit = function (Obj, callback) {
                 }
 
                 const OrderID = rows.insertId;
-
                 let ReceiptGoodIDs = '';
 
+                //Step 2: 添加订单商品
                 async.eachSeries(Goods, function (item, cb) {
 
                     let { GoodID, Name, Quantity, FinalPrice } = item;
-
                     let Quantity_num = Quantity;
-
                     let TotalCostPrice = 0;
-
                     let ReceiptGoodID = '';
-
                     let ReceiptQuantity = '';
 
+                    //检查进货记录，判断库存是否满足条件
                     pool.query(ReceiptGood_search, {
                         GoodID: GoodID
                     }, function (err, arrs) {
@@ -332,7 +332,7 @@ OrderTran.prototype.edit = function (Obj, callback) {
                         }
 
                         for (let i = 0; i < arrs.length; i++) {
-
+                            //如果该进货单详情对应记录有足够可用库存，则关联该进货单详情和销售单
                             if (arrs[i].ValiableQuantity >= Quantity_num) {
                                 let Flag = 0;
                                 if (Quantity_num > 0) {
@@ -345,11 +345,11 @@ OrderTran.prototype.edit = function (Obj, callback) {
                                 Quantity_num = 0;
                                 ReceiptGoodID += arrs[i].ID;
                                 ReceiptGoodIDs += arrs[i].ID + ",";
+
                                 ReceiptGood_update += ` when ID=${arrs[i].ID} then ${arrs[i].ValiableQuantity} `;
                                 ReceiptGood_update_child += ` when ID=${arrs[i].ID} then ${Flag} `;
 
                             } else {
-
                                 TotalCostPrice += arrs[i].CostPrice * arrs[i].ValiableQuantity;
                                 Quantity_num -= arrs[i].ValiableQuantity;
                                 ReceiptQuantity += arrs[i].ValiableQuantity + ",";
@@ -358,7 +358,6 @@ OrderTran.prototype.edit = function (Obj, callback) {
                                 ReceiptGoodIDs += arrs[i].ID + ",";
                                 ReceiptGood_update += ` when ID=${arrs[i].ID} then 0, `;
                                 ReceiptGood_update_child += ` when ID=${arrs[i].ID} then 1 `;
-
                             }
                         }
 
@@ -377,8 +376,6 @@ OrderTran.prototype.edit = function (Obj, callback) {
                         cb(null, arrs);
 
                     });
-
-
                 }, function (err) {
 
                     if (err) {
@@ -485,11 +482,8 @@ OrderTran.prototype.edit = function (Obj, callback) {
                             });
 
                         });
-
                     }
-
                 });
-
             });
 
         } else {
@@ -861,6 +855,282 @@ OrderTran.prototype.edit = function (Obj, callback) {
 
 };
 
+Order.prototype.calc = function (goods) {
+    let TotalAmount = 0;
+
+    goods.forEach(good => {
+        TotalAmount += good.Quantity * good.FinalPrice;
+    })
+
+    return { TotalAmount };
+}
+
+/**
+ * 修改订单的信息
+ * 
+ * 1、更新订单的基本信息；
+ * 2、更新子订单
+ * 2.1、逐个检查子订单的药品
+ *     如果数量没变，该子订单更新完之后，开始下一个药品；
+ *     如果数量发生了变化，则更新子订单，并且开始修改库存；
+ *     根据变化后的数量和变化前的数据，计算出本次修改需要返还和增加扣除的库存；
+ * @param {Object} order 订单
+ * @param {function} callback 回调
+ */
+Order.prototype.update = function (order, callback) {
+
+    let __updateOrder = "update Orders set MemberID=:MemberID,OperatorID=:OperatorID,Address=:Address,Connact=:Connact,Telephone=:Telephone,TotalAmount=:TotalAmount,ReceiptAmount=:ReceiptAmount,PayStyle=:PayStyle,DeliveryCompany=:DeliveryCompany,DeliveryFee=:DeliveryFee,DeliverCode=:DeliverCode,DeliverReceiptFee=:DeliverReceiptFee,DeliveryInsure=:DeliveryInsure,Remark=:Remark,Date=:Date,DeliveryReceive=:DeliveryReceive where ID=:ID";
+
+    let __listOrderGoods = "select ID,GoodID,Quantity,ReceiptGoodID,ReceiptQuantity from OrderGoods where OrderID=:ID;";
+
+    let __updateOrderGood = "update OrderGoods set Quantity=:Quantity,FinalPrice=:FinalPrice where ID=:ID";
+
+    let __addOrderGoods = "insert into OrderGoods(GoodID,OrderID,GoodName,Quantity,FinalPrice) values (:GoodID,:OrderID,:GoodName,:Quantity,:FinalPrice);";
+
+    let __updateStocks = "update Stocks set ValiableQuantity=TotalQuantity-SaledQuantity-:DeltaQuantity,SaledQuantity=SaledQuantity+:DeltaQuantity where GoodID=:GoodID;";
+
+    let __saveStockChangeRecord = "insert into StockChangeRecords (OperatorID,GoodID,DeltaQuantity,Remark,Type,RelatedObjectID,SalePrice,CreateTime) values (:OperatorID,:GoodID,:DeltaQuantity,:Remark,:Type,:RelatedObjectID,:SalePrice,now())";
+
+    let tran = pool.getTran();
+
+    const { ID, OperatorID, Goods } = order;
+
+    tran.beginTransaction(err => {
+        if (err) {
+            return callback(err);
+        }
+
+        tran.query(__updateOrder, order, function (err, result) {
+            if (err) {
+                tran.rollback(() => {
+                    return callback(err);
+                });
+                return;
+            }
+
+            tran.query(__listOrderGoods, { ID }, function (err, rows) {
+                if (err) {
+                    tran.rollback(() => {
+                        return callback(err);
+                    });
+                    return;
+                }
+
+                async.each(Goods, function (good, callback) {
+                    let _g = rows.find(r => r.GoodID == good.GoodID);
+
+                    console.log({ _g, good });
+
+                    if (_g && (_g.Quantity != good.Quantity || _g.FinalPrice != good.FinalPrice)) {
+                        let delta = _g.Quantity - good.Quantity;
+
+                        console.log("更新子订单:", new Date().getTime());
+
+                        //更新子订单
+                        tran.query(__updateOrderGood, Object.assign(good, { ID: _g.ID }), function (err, rest) {
+
+                            //需要更新库存
+                            if (delta > 0) {
+
+                                console.log("更新库存信息:", new Date().getTime());
+                                //更新库存信息
+                                tran.query(__updateStocks, { GoodID: good.GoodID, DeltaQuantity: -delta }, function (err, rest) {
+                                    if (err) {
+                                        return callback(err);
+                                    }
+
+                                    //保存库存更新记录
+                                    console.log("保存库存更新记录:", new Date().getTime());
+                                    tran.query(__saveStockChangeRecord, { OperatorID, GoodID: good.GoodID, DeltaQuantity: delta, Remark: "订单修改", Type: 3, RelatedObjectID: ID, SalePrice: good.FinalPrice }, function (err, rest) {
+                                        if (err) {
+                                            return callback(err);
+                                        }
+                                        else {
+                                            return callback(null, "更新成功");
+                                        }
+                                    })
+                                })
+                            } else {
+                                //不需要更新库存，直接提交
+                                callback(null, null);
+                            }
+                        })
+
+                    } else {
+                        console.log({ ID, good });
+
+                        good.OrderID = ID;
+                        good.GoodName = good.Name;
+
+                        console.log("添加修改时新增的商品记录:", new Date().getTime());
+                        //添加修改时新增的商品记录
+                        tran.query(__addOrderGoods, good, function (err, rest) {
+                            if (err) {
+                                return callback(err);
+                            }
+
+                            console.log("添加更新库存:", new Date().getTime());
+                            tran.query(__updateStocks, { GoodID: good.GoodID, DeltaQuantity: good.Quantity }, function (err, rest) {
+                                if (err) {
+                                    return callback(err);
+                                }
+
+                                console.log("添加更新库存变更记录:", new Date().getTime());
+                                tran.query(__saveStockChangeRecord, { OperatorID, GoodID: good.GoodID, DeltaQuantity: good.Quantity, Remark: "订单修改", Type: 3, RelatedObjectID: ID, SalePrice: good.FinalPrice }, function (err, rest) {
+                                    if (err) {
+                                        return callback(err);
+                                    } else {
+                                        return callback(null, null);
+                                    }
+                                })
+                            })
+
+                        })
+                    }
+                }, function (err) {
+                    console.log("提交或回滚事务:", new Date().getTime());
+                    if (err) {
+                        tran.rollback(() => {
+                            tran.end();
+                            return callback(err);
+                        });
+                    } else {
+                        tran.commit(err => {
+
+                            if (err) {
+                                tran.rollback(() => {
+                                    tran.end();
+                                    return callback(err);
+                                });
+                            }
+                            else {
+                                tran.end();
+                                callback(null, { ID: order.ID, message: '修改成功' });
+                            }
+                        })
+                    }
+                });
+            })
+        })
+    })
+};
+
+
+/**
+ * 保存订单到本地数据库
+ * 
+ * 1、生成一个新订单并返回订单的ID信息；
+ * 2、更新库存信息；
+ * 3、创建订单商品（子订单）；
+ * 4、添加库存变动记录；
+ * 5、触发保存成功事件：事件调用服务，更新该订单
+ * 
+ * @param {Object} order 订单详细信息
+ * @param {function} callback 回调函数
+ */
+Order.prototype.save = function (order, callback) {
+
+    let __addOrder = 'insert into Orders (MemberID,OperatorID,EmployeeID,Address,Connact,Telephone,TotalAmount,ReceiptAmount,PayStyle,DeliveryCompany,DeliveryFee,DeliverCode,DeliverReceiptFee,DeliveryInsure,Remark,Date,CreateTime,DeliveryReceive) values (:MemberID,:OperatorID,:EmployeeID,:Address,:Connact,:Telephone,:TotalAmount,:ReceiptAmount,:PayStyle,:DeliveryCompany,:DeliveryFee,:DeliverCode,:DeliverReceiptFee,:DeliveryInsure,:Remark,:Date,now(),:DeliveryReceive)';
+
+    let __addOrderGoods = "insert into OrderGoods(GoodID,OrderID,GoodName,Quantity,FinalPrice) values (:GoodID,:OrderID,:GoodName,:Quantity,:FinalPrice);";
+
+    let __updateStocks = "update Stocks set ValiableQuantity=TotalQuantity-SaledQuantity-:Quantity,SaledQuantity=SaledQuantity+:Quantity where GoodID=:GoodID;";
+
+    let __saveStockChangeRecord = "insert into StockChangeRecords (OperatorID,GoodID,DeltaQuantity,Remark,Type,RelatedObjectID,SalePrice,CreateTime) values (:OperatorID,:GoodID,:DeltaQuantity,:Remark,:Type,:RelatedObjectID,:SalePrice,now())";
+
+    let tran = pool.getTran();
+
+    const { ID, OperatorID, Goods } = order;
+
+    tran.beginTransaction(err => {
+
+        if (err) {
+            return callback(err);
+        }
+
+        //添加订单，返回 订单ID
+        tran.query(__addOrder, order, (err, result) => {
+            if (err) {
+                tran.rollback((e) => {
+                    console.error(e);
+                })
+
+                return callback(err);
+            }
+
+            let orderId = result.insertId;
+
+            async.each(Goods, function (good, callback) {
+                good.OrderID = orderId;
+                good.GoodName = good.Name;
+
+                //更新库存
+                tran.query(__updateStocks, good, function (err, res) {
+                    if (err) {
+                        return callback(err);
+                    }
+
+                    if (res) {
+                        tran.query(__addOrderGoods, good, function (err, rres) {
+                            if (err) {
+                                return callback(err);
+                            }
+
+                            if (rres) {
+                                tran.query(__saveStockChangeRecord, { OperatorID, GoodID: good.GoodID, DeltaQuantity: -good.Quantity, Remark: "销售出库", Type: 2, RelatedObjectID: orderId, SalePrice: good.FinalPrice }, function (err, rrres) {
+                                    if (err) {
+                                        return callback(err);
+                                    }
+
+                                    if (rrres) {
+                                        callback(null, "记录保存成功")
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+
+            }, function (err) {
+                if (err) {
+                    tran.rollback((e) => {
+                        tran.end();
+                        console.error(e);
+                    })
+
+                    return callback(err);
+                } else {
+                    tran.commit(err => {
+                        if (err) {
+                            tran.rollback((() => {
+                                tran.end();
+                                return callback(err);
+                            }))
+                        } else {
+                            tran.end();
+                            return callback(null, { ID: orderId, message: "保存成功" });
+                        }
+                    })
+                }
+            });
+        })
+    })
+}
+
+/**
+ * 添加或修改订单信息
+ * 
+ * @param {Object} order 订单详细信息
+ * @param {function} callback 回调函数
+ */
+Order.prototype.edit = function (order, callback) {
+    if (order.ID > 0) {
+        this.update(order, callback);
+    } else {
+        this.save(order, callback);
+    }
+}
+
 
 OrderTran.prototype.cancel = function (ID, callback) {
 
@@ -1076,39 +1346,6 @@ Order.prototype.good = function (StartTime, EndTime, callback) {
 
 }
 
-
 module.exports.Order = new Order();
 
 module.exports.OrderTran = new OrderTran();
-
-// const m = new OrderTran();
-
-// const Obj = {
-//     ID: 70,
-//     MemberID: 1,
-//     OperatorID: 1,
-//     Address: '北京',
-//     Connact: '测试',
-//     Telephone: '10086',
-//     TotalAmount: 128,
-//     ReceiptAmount: 128,
-//     PayStyle: 1,
-//     DeliveryCompany: '',
-//     DeliveryFee: '',
-//     DeliverCode: '',
-//     DeliverReceiptFee: '',
-//     Remark: '',
-//     Date: '2018-04-30',
-//     Goods: [
-//         { GoodID: 1, Name: '感冒药', Quantity: 5, FinalPrice: 10 },
-//         { GoodID: 2, Name: '退烧药', Quantity: 5, FinalPrice: 6 }
-//     ]
-// };
-
-// m.edit(Obj, function(err, rows) {
-
-//     console.log(err);
-
-//     console.log(rows);
-
-// });

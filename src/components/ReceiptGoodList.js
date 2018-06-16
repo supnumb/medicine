@@ -78,7 +78,10 @@ class ReceiptGoodList extends React.Component {
 
     render() {
         let { receiptGood, goods } = this.state;
+        let { isEditabled } = this.props;
         console.log({ receiptGood, goods });
+
+        let desc_text = isEditabled ? (<p className="text-danger">提示：已经结算或销售的进货单，只能退货，不能修改</p>) : ("");
 
         let jsx = goods.map((g, index) => {
 
@@ -97,13 +100,13 @@ class ReceiptGoodList extends React.Component {
 
                     </td>
                     <td>
-                        <input onChange={(event) => {
+                        <input disabled={isEditabled} onChange={(event) => {
                             this.onTextChanged(event, g);
                         }} style={{ "width": "40px" }} type="text" id="CostPrice" value={g.CostPrice} placeholder="成本价" /></td>
-                    <td><input onChange={(event) => {
+                    <td><input disabled={isEditabled} onChange={(event) => {
                         this.onTextChanged(event, g);
                     }} style={{ "width": "40px" }} type="text" id="Quantity" value={g.Quantity} placeholder="数量" /></td>
-                    <td><input onChange={(event) => {
+                    <td><input disabled={isEditabled} onChange={(event) => {
                         this.onTextChanged(event, g);
                     }} style={{ "width": "80px" }} type="text" id="BatchNo" value={g.BatchNo} placeholder="批号" /></td>
 
@@ -129,7 +132,6 @@ class ReceiptGoodList extends React.Component {
                     <td>{g.Quantity}</td>
                     <td>{g.BatchNo}</td>
                     <td></td>
-
                     <td>
                         <a href="#" onClick={() => {
                             this.setState({ receiptGood: g })
@@ -137,15 +139,15 @@ class ReceiptGoodList extends React.Component {
                     </td>
                 </tr>);
             }
-
         });
 
         return (<div id="GoodList">
+            {desc_text}
             <table className="table">
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>药品名</th>
+                        <th>药名</th>
                         <th>规格</th>
                         <th>单位</th>
                         <th>厂家</th>

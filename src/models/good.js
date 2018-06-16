@@ -21,13 +21,13 @@ function Good() {
         _goodQuantity: "select count(1) as Quantity from Goods g where g.Status=1  and g.CreateTime>=:StartTime and g.CreateTime<=:EndTime and concat(g.Name,g.OfficalName) like :KeyWord;",
 
         //列表
-        _goodList: "select g.*,ifnull(s.TotalQuantity,0) TotalQuantity,ifnull(s.ValiableQuantity,0) ValiableQuantity,ifnull(s.SaledQuantity,0) SaledQuantity from Goods g left join Stocks s on g.ID=s.GoodID where g.Status=1 and g.CreateTime>=:StartTime and g.CreateTime<=:EndTime and concat(g.Name,g.OfficalName) like :KeyWord group by g.ID order by g.ID desc limit :Page,:Limit;",
+        _goodList: "select g.*,ifnull(s.TotalQuantity,0) TotalQuantity,ifnull(s.ValiableQuantity,0) ValiableQuantity,ifnull(s.SaledQuantity,0) SaledQuantity from Goods g left join Stocks s on g.ID=s.GoodID where g.Status=1 and g.CreateTime>=:StartTime and g.CreateTime<=:EndTime and concat(Name,OfficalName,PinYin,Manufacturer) like :KeyWord group by g.ID order by g.ID desc limit :Page,:Limit;",
 
         //详情
         _goodInfo: "select g.*,ifnull(s.TotalQuantity,0) TotalQuantity,ifnull(s.ValiableQuantity,0) ValiableQuantity,ifnull(s.SaledQuantity,0) SaledQuantity from Goods g left join Stocks s on g.ID=s.GoodID where g.ID=:ID;",
 
         //药品查询
-        _search: "select * from Goods where Status=1 and Name like :KeyWord;",
+        _search: "select * from Goods where Status=1 and concat(Name,OfficalName,PinYin,Manufacturer) like :KeyWord;",
 
     };
 
@@ -99,9 +99,7 @@ Good.prototype.goodList = function(KeyWord, Page, Limit, StartTime, EndTime, cal
     const that = this;
 
     async.parallel([
-
         function(cb) {
-
             that._goodQuantity({
                 KeyWord: `%${KeyWord}%`,
                 StartTime,
@@ -113,13 +111,10 @@ Good.prototype.goodList = function(KeyWord, Page, Limit, StartTime, EndTime, cal
                 }
 
                 cb(null, db[0]);
-
             });
-
         },
 
         function(cb) {
-
             that._goodList({
                 KeyWord: `%${KeyWord}%`,
                 Page,

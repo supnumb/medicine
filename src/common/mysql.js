@@ -58,6 +58,7 @@ var db = {
     },
 
     getTran: function () {
+        let _conn = mysql.createConnection(dbConfig);
         _conn.config.queryFormat = function (query, values) {
             if (!values)
                 return query;
@@ -94,6 +95,7 @@ var db = {
                 }
 
                 _conn.commit(function (err) {
+                    _conn.close();
                     if (err) {
                         _conn.rollback(function () {
                             callback(err);

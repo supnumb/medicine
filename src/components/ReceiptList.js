@@ -70,7 +70,6 @@ class ReceiptList extends React.Component {
     }
 
     _settle(receiptID) {
-
         let data = { ID: receiptID };
 
         fetch('/api/receipt/settle', {
@@ -128,21 +127,17 @@ class ReceiptList extends React.Component {
             <td>{r.Amount}</td>
             <td>{r.Date}</td>
             <td>
-                <a href="#" onClick={() => {
+
+                <a href="#" disabled={true} onClick={() => {
                     this.props.history.push({
                         pathname: "/receipt/editor",
                         state: r
                     })
-                    // Store.dispatch({type: "CHECKED_RECEIPT", payload: r})
                 }}>编辑</a>
+
                 &nbsp;
                   <a href="#" onClick={() => {
                     this.settle(r.ID, r.Status === 0 ? 1 : 0)
-                    // this.props.history.push({
-                    //     pathname: "/receipt/settle",
-                    //     state: r
-                    // })
-                    // Store.dispatch({type: "CHECKED_RECEIPT", payload: r})
                 }}>{
                         r.Status === 1 ? "已结算" : "未结算"
                     } </a>

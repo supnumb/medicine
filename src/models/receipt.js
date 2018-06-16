@@ -13,7 +13,7 @@ function Receipt() {
         _receiptQuantity: "select count(r.ID) as Quantity from Receipts r,ReceiptGoods p,Goods g,Vendors v,Members m  where r.ID=p.ReceiptID and p.GoodID=g.ID and r.VendorID=v.ID and r.OperatorID=m.ID and r.Date>=:StartTime and r.Date<=:EndTime and concat(r.ID,g.Name) like :KeyWord;",
 
         //列表
-        _search: "SELECT r.*, m. NAME AS EmployeeName , group_concat(g. NAME) AS Goods ,(p.CostPrice*(p.Quantity-p.ReturnQuantity)) as Amount , p.CostPrice , v.Contact , v.Telephone , v.Address FROM Receipts r INNER JOIN ReceiptGoods p ON r.ID = p.ReceiptID INNER JOIN Goods g ON p.GoodID = g.ID INNER JOIN Vendors v ON r.VendorID = v.ID INNER JOIN Members m ON r.OperatorID = m.ID WHERE r.Date >=:StartTime AND r.Date <=:EndTime AND concat( r.VendorName , g.NAME , v.Telephone , v.Address , v.Contact) LIKE :KeyWord and r.Status in (:Status) GROUP BY r.ID ORDER BY r.Date DESC LIMIT :Page,:Limit;",
+        _search: "SELECT r.*, m. NAME AS EmployeeName , group_concat(g. NAME) AS Goods ,(p.CostPrice*(p.Quantity-p.ReturnQuantity)) as Amount , p.CostPrice , v.Contact , v.Telephone , v.Address FROM Receipts r INNER JOIN ReceiptGoods p ON r.ID = p.ReceiptID INNER JOIN Goods g ON p.GoodID = g.ID INNER JOIN Vendors v ON r.VendorID = v.ID INNER JOIN Members m ON r.OperatorID = m.ID WHERE r.Date >=:StartTime AND r.Date <=:EndTime AND concat( r.VendorName , g.NAME , v.Telephone , v.Address , v.Contact) LIKE :KeyWord and r.Status in (:Status) GROUP BY r.ID ORDER BY r.CreateTime DESC LIMIT :Page,:Limit;",
 
         //详情
         _ReceiptInfo: "select r.*,v.Name,v.Telephone,v.Address,v.Contact,v.Remark from Receipts r left join Vendors v on r.VendorID=v.ID left join Members m on r.OperatorID=m.ID where r.ID=:ID;",
@@ -32,41 +32,50 @@ function Receipt() {
     Base.apply(this, arguments);
 };
 
-function ReceiptTran() {
+// function ReceiptTran() {
 
-}
-
+// }
 
 /**
- * 入库单添加
- * @param  {Object} Obj 入库单信息
- * 1、添加入库单
- * 2、添加入库子订单
- * 3、修改库存
+ * 更新进货单信息
+ *
+ * 1、修改入库单信息
+ * 2、修改子入库信息:如果子入库信息存在，则直接更新（只有未销售和未结算的入库单才能更新）；否则添加一个新的子入库记录；
+ * 3、修改库存：如果该商品库存存在，则直接修改，否则添加一条新的库存
  * 4、增加库存记录信息
  * 
+ * @param {Object} receiptData 进货单详情信息
+ * @param {function} callback 回调
  */
-ReceiptTran.prototype.add = function (Obj, callback) {
+Receipt.prototype.update = function (receiptData, callback) {
+    let __updateReceipt = "update Receipts set VendorName=:VendorName,VendorID=:VendorID,OperatorID=:OperatorID,Date=:Date where ID=:ID;";
+
+    let __updateReceiptGood = "update ReceiptGoods set Quantity=:Quantity,ExpiryDate=:ExpiryDate,BatchNo=:BatchNo,CostPrice=:CostPrice where ReceiptID=:ReceiptID and GoodID=:GoodID;";
+
+    let __addReceiptGood = "insert into ReceiptGoods (ReceiptID,GoodID,CostPrice,Quantity,ValiableQuantity,ExpiryDate,BatchNo) values (:ReceiptID,:GoodID,:CostPrice,:Quantity,:ValiableQuantity,:ExpiryDate,:BatchNo)";
+
+    let __updateStock = "update Stocks set TotalQuantity=TotalQuantity-:DeltaQuantity,ValiableQuantity=ValiableQuantity-:DeltaQuantity where GoodID=:GoodID;";
+
+    let __addStock = "insert into Stocks (GoodID,TotalQuantity,ValiableQuantity,CreateTime) values (:GoodID,:Quantity,:Quantity,now());";
+
+    let __addStockChangeRecord = "insert into StockChangeRecords (OperatorID,GoodID,DeltaQuantity,Remark,Type,RelatedObjectID,SalePrice) values (:OperatorID,:GoodID,:DeltaQuantity,:Remark,:Type,:RelatedObjectID,0)";
+
+    let __goodsOfReceipt = "select * from ReceiptGoods where ReceiptID=:ReceiptID";
 
     let tran = pool.getTran();
 
-    tran.beginTransaction(function (err) {
+    console.log(new Date().getTime(), "任务开始");
 
+    tran.beginTransaction(function (err) {
         if (err) {
-            return callback(err, null);
+            console.error(err);
+            return callback(err);
         }
 
-        let { ReceiptGoods, OperatorID } = Obj
-
-        let Receipt_add = 'insert into Receipts (VendorName,VendorID,OperatorID,Date,CreateTime) values (:VendorName,:VendorID,:OperatorID,:Date,now());';
-
-        let StockChange_add = 'insert into StockChangeRecords (OperatorID,GoodID,DeltaQuantity,Remark,Type,RelatedObjectID,SalePrice) values ';
-
-        tran.query(Receipt_add, Obj, function (err, rows) {
-
+        console.log(new Date().getTime(), "1、修改入库单信息");
+        //1、修改入库单信息
+        tran.query(__updateReceipt, receiptData, function (err, result) {
             if (err) {
-                console.log({ err });
-
                 tran.rollback(() => {
                     return callback(err, null);
                 });
@@ -74,238 +83,274 @@ ReceiptTran.prototype.add = function (Obj, callback) {
                 return;
             }
 
-            console.log({ rows });
+            if (result) {
+                let { ID: receiptId, ReceiptGoods, OperatorID } = receiptData;
 
-            const ReceiptID = rows.insertId;
-
-            async.eachSeries(ReceiptGoods, function (item, cb) {
-
-                let { GoodID, CostPrice, Quantity, ExpiryDate, BatchNo } = item;
-
-                let ValiableQuantity = Quantity;
-
-                let ReceiptGood_add = 'insert into ReceiptGoods (ReceiptID,GoodID,CostPrice,Quantity,ValiableQuantity,ExpiryDate,BatchNo) values (:ReceiptID,:GoodID,:CostPrice,:Quantity,:ValiableQuantity,:ExpiryDate,:BatchNo)';
-                let Stock_update = 'update Stocks set TotalQuantity=TotalQuantity+:Quantity,ValiableQuantity=ValiableQuantity+:Quantity where GoodID=:GoodID;';
-                let Stock_add = 'insert into Stocks (GoodID,TotalQuantity,ValiableQuantity,CreateTime) values (:GoodID,:Quantity,:Quantity,now());';
-
-                pool.query(ReceiptGood_add, {
-                    ReceiptID,
-                    GoodID,
-                    CostPrice,
-                    Quantity,
-                    ValiableQuantity,
-                    ExpiryDate,
-                    BatchNo
-                }, function (err, arrs) {
-
+                tran.query(__goodsOfReceipt, { ReceiptID: receiptId }, function (err, rows) {
                     if (err) {
-                        console.error(err);
-                        return cb(err, null);
+                        tran.rollback(() => {
+                            return callback(err, null);
+                        });
+
+                        return;
                     }
 
-                    StockChange_add = StockChange_add + `(${OperatorID},${GoodID},${Quantity},'药品入库统计',1,${ReceiptID},0),`;
+                    if (rows) {
+                        async.each(ReceiptGoods, function (good, callback) {
+                            let __good = rows.find(r => r.GoodID == good.GoodID);
 
-                    pool.query(Stock_update, { Quantity, GoodID }, function (err, rows) {
+                            let delta = 0;
 
-                        if (err) {
-                            console.error(err);
-                            return cb(err, null);
-                        }
+                            if (__good)
+                                delta = __good.Quantity - good.Quantity;
 
-                        if (rows.affectedRows == 0) {
-                            pool.query(Stock_add, { Quantity, GoodID }, function (err, rows) {
+                            good.ReceiptID = receiptId;
+                            console.log({ delta, __good, good });
 
+                            console.log(new Date().getTime(), "2、修改子入库信息:如果子入库信息存在，则直接更新（只有未销售和未结算的入库单才能更新）；否则添加一个新的子入库记录；");
+                            //2、修改子入库信息:如果子入库信息存在，则直接更新（只有未销售和未结算的入库单才能更新）；否则添加一个新的子入库记录；
+                            tran.query(__updateReceiptGood, good, function (err, result) {
                                 if (err) {
-                                    console.error(err);
-
-                                    return cb(err, null);
+                                    return callback(err);
                                 }
 
-                                return cb(null, 1);
+                                let saveStock = function (ccb) {
+                                    if (delta == 0) {
+                                        return ccb(null, { code: 0, message: "更新进货单成功" });
+                                    };
 
-                            });
+                                    console.log(new Date().getTime(), "3.0 进货单修改更新库存");
+                                    //更新库存信息
+                                    tran.query(__updateStock, { DeltaQuantity: delta, GoodID: good.GoodID }, (err, result) => {
+                                        if (err) {
+                                            return ccb(err);
+                                        }
 
-                        } else {
-                            console.log({ "更新库存失败": rows });
-                            return cb(null, 1);
-                        }
-                    });
+                                        let saveStockChangeRecord = (record, cb) => {
+                                            console.log(new Date().getTime(), "4、添加库存变更记录；");
+                                            //4、添加库存变更记录；
+                                            tran.query(__addStockChangeRecord, record, (err, result) => {
+                                                // console.log(err, result);
+                                                if (err) {
+                                                    return cb(err);
+                                                }
 
-                });
+                                                if (result) {
+                                                    cb(null, { code: 0, message: "进货单修改库存完成", data: result });
+                                                }
+                                            })
+                                        }
 
-            }, function (err) {
+                                        if (result.affectedRows > 0) {
+                                            saveStockChangeRecord({
+                                                OperatorID, GoodID: good.GoodID, DeltaQuantity: delta, Remark: "入库单修改", Type: 6, RelatedObjectID: receiptId,
+                                            }, ccb);
+                                        } else {
+                                            console.log(new Date().getTime(), "3.1进货单添加更新库存");
+                                            //4、添加库存变更记录；
+                                            tran.query(__addStock, { GoodID: good.GoodID, Quantity: good.Quantity }, (err, result) => {
+                                                if (err) {
+                                                    return ccb(err);
+                                                }
 
-                if (err) {
-                    console.error({ "事务操作失败": err });
-                    tran.rollback(() => {
-                        return callback(err, null);
-                    });
-                } else {
+                                                if (result) {
+                                                    let receiptId = result.insertId;
 
-                    StockChange_add = StockChange_add.slice(0, StockChange_add.length - 1);
+                                                    saveStockChangeRecord({
+                                                        OperatorID, GoodID: good.GoodID, DeltaQuantity: delta, Remark: "入库单修改", Type: 6, RelatedObjectID: receiptId,
+                                                    }, ccb);
+                                                }
+                                            })
+                                        }
+                                    })
+                                };
 
-                    console.log({ StockChange_add });
+                                if (result.affectedRows == 0) {
+                                    console.log(new Date().getTime(), "2.1、添加一个新的子入库记录；");
+                                    //2.1、添加一个新的子入库记录；
+                                    tran.query(__addReceiptGood, good, function (err, result) {
+                                        if (err) {
+                                            return callback(err);
+                                        }
 
-                    pool.query(StockChange_add, {}, function (err, rows) {
-                        if (err) {
-                            console.log("提交进货单库存更新失败");
-                            console.error({ err });
-
-                            tran.rollback(() => {
-                                return callback(err, null);
-                            });
-                        }
-
-                        tran.commit(function (err) {
+                                        if (result) {
+                                            saveStock(callback);
+                                        }
+                                    })
+                                } else {
+                                    saveStock(callback);
+                                }
+                            })
+                        }, function (err) {
+                            console.log(new Date().getTime(), "END==>提交进货单库存更新完成");
                             if (err) {
-                                console.log("提交事务失败", err);
-                                tran.rollback();
-                                return callback(err, null);
+                                tran.end();
+
+                                console.log("提交进货单库存更新失败", err);
+
+                                tran.rollback(() => {
+                                    return callback(err);
+                                });
+                            } else {
+
+                                tran.commit(err => {
+                                    if (err) {
+                                        tran.end();
+                                        console.log("提交进货单库存更新失败", err);
+                                        callback(err);
+                                    } else {
+                                        tran.end();
+                                        console.log(new Date().getTime(), "END==>提交进货单库存更新成功");
+                                        callback(null, { ID: receiptId })
+                                    }
+                                })
                             }
-
-                            console.log("提交进货单库存成功");
-
-                            return callback(null, 1);
                         });
-                    });
-                }
-            });
-        });
-
+                    }
+                })
+            }
+        })
     });
-
 };
 
+
 /**
- * 入库单退回
+ * 保存进货单详情
  * 
- * @param  {Object} Obj 入库单信息
- * 1、修改入库单信息
- * 2、修改子入库信息
+ * 1、添加入库单
+ * 2、添加入库子订单
  * 3、修改库存
  * 4、增加库存记录信息
  * 
+ * @param {Object} receiptData 进货单详情信息
+ * @param {function} callback 回调
  */
-ReceiptTran.prototype.update = function (Obj, callback) {
+Receipt.prototype.add = function (receiptData, callback) {
+    let __addReceipt = "insert into Receipts (VendorName,VendorID,OperatorID,Date,CreateTime) values (:VendorName,:VendorID,:OperatorID,:Date,now());";
 
-    //TODO:这块逻辑有问题，修改进货单时，增加商品的情况没考虑； 
-    //TODO:这块逻辑需要重新写一下。
+    let __addReceiptGood = "insert into ReceiptGoods (ReceiptID,GoodID,CostPrice,Quantity,ValiableQuantity,ExpiryDate,BatchNo) values (:ReceiptID,:GoodID,:CostPrice,:Quantity,:Quantity,:ExpiryDate,:BatchNo)";
+
+    let __updateStock = "update Stocks set TotalQuantity=TotalQuantity+:Quantity,ValiableQuantity=ValiableQuantity+:Quantity where GoodID=:GoodID;";
+
+    let __addStock = "insert into Stocks (GoodID,TotalQuantity,ValiableQuantity,CreateTime) values (:GoodID,:Quantity,:Quantity,now());";
+
+    let __addStockChangeRecord = "insert into StockChangeRecords (OperatorID,GoodID,DeltaQuantity,Remark,Type,RelatedObjectID,SalePrice) values (:OperatorID,:GoodID,:DeltaQuantity,:Remark,:Type,:RelatedObjectID,:SalePrice)";
 
     let tran = pool.getTran();
 
-    tran.beginTransaction(function (err) {
+    console.log(new Date().getTime(), "添加任务开始");
 
+    tran.beginTransaction(function (err) {
         if (err) {
-            return callback(err, null);
+            return callback(err);
         }
 
-        let { ReceiptGoods, OperatorID, ID } = Obj;
-
-        let Receipt_cancel = 'update Receipts set VendorName=:VendorName,VendorID=:VendorID,OperatorID=:OperatorID,Date=:Date where ID=:ID;';
-
-        let StockChange_add = 'insert into StockChangeRecords (OperatorID,GoodID,DeltaQuantity,Remark,Type,RelatedObjectID,SalePrice) values ';
-
-        tran.query(Receipt_cancel, Obj, function (err, rows) {
-
+        tran.query(__addReceipt, receiptData, (err, result) => {
             if (err) {
                 tran.rollback(() => {
-                    return callback(err, null);
+                    return callback(err);
                 });
+
+                return;
             }
 
-            const ReceiptID = ID;
+            console.log(new Date().getTime(), "添加进货单完成", result);
 
-            async.eachSeries(ReceiptGoods, function (item, cb) {
-                let { GoodID, CostPrice, Quantity, ReturnQuantity, ExpiryDate, BatchNo } = item;
+            if (result) {
+                let receiptId = result.insertId;
+                let { ReceiptGoods, OperatorID } = receiptData;
 
-                //更新库存
-                let ReceiptGood_update = 'update ReceiptGoods set Quantity=Quantity-:ReturnQuantity,ValiableQuantity=ValiableQuantity-:ReturnQuantity,ReturnQuantity=:ReturnQuantity,ExpiryDate=:ExpiryDate where ReceiptID=:ReceiptID and GoodID=:GoodID and ValiableQuantity>=:ReturnQuantity';
-                let Stock_update = 'update Stocks set TotalQuantity=TotalQuantity-:ReturnQuantity,ValiableQuantity=ValiableQuantity-:ReturnQuantity where GoodID=:GoodID;';
-                let Stock_add = 'insert into Stocks (GoodID,TotalQuantity,ValiableQuantity,CreateTime) values (:GoodID,:Quantity,:Quantity,now());';
+                async.each(ReceiptGoods, function (good, callback) {
 
-                tran.query(ReceiptGood_update, {
-                    ReceiptID,
-                    GoodID,
-                    ReturnQuantity,
-                    ExpiryDate
-                }, function (err, arrs) {
+                    good.ReceiptID = receiptId;
 
-                    if (err) {
-                        return cb(err, null);
-                    }
-
-                    if (arrs.affectedRows == 0) {
-                        return cb({ message: `${GoodID}商品数量不足！` }, null);
-                    }
-
-                    StockChange_add += `(${OperatorID},${GoodID},${ReturnQuantity},'药品退回统计',4,${ReceiptID},0) `;
-
-                    tran.query(Stock_update, { ReturnQuantity, GoodID }, function (err, rows) {
+                    console.log(new Date().getTime(), "添加进货商品");
+                    //添加进货单商品
+                    tran.query(__addReceiptGood, good, (err, result) => {
 
                         if (err) {
-                            return cb(err, null);
+                            return callback(err);
                         }
 
-                        if (rows.affectedRows == 0) {
-
-                            tran.query(Stock_add, { Quantity, GoodID }, function (err, rows) {
+                        if (result) {
+                            let { Quantity, GoodID } = good;
+                            console.log(new Date().getTime(), "更新指定商品库存开始");
+                            //更新指定商品库存
+                            tran.query(__updateStock, { Quantity, GoodID }, (err, result) => {
 
                                 if (err) {
-                                    return cb(err, null);
+                                    return callback(err);
                                 }
 
-                                return cb(null, 1);
+                                if (result.affectedRows == 0) {
+                                    //该商品库存不存在 ，添加该商品的库存
+                                    tran.query(__addStock, { Quantity, GoodID }, (err, result) => {
+                                        if (err) {
+                                            return callback(err);
+                                        }
 
-                            });
+                                        if (result.insertId > 0) {
+                                            console.log(new Date().getTime(), "添加库存更新记录");
+                                            //添加库存更新记录
+                                            tran.query(__addStockChangeRecord, { OperatorID, GoodID: good.GoodID, DeltaQuantity: good.Quantity, Remark: "进货单入库", Type: 1, RelatedObjectID: receiptId, SalePrice: 0 }, (err, result) => {
+                                                if (err) {
+                                                    return callback(err);
+                                                }
 
-                        } else {
-                            return cb(null, 1);
+                                                if (result) {
+                                                    callback(null, { code: 0, message: "更新库存信息成功" });
+                                                }
+                                            })
+                                        }
+                                    })
+                                } else {
+                                    console.log(new Date().getTime(), "添加库存更新记录");
+                                    //添加库存更新记录
+                                    tran.query(__addStockChangeRecord, { OperatorID, GoodID: good.GoodID, DeltaQuantity: good.Quantity, Remark: "进货单入库", Type: 1, RelatedObjectID: receiptId, SalePrice: 0 }, (err, result) => {
+                                        if (err) {
+                                            return callback(err);
+                                        }
+
+                                        if (result) {
+                                            console.log(new Date().getTime(), "==》更新库存信息成功");
+                                            callback(null, { code: 0, message: "更新库存信息成功" });
+                                        }
+                                    })
+                                }
+                            })
                         }
-
                     });
 
-                });
+                }, function (err) {
 
+                    console.log("====》提交进货单库保存完成");
 
-            }, function (err) {
+                    if (err) {
+                        tran.end();
 
-                if (err) {
-                    tran.rollback(() => {
-                        return callback(err, null);
-                    });
-                } else {
-                    tran.query(StockChange_add, {}, function (err, rows) {
+                        console.log("提交进货单库存更新失败", err);
 
-                        if (err) {
-                            tran.rollback(() => {
-                                return callback(err, null);
-                            });
-                        }
-
-                        tran.commit(function (err) {
-
-                            if (err) {
-                                console.log("提交事务失败", err);
-                                tran.rollback();
-                                return callback(err, null);
-                            }
-
-                            return callback(null, 1);
-
+                        tran.rollback(() => {
+                            return callback(err);
                         });
-
-                    });
-
-                }
-
-            });
-
+                    } else {
+                        tran.commit(err => {
+                            if (err) {
+                                tran.end();
+                                console.log("提交进货单库存更新失败", err);
+                                callback(err);
+                            } else {
+                                tran.end();
+                                console.log("提交进货单保存成功", err);
+                                callback(null, { ID: receiptId })
+                            }
+                        })
+                    }
+                })
+            }
         });
-
     });
-
-};
-
+}
 
 /**
  * 入库药品清单
@@ -386,27 +431,21 @@ Receipt.prototype.search = function (KeyWord, Page, Limit, StartTime, EndTime, S
  * @param  {Number} ID 入库单ID
  */
 Receipt.prototype.receiptInfo = function (ID, callback) {
-
     let that = this;
-
     async.parallel([
         function (cb) {
-
             that._ReceiptInfo({
                 ID: ID
             }, function (err, rows) {
-
                 if (err) {
                     return cb(err, null);
                 }
 
                 cb(null, rows);
-
             });
 
         },
         function (cb) {
-
             that._ReceiptGoodInfo({
                 ID: ID
             }, function (err, rows) {
@@ -418,10 +457,8 @@ Receipt.prototype.receiptInfo = function (ID, callback) {
                 cb(null, rows);
 
             });
-
         }
     ], function (err, result) {
-
         if (err) {
             return callback(err, null);;
         }
@@ -474,4 +511,4 @@ Receipt.prototype.settle = function (ID, Status, callback) {
 
 
 module.exports.Receipt = new Receipt();
-module.exports.ReceiptTran = new ReceiptTran();
+// module.exports.ReceiptTran = new ReceiptTran();

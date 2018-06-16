@@ -31,16 +31,23 @@ class OrderGoodList extends React.Component {
             ? target.checked
             : target.value;
         const id = target.id;
+        let val = value;
 
-        g[id] = value;
+        console.log(/\d+/.test(val));
 
-        console.log(id, value);
+        if (!/\d+/.test(val)) {
+            val = 0;
+        }
+
+        g[id] = val;
+
+        console.log(id, val);
 
         let { orderGoods } = this.state;
 
         orderGoods.forEach(good => {
             if (good.ID == g.ID) {
-                good[id] = value;
+                good[id] = Number.parseFloat(val);
             }
         })
 

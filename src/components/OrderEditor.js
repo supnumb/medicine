@@ -45,8 +45,6 @@ class OrderEditor extends React.Component {
         let { order } = nextProps;
         let { order: oldOrder } = this.props;
 
-        console.log({ order, oldOrder });
-
         if (oldOrder) {
             if (order && order.ID != oldOrder.ID) {
                 this.loadOrderDetailFromDB(order);
@@ -57,15 +55,11 @@ class OrderEditor extends React.Component {
     }
 
     componentDidMount() {
-        let { order } = this.props;
-
         let { location: {
             state
         } } = this.props;
 
         Store.dispatch({ type: "SWITCH_SELECTOR_SHOW", payload: false })
-
-        console.log({ state });
 
         if (state) {
             this.loadOrderDetailFromDB(state);
@@ -76,7 +70,10 @@ class OrderEditor extends React.Component {
                 type: "SET_CHECKED_ORDER", payload: {
                     DeliveryCode: "",
                     DeliveryCompany: "",
-                    DeliveryFee: ""
+                    DeliveryFee: "",
+                    orderGoods: [],
+                    MobilPhone: "",
+                    Address: ""
                 }
             });
         }
@@ -96,6 +93,7 @@ class OrderEditor extends React.Component {
             let result = Object.assign({}, values, {
                 Connact: member.Name,
                 Name: member.Name,
+                MemberName: member.Name,
                 MobilPhone: member.MobilPhone,
                 Telephone: member.MobilPhone,
                 Address: member.Address,
