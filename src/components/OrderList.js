@@ -168,7 +168,7 @@ class OrderList extends React.Component {
                 </tbody>
                 <tfoot>
                     <tr>
-                        <td>
+                        <td colSpan={14}>
                             {/* <Pager /> */}
                         </td>
                     </tr>
