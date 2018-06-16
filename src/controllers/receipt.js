@@ -33,7 +33,7 @@ exports.save = (req, res, next) => {
         return res.status(200).send({ code: 2, message: "VendorName|VendorID|Date|ReceiptGoods参数不匹配！" });
     };
 
-    const ReceiptData = { ID, VendorName, VendorID, Date, ReceiptGoods };
+    const ReceiptData = { ID, VendorName, VendorID, Date: moment(Date).format("YYYY-MM-DD"), ReceiptGoods };
 
     let { user } = req.session;
 
