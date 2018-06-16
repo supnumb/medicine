@@ -70,7 +70,7 @@ class OrderEditor extends React.Component {
                 type: "SET_CHECKED_ORDER", payload: {
                     DeliveryCode: "",
                     DeliveryCompany: "",
-                    DeliveryFee: "",
+                    DeliveryFee: 0,
                     orderGoods: [],
                     MobilPhone: "",
                     Address: ""
