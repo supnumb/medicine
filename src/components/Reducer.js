@@ -48,7 +48,6 @@ const defaultState = {
         values: [],
         errors: {}
     },
-
     intentionList: {
         isFetching: false,
         intentions: [],
@@ -84,13 +83,27 @@ const defaultState = {
         orderGoods: [],
         isFetching: false
     },
-    xxxx: {}
+    employeeList: {
+        employees: [],
+        isFetching: false
+    }
 };
 
 function XXXXReducer(state = defaultState.xxxx, action) {
     switch (action.type) {
         case "":
             break;
+        default:
+            return state;
+    }
+}
+
+function EmployeesReducer(state = defaultState.employeeList, action) {
+    switch (action.type) {
+        case "FETCH_EMPLOYEE":
+            return Object.assign({}, state, { isFetching: true });
+        case "FETCH_EMPLOYEE_DONE":
+            return Object.assign({}, state, { employees: acorn.payload, isFetching: false })
         default:
             return state;
     }
@@ -413,7 +426,8 @@ const reducer = combineReducers({
     vendorList: VendorListReducer,
     receiptList: ReceiptsListReducer,
     orderEditor: OrderEditorReducer,
-    orderGoodList: OrderGoodListReducer
+    orderGoodList: OrderGoodListReducer,
+    employeeList: EmployeesReducer
     // vendorEditor: VendorEditorReducer
 });
 
