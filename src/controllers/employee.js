@@ -31,7 +31,7 @@ exports.search = (req, res, next) => {
 
     const { KeyWord = '' } = req.body;
 
-    Member.employeeList(KeyWord, function(err, mem) {
+    Member.employeeList(KeyWord, function (err, mem) {
 
         if (err) {
             return res.send({ code: 2, message: "数据库出错" });
@@ -54,39 +54,29 @@ exports.search = (req, res, next) => {
  */
 exports.addEmployee = (req, res, next) => {
 
-    const { Name, MobilPhone, Password } = req.body;
+    const { Name, MobilPhone, DefaultPassword, Flag } = req.body;
 
-    // let ep = new eventproxy();
-
-    // ep.fail(function(error) {
-    //     console.error(error);
-    //     return res.status(403).send({ code: -1, message: "系统错误", data: error });
-    // });
-
-    if (!Name || !MobilPhone || !Password) {
-        return res.send({ code: 2, message: "Name|MobilPhone|Password参数不完整" });
+    if (!Name || !MobilPhone || !DefaultPassword) {
+        return res.send({ code: 2, message: "参数不完整理，请检查！" });
     };
 
-    const Flag = req.session ? req.session.user.Flag : 2;
+    const isHasRight = req.session ? req.session.user.Flag : 2;
 
-    if (Flag != 2) {
-        return res.send({ code: 2, message: "权限不足！" })
+    if (isHasRight != 2) {
+        return res.send({ code: 2, message: "权限不足：只有管理员能添加账户！" })
     }
 
-    let memberData = { Name, MobilPhone, Password };
+    let passhash = bcrypt.hashSync(DefaultPassword, bcrypt.genSaltSync(10));
 
-    let passhash = bcrypt.hashSync(Password, bcrypt.genSaltSync(10));
+    let memberData = { Name, MobilPhone, Password: passhash, Flag };
 
-    memberData.Password = passhash;
-
-    Member.addEmployee(memberData, function(err, mem) {
+    Member.addEmployee(memberData, function (err, mem) {
 
         if (err) {
-            return res.send({ code: 2, message: "数据库出错" });
+            return res.send({ code: 2, message: "数据库出错", data: err });
         };
 
         return res.status(200).send({ code: 0, message: "添加雇员操作成功！", data: mem });
-
     });
 }
 
@@ -105,7 +95,7 @@ exports.profile = (req, res, next) => {
         MemberID = req.session.user.ID;
     };
 
-    Member.memberInfo(MemberID, function(err, mem) {
+    Member.memberInfo(MemberID, function (err, mem) {
 
         if (err) {
             return res.send({ code: 2, message: "数据库出错" });
@@ -116,6 +106,27 @@ exports.profile = (req, res, next) => {
     });
 
 
+}
+
+/**
+ *  修改雇员的可用状态
+ * @param  {Object}   req  http 请求对象
+ * @param  {Object}   res  http 响应对象
+ * @param  {Function} next 管道操作，传递到下一步
+ * @param  {String}   req.body.EmployeeID 雇员ID
+ * @param  {String}   req.body.Status 新状态
+ */
+exports.toggleStatus = (req, res, next) => {
+
+    const { EmployeeID, Status } = req.body;
+
+    Member.ToggleStatus(EmployeeID, Status, (err, result) => {
+        if (err) {
+            return res.send({ code: 1, message: "保存数据错误", data: err });
+        }
+
+        return res.send({ code: 0, message: "修改成功", data: result });
+    })
 }
 
 /**
@@ -144,7 +155,7 @@ exports.alterpass = (req, res, next) => {
 
     let passhash = bcrypt.hashSync(NewPass, bcrypt.genSaltSync(10));
 
-    Member.checkByID(MemberID, function(err, mem) {
+    Member.checkByID(MemberID, function (err, mem) {
         if (err) {
             return res.send({ code: 2, message: "数据库出错" });
         };
@@ -153,7 +164,7 @@ exports.alterpass = (req, res, next) => {
 
             if (OldPass) {
 
-                bcrypt.compare(OldPass, mem.Password, function(err, result) {
+                bcrypt.compare(OldPass, mem.Password, function (err, result) {
 
                     if (err) {
                         return res.send({ code: 2, message: "数据库出错" });
@@ -161,7 +172,7 @@ exports.alterpass = (req, res, next) => {
 
                     if (result) {
 
-                        Member.alterpass(MemberID, passhash, function(err, data) {
+                        Member.alterpass(MemberID, passhash, function (err, data) {
 
                             if (err) {
                                 return res.send({ code: 2, message: "数据库出错" });
@@ -177,7 +188,7 @@ exports.alterpass = (req, res, next) => {
 
             } else {
 
-                Member.alterpass(MemberID, passhash, function(err, data) {
+                Member.alterpass(MemberID, passhash, function (err, data) {
 
                     if (err) {
                         return res.send({ code: 2, message: "数据库出错" });

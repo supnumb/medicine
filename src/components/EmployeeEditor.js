@@ -6,7 +6,7 @@ import { Icon, RadioGroup, Radio } from 'rsuite';
 
 const model = SchemaModel({
     Name: StringType().isRequired('请输入账户名'),
-    MobilPhone: StringType().isRequired('请输入账户电话'),
+    MobilPhone: StringType().isRequired('请输入账户电话').pattern(/^1[3456789]\d{9}$/, "格式不正确"),
     DefaultPassword: StringType().isRequired('请填写初始密码')
 });
 
@@ -41,8 +41,7 @@ class EmployeeEditor extends React.Component {
             return;
         }
 
-
-        fetch('/api//employee/save', {
+        fetch('/api/employee/save', {
             body: JSON.stringify(values),
             method: 'POST',
             mode: 'same-origin',
@@ -53,8 +52,11 @@ class EmployeeEditor extends React.Component {
         }).then(res => res.json()).then(json => {
             console.log({ json });
             if (json.code == 0) {
-                Store.dispatch({ type: "FETCH_EMPLOYEES_DONE", payload: json.data });
-                // this.setState({ employees: employees })
+
+                if (this.props.onSumbitCompleted) {
+                    this.props.onSumbitCompleted("SUCCESS", json)
+                }
+                alert(json.message);
             } else {
                 alert(json.message);
             }
@@ -108,10 +110,10 @@ class EmployeeEditor extends React.Component {
             <h4>添加账户</h4>
 
             <Form className="form-horizontal" ref={ref => this.form = ref} values={values} id="form" model={model} onChange={(values) => {
-                Store.dispatch({ type: "SET_VALUES", payload: values });
+                this.setState({ values })
                 this.form.cleanErrors();
             }} onCheck={(errors) => {
-                Store.dispatch({ type: "SET_ERRORS", payload: errors });
+                this.setState({ errors });
             }}>
 
                 <div className="form-group">

@@ -60,21 +60,24 @@ exports.signIn = (req, res, next) => {
         };
 
         if (mem) {
-            bcrypt.compare(password, mem.Password, function (err, result) {
+            if (mem.Status == 1) {
+                bcrypt.compare(password, mem.Password, function (err, result) {
 
-                if (err) {
-                    return res.send({ code: 2, message: "密码比对出错" });
-                }
+                    if (err) {
+                        return res.send({ code: 2, message: "密码错误" });
+                    }
 
-                if (result) {
-                    req.session.user = mem;
-                    return res.send({ code: 0, message: "登录成功" });
-                } else {
-                    return res.send({ code: 2, message: "电话或密码不正确" });
-                }
-            });
+                    if (result) {
+                        req.session.user = mem;
+                        return res.send({ code: 0, message: "登录成功" });
+                    } else {
+                        return res.send({ code: 2, message: "电话或密码不正确" });
+                    }
+                });
+            } else {
+                return res.send({ code: 2, message: "该账户已经禁用" })
+            }
         } else {
-
             return res.send({ code: 2, message: `${login_name}没有注册。` });
         }
     });

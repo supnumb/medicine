@@ -26,6 +26,7 @@ router.get('/employee/profile', employee.profile);
 
 //管理员重置密码
 router.post('/employee/alterpass', member.checkUser, employee.alterpass);
+router.post('/employee/togglestatus', member.checkUser, employee.toggleStatus);
 
 //添加会员
 router.post('/member/save', member.checkUser, member.save);

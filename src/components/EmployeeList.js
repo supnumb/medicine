@@ -21,6 +21,7 @@ class EmployeeList extends React.Component {
 
         this.state = Store.getState();
         this.loadEmployeesFromDB = this._loadEmployeesFromDB.bind(this);
+        this.toggleEnableStatus = this._toggleEnableStatus.bind(this);
     }
 
     _loadEmployeesFromDB() {
@@ -37,6 +38,30 @@ class EmployeeList extends React.Component {
             console.log({ json });
             if (json.code == 0) {
                 Store.dispatch({ type: "FETCH_EMPLOYEES_DONE", payload: json.data });
+                // this.setState({ employees: employees })
+            } else {
+                alert(json.message);
+            }
+        }).catch(err => {
+            console.error(err);
+        })
+    }
+
+    _toggleEnableStatus(EmployeeID, status) {
+
+        fetch('/api/employee/togglestatus', {
+            body: JSON.stringify({ EmployeeID, Status: status }),
+            method: 'POST',
+            mode: 'same-origin',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(res => res.json()).then(json => {
+            console.log({ json });
+            if (json.code == 0) {
+                this.loadEmployeesFromDB();
+                alert(json.message);
                 // this.setState({ employees: employees })
             } else {
                 alert(json.message);
@@ -68,27 +93,55 @@ class EmployeeList extends React.Component {
         }
 
         let listJsx = employees.map((e, index) => {
-            return (<tr key={index}>
-                <td>{e.ID}</td>
-                <td>{e.Name}</td>
-                <td>{e.Telephone}</td>
-                <td>{
-                    e.Flag == 2 ? "管理员" : "药师"}</td>
-                <td>
+            if (e.Status == 0) {
+                let disabledStyle = { "color": "#cce" };
+
+                return (<tr key={index} >
+                    <td style={disabledStyle}>{e.ID}</td>
+                    <td style={disabledStyle}>{e.Name}</td>
+                    <td style={disabledStyle}>{e.MobilPhone}</td>
+                    <td style={disabledStyle}>{
+                        e.Flag == 2 ? "管理员" : "药师"}</td>
+                    <td>
+                        <a href="#" onClick={() => {
+                            this.toggleEnableStatus(e.ID, e.Status == 1 ? 0 : 1);
+                            // Store.dispatch({ type: "SET_EDITOR_MODE", payload: { action: "update", employee: e } })
+                        }}>
+                            {e.Status == 1 ? "禁用" : "启用"}
+                        </a>
+                        &nbsp;
                     <a href="#" onClick={() => {
-                        Store.dispatch({ type: "SET_EDITOR_MODE", payload: { action: "update", employee: e } })
-                    }}>
-                        编辑
+                            console.log(e);
+                            Store.dispatch({ type: "SET_EDITOR_MODE", payload: { action: "resetpass", employee: e } })
+                        }}>
+                            重置密码
                     </a>
-                    &nbsp;
+                    </td>
+                </tr>)
+            } else {
+                return (<tr key={index}>
+                    <td>{e.ID}</td>
+                    <td>{e.Name}</td>
+                    <td>{e.MobilPhone}</td>
+                    <td>{
+                        e.Flag == 2 ? "管理员" : "药师"}</td>
+                    <td>
+                        <a href="#" onClick={() => {
+                            this.toggleEnableStatus(e.ID, e.Status == 1 ? 0 : 1);
+                            // Store.dispatch({ type: "SET_EDITOR_MODE", payload: { action: "update", employee: e } })
+                        }}>
+                            {e.Status == 1 ? "禁用" : "启用"}
+                        </a>
+                        &nbsp;
                     <a href="#" onClick={() => {
-                        console.log(e);
-                        Store.dispatch({ type: "SET_EDITOR_MODE", payload: { action: "resetpass", employee: e } })
-                    }}>
-                        重置密码
+                            console.log(e);
+                            Store.dispatch({ type: "SET_EDITOR_MODE", payload: { action: "resetpass", employee: e } })
+                        }}>
+                            重置密码
                     </a>
-                </td>
-            </tr>)
+                    </td>
+                </tr>)
+            }
         });
 
         return (<div id='EmployeeList'>
@@ -110,7 +163,7 @@ class EmployeeList extends React.Component {
                             <th>名称</th>
                             <th>电话</th>
                             <th>角色</th>
-                            <th>操作</th>
+                            <th style={{ "width": "140px" }}>操作</th>
                         </tr>
                     </thead>
                     <tbody>

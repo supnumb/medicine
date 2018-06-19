@@ -18,7 +18,7 @@ function Member() {
         _add: "insert into Members (Name,PinYin,City,Gender,Address,Remark,MobilPhone,WeiXinCode,IsWeixinFriend,FriendName,BirthYear,Diseases,RelationWithPatient,CreateTime) values (:Name,:PinYin,:City,:Gender,:Address,:Remark,:MobilPhone,WeiXinCode,IsWeixinFriend,FriendName,:BirthYear,:Diseases,:RelationWithPatient,now());",
 
         //雇员添加
-        _addEmployee: "insert into Members (Name,MobilPhone,Password,Flag,CreateTime) values (:Name,:MobilPhone,:Password,1,Now());",
+        _addEmployee: "insert into Members (Name,MobilPhone,Password,Flag,CreateTime) values (:Name,:MobilPhone,:Password,:Flag,Now());",
 
         //会员删除
         _delete: "update Members set Status=0 where ID=:ID;",
@@ -39,8 +39,9 @@ function Member() {
         _memberInfo: "select * from Members where ID=:ID;",
 
         //雇员列表
-        _employeeList: "select * from Members where Flag!=0 and concat(Name,MobilPhone) like :KeyWord order by Flag desc",
+        _employeeList: "select * from Members where Flag!=0 and concat(Name,MobilPhone) like :KeyWord order by ID desc",
 
+        _toggleStatus: "update Members set Status=:Status where ID=:EmployeeID",
     };
 
     var base = new Base();
@@ -290,19 +291,21 @@ Member.prototype.employeeList = function (KeyWord, callback) {
 
 /**
  * 雇员添加
- * @param  {Object} obj 会员信息
+ * @param  {Object} memberInfo 会员信息
  * @param  {Function} callback 回调
  */
-Member.prototype.addEmployee = function (Obj, callback) {
+Member.prototype.addEmployee = function (memberInfo, callback) {
 
-    this._addEmployee(Obj, function (err, rows) {
-        if (err) {
-            return callback(err, null);
-        }
+    if (!memberInfo.Flag) {
+        memberInfo.Flag = 1;
+    }
 
-        callback(null, rows);
-    });
+    this._addEmployee(memberInfo, callback);
 };
+
+Member.prototype.ToggleStatus = function (EmployeeID, Status, callback) {
+    this._toggleStatus({ EmployeeID, Status }, callback);
+}
 
 
 /**
