@@ -31,7 +31,8 @@ class ReceiptEditor extends React.Component {
             employees: [],
             vendors: [],
             isShowGoodSelector: false,
-            message: ""
+            message: "",
+            isReturn: false
         };
 
         this.loadReceiptDetailFromDB = this._loadReceiptDetailFromDB.bind(this);
@@ -44,15 +45,12 @@ class ReceiptEditor extends React.Component {
     }
 
     _submitReceipt() {
-
-        console.log(this.form.check());
-
         if (!this.form.check()) {
-            this.setState({ message: "数据格式有错误!" });
+            this.setState({ message: "请检查输入的数据错误!" });
             return;
         }
 
-        let { values, receiptGoods, receipt } = this.state;
+        let { values, receiptGoods, receipt, isReturn = false } = this.state;
         let receiptData = Object.assign({}, receipt, values);
 
         let _amount = 0;
@@ -62,10 +60,10 @@ class ReceiptEditor extends React.Component {
         })
 
         receiptData.Date = receiptData.Date || Moment();
-
         receiptData.ReceiptAmount = _amount;
         receiptData.TotalAmount = _amount;
         receiptData.ReceiptGoods = receiptGoods;
+        receiptData.IsReturn = isReturn;
 
         console.log(receiptData);
 
@@ -107,7 +105,6 @@ class ReceiptEditor extends React.Component {
 
             this.setState({ values })
         }
-
     }
 
     _onSelectVendor(data) {
@@ -202,22 +199,31 @@ class ReceiptEditor extends React.Component {
     componentDidMount() {
         let {
             location: {
-                state: receipt
+                state
             }
         } = this.props;
 
-        if (receipt) {
-            this.setState({ values: receipt });
-            this.loadReceiptDetailFromDB(receipt);
-        }
+        if (state) {
+            let { receipt, isReturn } = state;
 
-        this.loadVendorListFromDB();
+            if (receipt) {
+                this.setState({ values: receipt, isReturn });
+                this.loadReceiptDetailFromDB(receipt);
+            } else {
+                this.setState({ isReturn });
+            }
+
+            this.loadVendorListFromDB();
+        } else {
+            this.props.history.push({
+                pathname: "/receipts/"
+            })
+        }
         // this.loadEmployeesFromDB();
     }
 
     _onGoodSelectorChanged(selected) {
         let { receiptGoods } = this.state;
-
 
         if (selected) {
             selected.forEach(sg => {
@@ -231,11 +237,13 @@ class ReceiptEditor extends React.Component {
                 if (!isHas) {
                     receiptGoods.push({
                         GoodID: sg.ID,
-                        Quantity: 1,
+                        ValiableQuantity: 1,
                         ExpiryDate: Moment().add(0, 'days').format("YYYY-MM-DD"),
                         BatchNo: "",
                         CostPrice: sg.DefaultCostPrice,
                         Name: sg.Name,
+                        Dimension: sg.Dimension,
+                        Manufacturer: sg.Manufacturer,
                         OfficalName: sg.OfficalName,
                         Flag: 0
                     });
@@ -252,9 +260,9 @@ class ReceiptEditor extends React.Component {
     }
 
     render() {
-        let { receipt, values, errors, receiptGoods, employees, vendors, isShowGoodSelector, isFetching, message } = this.state;
+        let { receipt, values, errors, receiptGoods, employees, vendors, isShowGoodSelector, isFetching, message, isReturn } = this.state;
 
-        let isEditabled = receipt && (receipt.Status == 1 || receipt.Flag == 1);
+        let isEditabled = receipt && (receipt.Status == 1);
 
         let loading = isFetching ? (<Icon icon='spinner' spin />) : ("");
 
@@ -266,7 +274,7 @@ class ReceiptEditor extends React.Component {
 
         return (<div id="ReceiptEditor">
             <div className="col-md-6 col-md-offset-1 main">
-                <h4>进货单编辑</h4>
+                <h4>{isReturn ? "退货单编辑" : "进货单编辑"}</h4>
                 <Form className="form-horizontal" ref={ref => this.form = ref} values={values} id="form" model={model} onChange={(values) => {
                     this.setState({ values });
                     this.form.cleanErrors();
@@ -326,15 +334,18 @@ class ReceiptEditor extends React.Component {
                         </div>
                     </div>
 
-                    <ReceiptGoodList isEditabled={isEditabled} goods={receiptGoods} onAddGood={() => {
+                    <ReceiptGoodList isEditabled={isEditabled} isReturn={isReturn} goods={receiptGoods} onAddGood={() => {
                         this.setState({ isShowGoodSelector: true })
                     }} />
+
+                    {loading}
 
                     <p className="text-danger">
                         {message}
                     </p>
 
-                    <button className="btn btn-primary" onClick={this.submitReceipt}>保存进货单</button>
+                    {isEditabled ? ("") : (<button className="btn btn-primary" onClick={this.submitReceipt}>保存进货单</button>)}
+
                 </Form>
 
             </div>
@@ -342,7 +353,6 @@ class ReceiptEditor extends React.Component {
                 {goodSelectorJsx}
             </div>
 
-            {loading}
         </div>)
     }
 }

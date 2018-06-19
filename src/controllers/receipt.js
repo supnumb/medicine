@@ -17,7 +17,9 @@ const moment = require('moment');
 const { Receipt } = require('../models/index');
 
 /**
- * 入库单添加、修改
+ * 入库单\退货单：添加、修改
+ * 
+ *
  * @param  {Object}   req  http 请求对象
  * @param  {Object}   res  http 响应对象
  * @param  {Number}   req.body.VendorName 供货商名称
@@ -27,13 +29,13 @@ const { Receipt } = require('../models/index');
  * @param  {Function} next 管道操作，传递到下一步
  */
 exports.save = (req, res, next) => {
-    let { ID, VendorName, VendorID, Date, ReceiptGoods } = req.body;
+    let { ID, VendorName, VendorID, Date, IsReturn, ReceiptGoods } = req.body;
 
     if (!VendorName || !VendorID || !Date || ReceiptGoods.length == 0) {
         return res.status(200).send({ code: 2, message: "VendorName|VendorID|Date|ReceiptGoods参数不匹配！" });
     };
 
-    const ReceiptData = { ID, VendorName, VendorID, Date: moment(Date).format("YYYY-MM-DD"), ReceiptGoods };
+    const ReceiptData = { ID, VendorName, VendorID, Date: moment(Date).format("YYYY-MM-DD"), ReceiptGoods, Flag: IsReturn ? 1 : 0 };
 
     let { user } = req.session;
 
@@ -50,8 +52,8 @@ exports.save = (req, res, next) => {
             if (rows) {
                 let { data: [receiptInfo] } = rows;
 
-                if (receiptInfo.Status == 1 || receiptInfo.Flag == 1) {
-                    return res.send({ code: 3, message: "进货单已经结算或已经销售，不能修改" })
+                if (receiptInfo.Status == 1) {
+                    return res.send({ code: 3, message: "进货单已经结算，不能修改" })
                 }
 
                 // console.log({ ReceiptData });
@@ -82,44 +84,6 @@ exports.save = (req, res, next) => {
     }
 }
 
-/**
- * 退回入库单
- * @param  {Object}   req  http 请求对象
- * @param  {Object}   res  http 响应对象
- * @param  {Number}   req.body.ID 订单ID
- * @param  {Number}   req.body.VendorName 供货商名称
- * @param  {String}   req.body.VendorID 供货商ID
- * @param  {String}   req.body.Date 入库时间
- * @param  {Array}    req.body.ReceiptGoods 入库单商品
- * @param  {Function} next 管道操作，传递到下一步
- */
-exports.update = (req, res, next) => {
-
-    let { ID = '', VendorName, VendorID, Date, ReceiptGoods } = req.body;
-
-    if (!ID || !VendorName || !VendorID || ReceiptGoods.length == 0) {
-        return res.status(200).send({ code: 2, message: "订单ID|VendorName|VendorID|ReceiptGoods参数不匹配！" });
-    };
-
-    const ReceiptData = { ID, VendorName, VendorID, Date, ReceiptGoods };
-
-    ReceiptData.OperatorID = req.session ? req.session.user.ID : 1;
-
-    ReceiptTran.update(ReceiptData, function (err, mem) {
-
-        if (err && err.message) {
-            return res.send({ code: 2, message: err.message });
-        }
-
-        if (err) {
-            return res.send({ code: 2, message: "数据库出错" });
-        };
-
-        return res.send({ code: 0, message: "返回入库单操作成功！", data: mem });
-
-    });
-
-}
 
 /**
  * 入库单列表
@@ -207,7 +171,7 @@ exports.settle = (req, res, next) => {
             return res.send({ code: 2, message: "数据库出错", data: err });
         };
 
-        return res.send({ code: 0, message: "入库单结算操作成功！", data: mem });
+        return res.send({ code: 0, message: "入库单【结算|取消结算】操作成功！", data: mem });
 
     });
 }

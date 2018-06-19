@@ -79,9 +79,14 @@ class OrderGoodList extends React.Component {
 
         let listJsx = orderGoods.map((og, index) => {
 
+            //删除的商品
+            if (og.Flag == -1) {
+                return;
+            }
+
             if (orderGood && orderGood.ID == og.ID) {
                 return (<tr key={index}>
-                    <td>{og.ID}</td>
+                    <td>{og.GoodID}</td>
                     <td>{og.GoodName || og.Name}</td>
                     <td>{og.Dimension}</td>
                     <td>{og.Unit}</td>
@@ -118,6 +123,13 @@ class OrderGoodList extends React.Component {
                         <a href="#" onClick={() => {
                             this.setState({ orderGood: og })
                         }}>编辑</a>
+
+                        <br />
+                        <a href="#" onClick={() => {
+                            og.Flag = -1;
+                            this.setState({ orderGood: null })
+                        }}>删除</a>
+
                     </td>
                 </tr>);
             }

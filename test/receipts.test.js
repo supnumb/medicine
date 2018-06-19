@@ -4,7 +4,7 @@ var agent = supertest.agent(app);
 var should = require('should');
 //Amount, CostPrice, Quantity, ExpiryDate, BatchNo
 let receiptData = {
-    ID: 103,
+    ID: 0,
     VendorName: '哈药集团',
     VendorID: 43,
     Contact: '张三',
@@ -12,16 +12,18 @@ let receiptData = {
     Date: '2018-06-09',
     ReceiptAmount: 15,
     TotalAmount: 15,
+    IsReturn: true,
     ReceiptGoods:
         [{
             GoodID: 43,
-            Quantity: 80,
+            Quantity: 100,
             ExpiryDate: '2018-10-08',
             BatchNo: 'A12345678',
             CostPrice: 55,
             Name: 'Y01',
+            ValiableQuantity: 100,
+            Flag: 0,
             OfficalName: '测试药品',
-            ReturnQuantity: 0
         }]
 }
 

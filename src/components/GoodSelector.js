@@ -30,7 +30,7 @@ class GoodSelector extends React.Component {
             });
         });
 
-        // console.log(checkedGoods);
+        console.log(checkedGoods);
 
         if (this.props.onCheckChanged) {
             this.props.onCheckChanged(checkedGoods);

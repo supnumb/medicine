@@ -883,7 +883,7 @@ Order.prototype.update = function (order, callback) {
 
     let __listOrderGoods = "select ID,GoodID,Quantity,ReceiptGoodID,ReceiptQuantity from OrderGoods where OrderID=:ID;";
 
-    let __updateOrderGood = "update OrderGoods set Quantity=:Quantity,FinalPrice=:FinalPrice where ID=:ID";
+    let __updateOrderGood = "update OrderGoods set Quantity=:Quantity,FinalPrice=:FinalPrice,Flag=:Flag where ID=:ID";
 
     let __addOrderGoods = "insert into OrderGoods(GoodID,OrderID,GoodName,Quantity,FinalPrice) values (:GoodID,:OrderID,:GoodName,:Quantity,:FinalPrice);";
 
@@ -922,25 +922,38 @@ Order.prototype.update = function (order, callback) {
                     console.log({ _g, good });
 
                     if (_g && (_g.Quantity != good.Quantity || _g.FinalPrice != good.FinalPrice)) {
-                        let delta = _g.Quantity - good.Quantity;
 
-                        console.log("更新子订单:", new Date().getTime());
+                        let delta = 0;
+
+                        //该商品从订单中被删除:订单中该商品的原数量返回给库存
+                        if (good.Flag == -1) {
+                            delta = -_g.Quantity;
+                        } else {
+                            //订单中该商品数量变化：
+                            delta = good.Quantity - _g.Quantity;
+                        }
+
+                        console.log(new Date().getTime(), "更新子订单:", good.GoodID, good.Flag, delta);
 
                         //更新子订单
                         tran.query(__updateOrderGood, Object.assign(good, { ID: _g.ID }), function (err, rest) {
 
+                            if (err) {
+                                return callback(err);
+                            }
+
                             //需要更新库存
-                            if (delta > 0) {
+                            if (delta != 0) {
 
                                 console.log("更新库存信息:", new Date().getTime());
                                 //更新库存信息
-                                tran.query(__updateStocks, { GoodID: good.GoodID, DeltaQuantity: -delta }, function (err, rest) {
+                                tran.query(__updateStocks, { GoodID: good.GoodID, DeltaQuantity: delta }, function (err, rest) {
                                     if (err) {
                                         return callback(err);
                                     }
 
                                     //保存库存更新记录
-                                    console.log("保存库存更新记录:", new Date().getTime());
+                                    console.log(new Date().getTime(), "保存库存更新记录:");
                                     tran.query(__saveStockChangeRecord, { OperatorID, GoodID: good.GoodID, DeltaQuantity: delta, Remark: "订单修改", Type: 3, RelatedObjectID: ID, SalePrice: good.FinalPrice }, function (err, rest) {
                                         if (err) {
                                             return callback(err);
@@ -988,15 +1001,16 @@ Order.prototype.update = function (order, callback) {
                         })
                     }
                 }, function (err) {
-                    console.log("提交或回滚事务:", new Date().getTime());
+
                     if (err) {
+                        console.log(new Date().getTime(), "回滚事务;", err);
                         tran.rollback(() => {
                             tran.end();
                             return callback(err);
                         });
                     } else {
+                        console.log(new Date().getTime(), "提交事务;");
                         tran.commit(err => {
-
                             if (err) {
                                 tran.rollback(() => {
                                     tran.end();
@@ -1063,6 +1077,11 @@ Order.prototype.save = function (order, callback) {
             async.each(Goods, function (good, callback) {
                 good.OrderID = orderId;
                 good.GoodName = good.Name;
+
+                //订单中被删除的商品，添加时直接忽略掉
+                if (good.Flag == -1) {
+                    return callback(null, null);
+                }
 
                 //更新库存
                 tran.query(__updateStocks, good, function (err, res) {

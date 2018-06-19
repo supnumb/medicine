@@ -116,9 +116,6 @@ exports.deleteVendor = (req, res, next) => {
  * @param  {Number}   req.body.Limit 每页几条
  */
 exports.vendorList = (req, res, next) => {
-
-    console.log(req.body);
-
     let {
         KeyWord = '',
         Page = 0,

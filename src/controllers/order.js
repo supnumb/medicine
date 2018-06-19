@@ -45,8 +45,6 @@ exports.edit = (req, res, next) => {
 
     let { ID, MemberID, OperatorID = user.ID, EmployeeID, Address, MemberName: Connact, Telephone, ReceiptAmount = 0, PayStyle = 3, DeliveryCompany = '', DeliveryFee = 0, DeliverCode = '', DeliverReceiptFee = 0, DeliveryReceive = 0, DeliveryInsure = 0, Remark = '', Goods } = req.body;
 
-    console.log(req.body);
-
     if (!MemberID || !EmployeeID || !Address || !Connact || !Telephone || !ReceiptAmount || !PayStyle || Goods.length == 0) {
         return res.send({ code: 2, message: "参数不完整" });
     };
@@ -63,6 +61,8 @@ exports.edit = (req, res, next) => {
             console.error(err);
             return res.send({ code: 2, message: "数据库操作有误！", data: err });
         };
+
+        console.log({ mem });
 
         return res.send({ code: 0, message: "编辑销售订单操作成功！", data: { ID: mem.ID } });
     });

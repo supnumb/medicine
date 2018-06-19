@@ -295,6 +295,8 @@ class OrderEditor extends React.Component {
 
         console.log({ values, orderGoods });
 
+        let loading = isFetching ? (<Icon icon='spinner' spin />) : ("");
+
         let goodSelector = ("");
 
         if (isShowGoodSearchZone) {
@@ -472,7 +474,7 @@ class OrderEditor extends React.Component {
 
                     <hr />
                     <OrderGoodList orderGoods={orderGoods} onShowSelectorZone={() => { Store.dispatch({ type: "SWITCH_SELECTOR_SHOW", payload: true }) }} />
-
+                    {loading}
                     <hr />
 
                     <div className="form-group">

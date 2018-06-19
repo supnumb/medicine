@@ -3,6 +3,7 @@ import Store from './Reducer';
 import { Icon, Radio, RadioGroup } from 'rsuite';
 import { Form, Field, createFormControl } from 'form-lib';
 import { SchemaModel, StringType } from 'rsuite-schema';
+import Moment from 'moment';
 
 import ReceiptEditor from './ReceiptEditor';
 
@@ -69,8 +70,8 @@ class ReceiptList extends React.Component {
         })
     }
 
-    _settle(receiptID) {
-        let data = { ID: receiptID };
+    _settle(receiptID, Status) {
+        let data = { ID: receiptID, Status };
 
         fetch('/api/receipt/settle', {
             body: JSON.stringify(data),
@@ -125,13 +126,15 @@ class ReceiptList extends React.Component {
             <td>{r.VendorName}</td>
             <td>{r.Goods}</td>
             <td>{r.Amount}</td>
+            <td>{r.Flag == 0 ? "进货单" : "退货单"}</td>
             <td>{r.Date}</td>
+            <td>{Moment(r.CreateTime).format("YYYY-MM-DD")}</td>
             <td>
 
                 <a href="#" disabled={true} onClick={() => {
                     this.props.history.push({
                         pathname: "/receipt/editor",
-                        state: r
+                        state: { receipt: r, isReturn: Number.parseInt(r.Flag) == 1 }
                     })
                 }}>编辑</a>
 
@@ -161,10 +164,19 @@ class ReceiptList extends React.Component {
                                 <button onClick={() => {
                                     this.props.history.push({
                                         pathname: "/receipt/editor",
-                                        state: { ID: 0 }
+                                        state: { ID: 0, isReturn: false }
                                     })
                                 }} className="btn btn-default">
-                                    添加新进货单
+                                    添加进货单
+                                </button>
+                                &nbsp;
+                                <button onClick={() => {
+                                    this.props.history.push({
+                                        pathname: "/receipt/editor",
+                                        state: { ID: 0, isReturn: true }
+                                    })
+                                }} className="btn btn-default">
+                                    添加退货单
                                 </button>
                             </div>
                         </Form>
@@ -186,7 +198,9 @@ class ReceiptList extends React.Component {
                             <th>供应商</th>
                             <th>药品</th>
                             <th>金额</th>
+                            <th>类型</th>
                             <th>日期</th>
+                            <th>创建</th>
                             <th>操作</th>
                         </tr>
                     </thead>

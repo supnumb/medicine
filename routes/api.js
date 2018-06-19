@@ -96,9 +96,6 @@ router.post('/vendor/:VendorID', member.checkUser, vendor.vendorInfo);
 //入库单添加、修改
 router.post('/receipt/save', member.checkUser, receipt.save);
 
-//入库单退回
-router.post('/receipt/return', member.checkUser, receipt.update);
-
 //入库单查询
 router.post('/receipt/search', member.checkUser, receipt.receiptList);
 
