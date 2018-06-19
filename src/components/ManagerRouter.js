@@ -14,10 +14,13 @@ import {
     MainMenu,
     OrderEditor,
     ReceiptEditor,
-    EmployeeSignIn
+    EmployeeSignIn,
+    EmployeeList,
+    EmployeeEditor
 } from './index';
 
 import '../../public/stylesheets/rsuite.less';
+// import EmployeeList from './EmployeeList';
 
 const routes = [
     // {
@@ -57,9 +60,20 @@ const routes = [
         path: "/goods/",
         extra: true,
         component: GoodList
-    }, {
-        path: "/back_index",
+    },
+    {
+        path: "/employees/",
         extra: true,
+        component: EmployeeList
+    },
+    {
+        path: "/employees/editor",
+        extra: true,
+        component: EmployeeEditor
+    },
+    {
+        path: "/back_index",
+        extra: false,
         component: SiteIndex
     }
 ];

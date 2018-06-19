@@ -85,6 +85,7 @@ const defaultState = {
     },
     employeeList: {
         employees: [],
+        employee: null,
         isFetching: false
     }
 };
@@ -100,10 +101,12 @@ function XXXXReducer(state = defaultState.xxxx, action) {
 
 function EmployeesReducer(state = defaultState.employeeList, action) {
     switch (action.type) {
-        case "FETCH_EMPLOYEE":
+        case "FETCH_EMPLOYEES":
             return Object.assign({}, state, { isFetching: true });
-        case "FETCH_EMPLOYEE_DONE":
-            return Object.assign({}, state, { employees: acorn.payload, isFetching: false })
+        case "FETCH_EMPLOYEES_DONE":
+            return Object.assign({}, state, { employees: action.payload, isFetching: false });
+        case "SET_EDITOR_MODE":
+            return Object.assign({}, state, { action: action.payload.action, employee: action.payload.employee });
         default:
             return state;
     }

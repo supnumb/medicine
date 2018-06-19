@@ -32,10 +32,6 @@ function Receipt() {
     Base.apply(this, arguments);
 };
 
-// function ReceiptTran() {
-
-// }
-
 /**
  * 更新进货单信息
  *
@@ -50,7 +46,7 @@ function Receipt() {
 Receipt.prototype.update = function (receiptData, callback) {
     let __updateReceipt = "update Receipts set VendorName=:VendorName,VendorID=:VendorID,OperatorID=:OperatorID,Date=:Date where ID=:ID;";
 
-    let __updateReceiptGood = "update ReceiptGoods set Quantity=:Quantity,ExpiryDate=:ExpiryDate,BatchNo=:BatchNo,CostPrice=:CostPrice where ReceiptID=:ReceiptID and GoodID=:GoodID;";
+    let __updateReceiptGood = "update ReceiptGoods set Quantity=:Quantity,ExpiryDate=:ExpiryDate,BatchNo=:BatchNo,CostPrice=:CostPrice,Flag=:Flag where ReceiptID=:ReceiptID and GoodID=:GoodID;";
 
     let __addReceiptGood = "insert into ReceiptGoods (ReceiptID,GoodID,CostPrice,Quantity,ValiableQuantity,ExpiryDate,BatchNo) values (:ReceiptID,:GoodID,:CostPrice,:Quantity,:ValiableQuantity,:ExpiryDate,:BatchNo)";
 
@@ -507,8 +503,6 @@ Receipt.prototype.settle = function (ID, Status, callback) {
     });
 
 };
-
-
 
 module.exports.Receipt = new Receipt();
 // module.exports.ReceiptTran = new ReceiptTran();

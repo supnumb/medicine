@@ -29,8 +29,6 @@ class ReceiptGoodList extends React.Component {
 
         let { goods } = this.props;
 
-        console.log(goods, g);
-
         goods.forEach(good => {
             if (good.GoodID == g.GoodID) {
                 good[id] = value;
@@ -85,30 +83,37 @@ class ReceiptGoodList extends React.Component {
 
         let jsx = goods.map((g, index) => {
 
+            if (g.Flag == -1) {
+                return;
+            }
+
             if (receiptGood && receiptGood.GoodID == g.GoodID) {
                 return (<tr key={index}>
                     <td>{g.GoodID} </td>
                     <td>{g.Name}</td>
                     <td>{g.Dimension}</td>
-                    <td>{g.Unit}</td>
                     <td>{g.Manufacturer}</td>
                     <td>
+                        <input disabled={isEditabled} onChange={(event) => {
+                            this.onTextChanged(event, g);
+                        }} style={{ "width": "40px" }} type="text" id="CostPrice" value={g.CostPrice} placeholder="成本价" /></td>
+
+                    <td><input disabled={isEditabled} onChange={(event) => {
+                        this.onTextChanged(event, g);
+                    }} style={{ "width": "40px" }} type="text" id="Quantity" value={g.Quantity} placeholder="数量" /></td>
+
+                    <td><input disabled={isEditabled} onChange={(event) => {
+                        this.onTextChanged(event, g);
+                    }} style={{ "width": "80px" }} type="text" id="BatchNo" value={g.BatchNo} placeholder="批号" /></td>
+
+                    <td>
+
                         <DatePicker name="Date" id="Date" value={Moment(g.ExpiryDate)} onChange={(date) => {
                             g.ExpiryDate = Moment(date).format("YYYY-MM-DD");
                             this.setState({ goods });
                         }} placeholder="有效期" />
 
                     </td>
-                    <td>
-                        <input disabled={isEditabled} onChange={(event) => {
-                            this.onTextChanged(event, g);
-                        }} style={{ "width": "40px" }} type="text" id="CostPrice" value={g.CostPrice} placeholder="成本价" /></td>
-                    <td><input disabled={isEditabled} onChange={(event) => {
-                        this.onTextChanged(event, g);
-                    }} style={{ "width": "40px" }} type="text" id="Quantity" value={g.Quantity} placeholder="数量" /></td>
-                    <td><input disabled={isEditabled} onChange={(event) => {
-                        this.onTextChanged(event, g);
-                    }} style={{ "width": "80px" }} type="text" id="BatchNo" value={g.BatchNo} placeholder="批号" /></td>
 
                     <td><input onChange={(event) => {
                         this.onTextChanged(event, g);
@@ -117,6 +122,7 @@ class ReceiptGoodList extends React.Component {
                         <a href="#" onClick={() => {
                             this.setState({ receiptGood: null })
                         }}>保存</a>
+
                     </td>
                 </tr>);
 
@@ -125,17 +131,26 @@ class ReceiptGoodList extends React.Component {
                     <td>{g.GoodID} </td>
                     <td>{g.Name}</td>
                     <td>{g.Dimension}</td>
-                    <td>{g.Unit}</td>
                     <td>{g.Manufacturer}</td>
-                    <td>{g.ExpiryDate}</td>
                     <td>{g.CostPrice}</td>
                     <td>{g.Quantity}</td>
                     <td>{g.BatchNo}</td>
+                    <td>{g.ExpiryDate}</td>
                     <td></td>
                     <td>
                         <a href="#" onClick={() => {
                             this.setState({ receiptGood: g })
                         }}>编辑</a>
+                        <br />
+                        <a href="#" onClick={() => {
+                            g.Flag = -1;
+                            g.Quantity = 0;
+                            g.BatchNo = "";
+                            g.CostPrice = "";
+                            g.ExpiryDate = null;
+
+                            this.setState({ receiptGood: g });
+                        }}>删除</a>
                     </td>
                 </tr>);
             }
@@ -149,12 +164,11 @@ class ReceiptGoodList extends React.Component {
                         <th>ID</th>
                         <th>药名</th>
                         <th>规格</th>
-                        <th>单位</th>
                         <th>厂家</th>
-                        <th>有效期</th>
                         <th>进价</th>
                         <th>数量</th>
                         <th>批号</th>
+                        <th>有效期</th>
                         <th>退回</th>
                         <th>操作</th>
                     </tr>
@@ -164,7 +178,7 @@ class ReceiptGoodList extends React.Component {
                 </tbody>
                 <tfoot>
                     <tr>
-                        <td colSpan="11"> <button style={{ "float": "right" }} onClick={() => {
+                        <td colSpan="10"> <button style={{ "float": "right" }} onClick={() => {
                             if (this.props.onAddGood) {
                                 this.props.onAddGood();
                             }

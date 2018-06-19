@@ -1,12 +1,12 @@
 import React from 'react';
-import {Route, BrowserRouter as Router, Switch, NavLink, Link} from 'react-router-dom';
+import { Route, BrowserRouter as Router, Switch, NavLink, Link } from 'react-router-dom';
 
 const MainMenu = () => (<ul id="back_menu" className="nav nav-sidebar">
     <li>
         <NavLink to="/back_index">默认页</NavLink>
     </li>
     <li>
-        <NavLink to="/orders" activeClassName="checked">销售订单</NavLink>
+        <NavLink to="/orders" activeClassName="checked">销售单</NavLink>
     </li>
     <li>
         <NavLink to="/receipts" activeClassName="checked">进货单</NavLink>
@@ -23,7 +23,9 @@ const MainMenu = () => (<ul id="back_menu" className="nav nav-sidebar">
     <li>
         <NavLink to="/vendors" activeClassName="checked">供应商</NavLink>
     </li>
-
+    <li>
+        <NavLink to="/employees" activeClassName="checked">账户</NavLink>
+    </li>
 </ul>);
 
 export default MainMenu;

@@ -218,6 +218,7 @@ class ReceiptEditor extends React.Component {
     _onGoodSelectorChanged(selected) {
         let { receiptGoods } = this.state;
 
+
         if (selected) {
             selected.forEach(sg => {
                 let isHas = false;
@@ -236,9 +237,15 @@ class ReceiptEditor extends React.Component {
                         CostPrice: sg.DefaultCostPrice,
                         Name: sg.Name,
                         OfficalName: sg.OfficalName,
+                        Flag: 0
                     });
                 }
             })
+
+            console.log(selected);
+            console.log(receiptGoods);
+
+            receiptGoods.forEach(g => g.Flag = 0);
 
             this.setState({ receiptGoods });
         }
