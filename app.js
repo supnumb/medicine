@@ -10,8 +10,16 @@ var config = require('./config');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var apiRouter = require('./routes/api');
+// var numbers=require('n')
 
 var app = express();
+
+// app.locals.numberformat=function(str,test){
+
+// }
+
+
+
 
 // view engine setup    
 // app.set('views', path.join(__dirname, 'views'));
@@ -30,8 +38,6 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 let redisConfig = config.GetCache();
-
-console.log({ redisConfig });
 
 app.use(session({
     secret: 'medicineWeb',

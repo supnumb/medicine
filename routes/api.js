@@ -82,6 +82,9 @@ router.post('/order/search', member.checkUser, order.orderList);
 //销售订单详情
 router.post('/order/info', member.checkUser, order.orderInfo);
 
+router.post('/order/print_ticket', member.checkUser, order.printOrder);
+router.post('/order/print_deliver', member.checkUser, order.printDeliver);
+
 //供应商添加
 router.post('/vendor/save', member.checkUser, vendor.addVendor);
 

@@ -62,6 +62,7 @@
         "less-loader": "^4.1.0",
         "node-sass": "^4.8.3",
         "nodemon": "^1.17.3",
+        "numeral": "^2.0.6",
         "phantom": "^6.0.0",
         "react": "^16.3.1",
         "react-bootstrap-typeahead": "^3.1.3",

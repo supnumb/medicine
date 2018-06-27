@@ -106,6 +106,8 @@ class ReceiptGoodList extends React.Component {
 
                         <td> {Moment(g.ExpiryDate).format("YYYY-MM-DD")} </td>
 
+                        <td> {Moment(g.ManufactureDate).format("YYYY-MM-DD")} </td>
+
                         <td>
                             <a href="#" onClick={() => {
                                 this.setState({ receiptGood: null })
@@ -141,6 +143,16 @@ class ReceiptGoodList extends React.Component {
 
                         </td>
                         <td>
+
+                            <DatePicker name="ManufactureDate" id="ManufactureDate" value={Moment(g.ManufactureDate)} onChange={(date) => {
+                                g.ManufactureDate = Moment(date).format("YYYY-MM-DD");
+                                this.setState({ goods });
+                            }} placeholder="生产日期" />
+
+                        </td>
+
+
+                        <td>
                             <a href="#" onClick={() => {
                                 this.setState({ receiptGood: null })
                             }}>确定</a>
@@ -157,6 +169,7 @@ class ReceiptGoodList extends React.Component {
                     <td>{g.Quantity}</td>
                     <td>{g.BatchNo}</td>
                     <td>{g.ExpiryDate}</td>
+                    <td>{g.ManufactureDate}</td>
                     <td>
                         {
                             isEditabled ? ("编辑") : (<a href="#" onClick={() => { this.setState({ receiptGood: g }) }}>编辑</a>)
@@ -192,6 +205,7 @@ class ReceiptGoodList extends React.Component {
                         <th>数量</th>
                         <th>批号</th>
                         <th>有效期</th>
+                        <th>生产日期</th>
                         <th>操作</th>
                     </tr>
                 </thead>

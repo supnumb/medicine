@@ -35,6 +35,8 @@ class OrderEditor extends React.Component {
         this.loadEmployeesFromDB = this._loadEmployeesFromDB.bind(this);
         this.loadMembersFromDB = this._loadMembersFromDB.bind(this);
         this.onSelectMember = this._onSelectMember.bind(this);
+        this.printDeliverTicket = this._printDeliverTicket.bind(this);
+        this.printOrderTicket = this._printOrderTicket.bind(this);
     }
 
     componentWillUnmount() {
@@ -278,6 +280,74 @@ class OrderEditor extends React.Component {
         })
     }
 
+    _openPdfAndPrint(url) {
+        let wPop = window.open(url, 'wPop');
+        wPop.print();
+        wPop.close();
+    }
+
+    _printOrderTicket(orderid) {
+
+        console.log("打印小票中....", orderid);
+        Store.dispatch({ type: "PRINT_ORDER" });
+
+        fetch('/api/order/print_ticket', {
+            body: JSON.stringify({ orderid }),
+            method: 'POST',
+            mode: 'same-origin',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }
+        ).then(res => res.json()).then(json => {
+            if (json.code == 0) {
+
+                let wPop = window.open(json.data.path, 'wPop');
+                wPop.print();
+                // wPop.close();
+
+                Store.dispatch({ type: "PRINT_ORDER_DONE" });
+            } else {
+                Store.dispatch({ type: "PRINT_ORDER_DONE" });
+                alert(json.message)
+            }
+        }).catch(err => {
+            Store.dispatch({ type: "PRINT_ORDER_DONE" });
+            console.log(err);
+        })
+    }
+
+    _printDeliverTicket(orderid) {
+        console.log("打印快递单中....");
+        Store.dispatch({ type: "PRINT_DELIVER_TICKET" });
+
+        fetch('/api/order/print_deliver', {
+            body: JSON.stringify({ orderid }),
+            method: 'POST',
+            mode: 'same-origin',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }
+        ).then(res => res.json()).then(json => {
+            if (json.code == 0) {
+                let wPop = window.open(json.data.path, 'wPop');
+                wPop.print();
+                // wPop.close();
+
+                Store.dispatch({ type: "PRINT_DELIVER_DONE" });
+            } else {
+                Store.dispatch({ type: "PRINT_DELIVER_DONE" });
+                alert(json.message)
+            }
+        }).catch(err => {
+            Store.dispatch({ type: "PRINT_DELIVER_DONE" });
+            console.log(err);
+        })
+    }
+
     render() {
         let {
             orderEditor: {
@@ -289,11 +359,12 @@ class OrderEditor extends React.Component {
                 isFetching,
                 employees,
                 members,
-                message
+                message,
+                isPrintingOrder, isPrintingDeliverTicket
             }
         } = this.state;
 
-        console.log({ values, orderGoods });
+        // console.log({ values, orderGoods });
 
         let loading = isFetching ? (<Icon icon='spinner' spin />) : ("");
 
@@ -389,8 +460,8 @@ class OrderEditor extends React.Component {
                             }>
                                 <Radio value="未发">未发</Radio>
                                 <Radio value="圆通">圆通</Radio>
-                                <Radio value="顺丰">顺丰</Radio>
-                                <Radio value="韵达">韵达</Radio>
+                                <Radio value="中通">中通</Radio>
+                                <Radio value="中通">中通</Radio>
                             </RadioGroup>
 
                         </div>
@@ -466,9 +537,13 @@ class OrderEditor extends React.Component {
                     <div className="form-group">
                         <label className=" col-md-2"></label>
                         <div className="col-md-4">
-                            <button className="btn btn-info btn-sm">打小票</button>
+                            <button className="btn btn-info btn-sm" disabled={isPrintingOrder} onClick={
+                                () => this.printOrderTicket(order.ID)
+                            }>{isPrintingOrder ? "打印中.." : "打小票"}</button>
                             &nbsp;&nbsp;
-                            <button className="btn btn-info btn-sm">打快递单</button>
+                            <button className="btn btn-info btn-sm" disabled={isPrintingDeliverTicket} onClick={
+                                () => this.printDeliverTicket(order.ID)
+                            }>{isPrintingDeliverTicket ? "打印中.." : "打快递单"}</button>
                         </div>
                     </div>
 
@@ -493,7 +568,7 @@ class OrderEditor extends React.Component {
 
             {goodSelector}
 
-        </div>);
+        </div >);
     }
 }
 

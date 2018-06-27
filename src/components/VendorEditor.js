@@ -18,7 +18,8 @@ class VendorEditor extends React.Component {
 
         this.state = {
             values: {},
-            errors: {}
+            errors: {},
+            isFetching: false
         }
 
         this.saveVendor = this._saveVendor.bind(this);
@@ -31,6 +32,8 @@ class VendorEditor extends React.Component {
         }
 
         let { values } = this.state;
+
+        this.setState({ isFetching: true });
 
         fetch(`/api/vendor/save`, {
             body: JSON.stringify(values),
@@ -47,7 +50,9 @@ class VendorEditor extends React.Component {
                 this.props.onSaveCompleted();
                 alert(json.message);
             }
+            this.setState({ isFetching: false });
         }).catch(err => {
+            this.setState({ isFetching: false });
             console.error(err);
         })
 
@@ -92,7 +97,7 @@ class VendorEditor extends React.Component {
 
     render() {
         let { vendor } = this.props;
-        let { values, errors, message } = this.state;
+        let { values, errors, message, isFetching } = this.state;
 
         return (<div id="VendorEditor" className="editor_zone">
             <h4>供应商管理</h4>
@@ -161,8 +166,8 @@ class VendorEditor extends React.Component {
 
                 <div className="form-group">
                     <label className="control-label col-sm-3"></label>
-                    <button onClick={this.saveVendor} className="btn btn-primary">
-                        保存
+                    <button onClick={this.saveVendor} disabled={isFetching} className="btn btn-primary">
+                        {isFetching ? "保存中.." : "保存"}
                     </button>
                     &nbsp;&nbsp;
                     <button className="btn btn-default" onClick={() => {

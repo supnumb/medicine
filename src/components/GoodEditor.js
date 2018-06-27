@@ -80,7 +80,7 @@ class GoodEditor extends React.Component {
         let { good, action } = nextProps;
         let { good: oldGood } = this.props;
 
-        // console.log({action, good});
+        console.log({ action, good });
 
         if (good && oldGood) {
             if (good.ID != oldGood.ID) {
@@ -217,8 +217,6 @@ class GoodEditor extends React.Component {
                     <p className="text-danger">{errors.PeriodTreatment}</p>
                 </div>
 
-
-
                 <div className="form-group">
                     <label className="control-label col-sm-3">
                         <span className="red">*</span>是否进口:
@@ -231,8 +229,8 @@ class GoodEditor extends React.Component {
                                 this.setState({ values })
                             }
                         }>
-                            <Radio value="0">非进口</Radio>
-                            <Radio value="1">进口</Radio>
+                            <Radio value={0}>非进口</Radio>
+                            <Radio value={1}>进口</Radio>
                         </RadioGroup>
                     </div>
                 </div>

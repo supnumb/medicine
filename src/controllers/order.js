@@ -14,8 +14,22 @@
  */
 
 const moment = require('moment');
+let page = require("phantom");
+let config = require('../../config');
 
 const { Order, OrderTran } = require('../models/index');
+
+let isJson = (str) => {
+    try {
+        if (typeof JSON.parse(str) == "object") {
+            return true;
+        } else {
+            return false;
+        }
+    } catch (err) {
+        return false;
+    }
+}
 
 /**
  * 编辑销售订单
@@ -113,7 +127,7 @@ exports.cancel = (req, res, next) => {
  */
 exports.orderList = (req, res, next) => {
 
-    console.log(req.body);
+    // console.log(req.body);
 
     let { KeyWord = '', Page = 0, Limit = 10, StartTime = '2018-01-01', EndTime = '' } = req.body;
 
@@ -164,3 +178,103 @@ exports.orderInfo = (req, res, next) => {
 
     });
 }
+
+/**
+ * 打印快递单，返回Pdf文件地址  
+ * @param {Object} req 请求对象
+ * @param {Object} res 响应对象
+ * @param {Function} next 管道操作
+ */
+exports.printOrder = (req, res, next) => {
+    let { orderid } = req.body;
+
+    if (orderid > 0) {
+        page.create().then(function (ph) {
+            ph.createPage().then(function (pg) {
+
+                pg.open(`http://127.0.0.1:3000/order/view_ticket?orderid=${orderid}`).then(function (status) {
+
+                    if (status !== "success") {
+                        return res.send({ code: -1, message: "打印过程出错，请重试" })
+                    } else {
+
+                        pg.property('viewportSize', { width: 120, height: 500 });
+
+                        let deliverTicketPdf = `${config.TempFileRoot}/${orderid}.pdf`;
+                        let url = `${config.UrlTemFile}/${orderid}.pdf`;
+
+                        pg.property("plainText").then(function (jsonText) {
+
+                            let isJ = isJson(jsonText);
+                            if (isJ) {
+                                let json = JSON.parse(jsonText);
+                                return res.send(json);
+                            } else {
+                                pg.render(deliverTicketPdf).then(function () {
+                                    console.log('Page Rendered');
+                                    ph.exit();
+                                    return res.send({ code: 0, message: "开始打印...", data: { path: url } });
+                                })
+                            }
+                        })
+                    }
+                })
+            })
+        })
+    } else {
+        return res.send({ code: 2, message: "请指定打印的订单ID" });
+    }
+};
+
+
+/**
+ * 打印订单
+ * 
+ * @param {Object} req 请求对象 
+ * @param {Object} res 响应
+ * @param {Function} next 管道
+ */
+exports.printDeliver = (req, res, next) => {
+    let { orderid } = req.body;
+
+    if (orderid > 0) {
+        page.create().then(function (ph) {
+
+            ph.createPage().then(function (pg) {
+                pg.open(`http://127.0.0.1:3000/order/view_deliver_ticket?orderid=${orderid}`).then(function (status) {
+                    if (status !== "success") {
+                        return res.send({ code: -1, message: "打印过程出错，请重试" })
+                    } else {
+
+                        pg.property('viewportSize', { width: 120, height: 500 });
+
+                        let deliverTicketPdf = `${config.TempFileRoot}/${orderid}.pdf`;
+                        let url = `${config.UrlTemFile}/${orderid}.pdf`;
+
+                        pg.property("plainText").then(function (jsonText) {
+
+                            let isJ = isJson(jsonText);
+                            if (isJ) {
+                                let json = JSON.parse(jsonText);
+                                return res.send(json);
+                            } else {
+
+                                pg.render(deliverTicketPdf).then(function () {
+                                    console.log('Page Rendered');
+                                    ph.exit();
+                                    return res.send({ code: 0, message: "开始打印...", data: { path: url } });
+                                })
+                            }
+                        })
+
+                    }
+                })
+            })
+        }).catch(err => {
+            console.log(err);
+            ph.exit();
+        })
+    } else {
+        return res.send({ code: 2, message: "请指定打印的订单ID" });
+    }
+};

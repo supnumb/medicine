@@ -32,7 +32,9 @@ const defaultState = {
         message: "",
         isShowGoodSearchZone: false,
         employees: [],
-        members: []
+        members: [],
+        isPrintingOrder: false,
+        isPrintingDeliverTicket: false
     },
     memberList: {
         isFetching: false,
@@ -357,6 +359,14 @@ function OrderEditorReducer(state = defaultState.orderEditor, action) {
             return Object.assign({}, state, {
                 members: action.payload
             });
+        case "PRINT_ORDER":
+            return Object.assign({}, state, { isPrintingOrder: true });
+        case "PRINT_ORDER_DONE":
+            return Object.assign({}, state, { isPrintingOrder: false });
+        case "PRINT_DELIVER_TICKET":
+            return Object.assign({}, state, { isPrintingDeliverTicket: true });
+        case "PRINT_DELIVER_DONE":
+            return Object.assign({}, state, { isPrintingDeliverTicket: false });
         default:
             return state;
     }

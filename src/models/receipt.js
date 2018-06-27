@@ -13,12 +13,12 @@ function Receipt() {
         _receiptQuantity: "select count(r.ID) as Quantity from Receipts r,ReceiptGoods p,Goods g,Vendors v,Members m  where r.ID=p.ReceiptID and p.GoodID=g.ID and r.VendorID=v.ID and r.OperatorID=m.ID and r.Date>=:StartTime and r.Date<=:EndTime and concat(r.ID,g.Name) like :KeyWord;",
 
         //列表
-        _search: "SELECT r.*, m. NAME AS EmployeeName , group_concat(g. NAME) AS Goods ,(p.CostPrice*(p.Quantity-p.ReturnQuantity)) as Amount , p.CostPrice , v.Contact , v.Telephone , v.Address FROM Receipts r INNER JOIN ReceiptGoods p ON r.ID = p.ReceiptID INNER JOIN Goods g ON p.GoodID = g.ID INNER JOIN Vendors v ON r.VendorID = v.ID INNER JOIN Members m ON r.OperatorID = m.ID WHERE r.Date >=:StartTime AND r.Date <=:EndTime AND concat( r.VendorName , g.NAME , v.Telephone , v.Address , v.Contact) LIKE :KeyWord and r.Status in (:Status) GROUP BY r.ID ORDER BY r.CreateTime DESC LIMIT :Page,:Limit;",
+        _search: "SELECT r.*, m. NAME AS EmployeeName , group_concat(g. NAME) AS Goods ,SUM(p.CostPrice*p.ValiableQuantity) as Amount , p.CostPrice , v.Contact , v.Telephone , v.Address FROM Receipts r INNER JOIN ReceiptGoods p ON r.ID = p.ReceiptID INNER JOIN Goods g ON p.GoodID = g.ID INNER JOIN Vendors v ON r.VendorID = v.ID INNER JOIN Members m ON r.OperatorID = m.ID WHERE r.Date >=:StartTime AND r.Date <=:EndTime AND concat( r.VendorName , g.NAME , v.Telephone , v.Address , v.Contact) LIKE :KeyWord and r.Status in (:Status) GROUP BY r.ID ORDER BY r.CreateTime DESC LIMIT :Page,:Limit;",
 
         //详情
-        _ReceiptInfo: "select r.*,v.Name,v.Telephone,v.Address,v.Contact,v.Remark from Receipts r left join Vendors v on r.VendorID=v.ID left join Members m on r.OperatorID=m.ID where r.ID=:ID;",
+        _receiptInfo: "select r.*,v.Name,v.Telephone,v.Address,v.Contact,v.Remark from Receipts r left join Vendors v on r.VendorID=v.ID left join Members m on r.OperatorID=m.ID where r.ID=:ID;",
 
-        _ReceiptGoodInfo: "select r.*,g.* from ReceiptGoods r inner join Goods g on r.GoodID=g.ID where r.ReceiptID=:ID;",
+        _receiptGoodInfo: "select r.*,g.* from ReceiptGoods r inner join Goods g on r.GoodID=g.ID where r.ReceiptID=:ID and r.Flag>=0;",
 
         //结算
         _settle: "update Receipts set status=:Status where ID=:ID "
@@ -46,9 +46,9 @@ function Receipt() {
 Receipt.prototype.update = function (receiptData, callback) {
     let __updateReceipt = "update Receipts set VendorName=:VendorName,VendorID=:VendorID,OperatorID=:OperatorID,Date=:Date where ID=:ID;";
 
-    let __updateReceiptGood = "update ReceiptGoods set Quantity=:Quantity,ExpiryDate=:ExpiryDate,BatchNo=:BatchNo,CostPrice=:CostPrice,Flag=:Flag,ValiableQuantity=Quantity-:ReturnQuantity,ReturnQuantity=:ReturnQuantity where ReceiptID=:ReceiptID and GoodID=:GoodID;";
+    let __updateReceiptGood = "update ReceiptGoods set Quantity=:Quantity,ExpiryDate=:ExpiryDate,ManufactureDate=:ManufactureDate,BatchNo=:BatchNo,CostPrice=:CostPrice,Flag=:Flag,ValiableQuantity=Quantity-:ReturnQuantity,ReturnQuantity=:ReturnQuantity where ReceiptID=:ReceiptID and GoodID=:GoodID;";
 
-    let __addReceiptGood = "insert into ReceiptGoods (ReceiptID,GoodID,CostPrice,Quantity,ValiableQuantity,ReturnQuantity,ExpiryDate,BatchNo) values (:ReceiptID,:GoodID,:CostPrice,:Quantity,:Quantity,:ReturnQuantity,:ExpiryDate,:BatchNo)";
+    let __addReceiptGood = "insert into ReceiptGoods (ReceiptID,GoodID,CostPrice,Quantity,ValiableQuantity,ReturnQuantity,ExpiryDate,ManufactureDate,BatchNo) values (:ReceiptID,:GoodID,:CostPrice,:Quantity,:Quantity,:ReturnQuantity,:ExpiryDate,:ManufactureDate,:BatchNo)";
 
     let __updateStock = "update Stocks set TotalQuantity=TotalQuantity+:DeltaQuantity,ValiableQuantity=ValiableQuantity+:DeltaQuantity where GoodID=:GoodID;";
 
@@ -244,7 +244,7 @@ Receipt.prototype.update = function (receiptData, callback) {
 Receipt.prototype.add = function (receiptData, callback) {
     let __addReceipt = "insert into Receipts (VendorName,VendorID,OperatorID,Date,CreateTime,Flag) values (:VendorName,:VendorID,:OperatorID,:Date,now(),:Flag);";
 
-    let __addReceiptGood = "insert into ReceiptGoods (ReceiptID,GoodID,CostPrice,Quantity,ValiableQuantity,ExpiryDate,BatchNo) values (:ReceiptID,:GoodID,:CostPrice,:Quantity,:Quantity,:ExpiryDate,:BatchNo)";
+    let __addReceiptGood = "insert into ReceiptGoods (ReceiptID,GoodID,CostPrice,Quantity,ValiableQuantity,ExpiryDate,ManufactureDate,BatchNo) values (:ReceiptID,:GoodID,:CostPrice,:Quantity,:Quantity,:ExpiryDate,:ManufactureDate,:BatchNo)";
 
     let __updateStock = "update Stocks set TotalQuantity=TotalQuantity+:Quantity,ValiableQuantity=ValiableQuantity+:Quantity where GoodID=:GoodID;";
 
@@ -422,7 +422,7 @@ Receipt.prototype.search = function (KeyWord, Page, Limit, StartTime, EndTime, S
                 Status
             };
 
-            console.log({ "查询进货单": param });
+            // console.log({ "查询进货单": param });
 
             that._search(param, function (err, db) {
 
@@ -446,7 +446,7 @@ Receipt.prototype.search = function (KeyWord, Page, Limit, StartTime, EndTime, S
 
         rows.forEach(function (element, index) {
 
-            // rows[index].Amount = element.CostPrice * (element.Quantity - element.ReturnQuantity || 0)
+            // rows[index].Amount = ;
             rows[index].Date = moment(rows[index].Date).format('YYYY-MM-DD');
             rows[index].CreateTime = moment(rows[index].CreateTime).format('YYYY-MM-DD HH:mm:ss');
             rows[index].UpdateTime = moment(rows[index].UpdateTime).format('YYYY-MM-DD HH:mm:ss');
@@ -466,7 +466,7 @@ Receipt.prototype.receiptInfo = function (ID, callback) {
     let that = this;
     async.parallel([
         function (cb) {
-            that._ReceiptInfo({
+            that._receiptInfo({
                 ID: ID
             }, function (err, rows) {
                 if (err) {
@@ -478,7 +478,7 @@ Receipt.prototype.receiptInfo = function (ID, callback) {
 
         },
         function (cb) {
-            that._ReceiptGoodInfo({
+            that._receiptGoodInfo({
                 ID: ID
             }, function (err, rows) {
 
@@ -511,6 +511,12 @@ Receipt.prototype.receiptInfo = function (ID, callback) {
         ReceiptGood.forEach(function (element, index) {
 
             ReceiptGood[index].ExpiryDate = moment(ReceiptGood[index].ExpiryDate).format('YYYY-MM-DD');
+
+            if (ReceiptGood[index].ManufactureDate) {
+                ReceiptGood[index].ManufactureDate = moment(ReceiptGood[index].ManufactureDate).format('YYYY-MM-DD');
+            } else {
+                ReceiptGood[index].ManufactureDate = moment().format('YYYY-MM-DD');
+            }
 
         });
 

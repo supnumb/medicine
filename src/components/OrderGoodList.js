@@ -33,8 +33,6 @@ class OrderGoodList extends React.Component {
         const id = target.id;
         let val = value;
 
-        console.log(/\d+/.test(val));
-
         if (!/\d+/.test(val)) {
             val = 0;
         }
@@ -75,7 +73,7 @@ class OrderGoodList extends React.Component {
 
         let loading = isFetching ? (<Icon icon='spinner' spin />) : ("");
 
-        console.log({ orderGood });
+        // console.log({ orderGood });
 
         let listJsx = orderGoods.map((og, index) => {
 
@@ -91,7 +89,7 @@ class OrderGoodList extends React.Component {
                     <td>{og.Dimension}</td>
                     <td>{og.Unit}</td>
                     <td>
-                        <input style={{ "width": "60px" }} id="FinalPrice" value={og.FinalPrice || og.DefaultPrice} onChange={(event) => { this.onTextChanged(event, og); }} />
+                        <input style={{ "width": "60px" }} id="FinalPrice" value={og.FinalPrice} onChange={(event) => { this.onTextChanged(event, og); }} />
                     </td>
                     <td>
                         <input style={{ "width": "60px" }} id="Quantity" value={og.Quantity} onChange={(event) => {
@@ -114,7 +112,7 @@ class OrderGoodList extends React.Component {
                     <td>{og.GoodName || og.Name}</td>
                     <td>{og.Dimension}</td>
                     <td>{og.Unit}</td>
-                    <td>{og.DefaultPrice || og.FinalPrice}</td>
+                    <td>{og.FinalPrice}</td>
                     <td>{og.Quantity}</td>
                     <td>{og.GoodSumPrice}</td>
                     <td>{og.Manufacturer}</td>

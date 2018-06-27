@@ -209,9 +209,9 @@ Member.prototype.memberList = function (KeyWord, MobilPhone, Page, Limit, OrderB
         rows.forEach(function (element, index) {
 
             if (element.Gender == 1) {
-                rows[index].Gender = "男";
+                rows[index].GenderLabel = "男";
             } else {
-                rows[index].Gender = "女";
+                rows[index].GenderLabel = "女";
             }
 
             if (element.IsWeixinFriend == 1) {

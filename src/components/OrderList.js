@@ -60,7 +60,7 @@ class OrderList extends React.Component {
                 'Content-Type': 'application/json'
             }
         }).then(res => res.json()).then(json => {
-            console.log(json);
+            // console.log(json);
             if (json.code == 0) {
                 Store.dispatch({ type: "FETCH_ORDERS_DONE", payload: json.data })
             } else {
@@ -95,7 +95,7 @@ class OrderList extends React.Component {
             <td>{o.Name}</td>
             <td>{o.MobilPhone}</td>
             <td>{o.GoodNames}</td>
-            <td>{o.ReceiptAmount}</td>
+            <td>{o.TotalAmount}</td>
             <td>{o.PayStyleLabel}</td>
             <td>{o.DeliveryCompany}</td>
             <td>{o.DeliveryFee}</td>

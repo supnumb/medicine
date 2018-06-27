@@ -1,3 +1,6 @@
+
+let path = require("path");
+
 var config = {
 
     RedisConfig: {
@@ -31,7 +34,7 @@ var config = {
         password: "p1@32I",
         database: "Medicine"
     },
-    
+
     REDIS_TEST: {
         host: '127.0.0.1',
         port: "6379",
@@ -60,7 +63,11 @@ var config = {
         }
 
         return __config;
-    }
+    },
+
+    TempFileRoot: path.join(__dirname, "public/temp"),
+    UrlTemFile: "/temp"
+
 };
 
 module.exports = config;

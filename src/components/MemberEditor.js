@@ -92,7 +92,7 @@ class MemberEditor extends React.Component {
                 values: {
                     Name: "",
                     PinYin: "",
-                    Gender: "0",
+                    Gender: 0,
                     MobilPhone: "",
                     City: "",
                     Address: "",
@@ -169,9 +169,9 @@ class MemberEditor extends React.Component {
                                 this.setState({ values });
                             }
                         }>
-                            <Radio value="0" >未选择</Radio>
-                            <Radio value="1">男生</Radio>
-                            <Radio value="2">女生</Radio>
+                            <Radio value={0} >未选择</Radio>
+                            <Radio value={1}>男生</Radio>
+                            <Radio value={2}>女生</Radio>
                         </RadioGroup>
                     </div>
                 </div>

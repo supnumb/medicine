@@ -86,7 +86,7 @@ class ManagerRouter extends React.Component {
     constructor(props) {
         super(props);
 
-        console.log(props);
+        // console.log(props);
 
         this.state = {
             employee: {}
@@ -99,7 +99,7 @@ class ManagerRouter extends React.Component {
             mode: 'same-origin',
             credentials: 'same-origin'
         }).then(res => res.json()).then(json => {
-            console.log({ json });
+            // console.log({ json });
             if (json.code == 0) {
                 this.setState({ employee: json.data })
             } else {
