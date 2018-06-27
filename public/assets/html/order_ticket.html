@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+
+    <style>
+        body {
+            font-size: 17px;
+            margin: 0px;
+            padding: 0px;
+            font-family:Arial, Helvetica, sans-serif
+        }
+
+        div {
+            padding: 2px 0px;
+            line-height: 140%;
+        }
+
+        .border {
+            display: inline-block;
+            padding: 10px;
+            margin: 0px;
+            width: 220px;
+        }
+
+        h1 {
+            transform: scale(1, 2);
+            font-size: 18px;
+            margin: 15px 0px;
+            text-align: center
+        }
+
+        .good_line {
+            border-bottom: 1px solid #cccccc;
+            padding: 5px 0px;
+            line-height: 140%;
+        }
+
+        hr {
+            border: 1px solid #999999;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="border">
+        <h1>北京美信康年大药房</h1>
+
+        <div>单号：
+            <%= order.ID%>
+        </div>
+        <div>日期：
+            <%= order.CreateDate%>
+        </div>
+        <div>时间：
+            <%= order.Time%>
+        </div>
+        <div>款员：
+            <%= order.OperatorID%>
+        </div>
+
+        <hr />
+
+        <div class="good_line">
+            药品
+            <br /> 规格
+            <br /> 厂家
+            <br /> 单价
+            <br /> 数量
+            <br />
+        </div>
+
+        <% goods.forEach(function(g){%>
+            <div class="good_line">
+                <%= g.Name%>
+                    <br />
+                    <%= g.Dimension%>
+
+
+                        <br />
+                        <%= g.Manufacturer%>
+                            <br />
+                            <%= g.FinalPrice%>
+                                <br />
+                                <%= g.Quantity%>
+                                    <br />
+            </div>
+            <%});%>
+                <div>合计：
+                    <%= order.TotalAmount%>
+                </div>
+
+                <div>应收：
+                    <%= order.ReceiptAmount%>
+                </div>
+                <div>现金：
+                    <%= order.ReceiptAmount%>
+                </div>
+                <hr />
+                <div>电话： 010-67888761 </div>
+                <div>网址：bjmxkn.cn </div>
+                <div>地址： 北京经济技术开发区荣昌东街7号院6号楼1层1005 </div>
+                <div>除药品质量原因外，一经售出不得退换！ </div>
+    </div>
+</body>
+
+</html>

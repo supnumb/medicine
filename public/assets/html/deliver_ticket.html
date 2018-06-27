@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+
+    <style>
+        body {
+            font-size: 14px;
+        }
+
+        .border {
+            display: inline-block;
+            padding: 10px;
+            margin: 0px;
+            width: 220px;
+        }
+
+        h1 {
+            transform: scale(1, 1.5);
+            font-size: 18px;
+            margin-bottom: 20px;
+            text-align: center
+        }
+
+        .good_line {
+            border-bottom: 1px dashed #eee;
+            padding: 5px 0px;
+        }
+
+        hr {
+            border: 1px solid #cccccc;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="border">
+        
+        <%= order.Address%>
+            <%= order.Connact%>
+                <%= order.Telephone%>
+    </div>
+</body>
+
+</html>
