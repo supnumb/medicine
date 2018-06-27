@@ -94,7 +94,10 @@ class ReceiptGoodList extends React.Component {
                         <td>{g.Name}</td>
                         <td>{g.Dimension}</td>
                         <td>{g.Manufacturer}</td>
-                        <td>{g.CostPrice}</td>
+                        <td>
+                            <input disabled={isEditabled} onChange={(event) => {
+                                this.onTextChanged(event, g);
+                            }} style={{ "width": "40px" }} type="text" id="CostPrice" value={g.CostPrice} placeholder="成本价" /></td>
 
                         <td><input disabled={isEditabled} onChange={(event) => {
                             this.onTextChanged(event, g);
@@ -104,9 +107,20 @@ class ReceiptGoodList extends React.Component {
                             this.onTextChanged(event, g);
                         }} style={{ "width": "80px" }} type="text" id="BatchNo" value={g.BatchNo} placeholder="批号" /></td>
 
-                        <td> {Moment(g.ExpiryDate).format("YYYY-MM-DD")} </td>
+                        <td>
+                            <DatePicker name="Date" id="Date" value={Moment(g.ExpiryDate)} onChange={(date) => {
+                                g.ExpiryDate = Moment(date).format("YYYY-MM-DD");
+                                this.setState({ goods });
+                            }} placeholder="有效期" />
 
-                        <td> {Moment(g.ManufactureDate).format("YYYY-MM-DD")} </td>
+                        </td>
+                        <td>
+                            <DatePicker name="ManufactureDate" id="ManufactureDate" value={Moment(g.ManufactureDate)} onChange={(date) => {
+                                g.ManufactureDate = Moment(date).format("YYYY-MM-DD");
+                                this.setState({ goods });
+                            }} placeholder="生产日期" />
+
+                        </td>
 
                         <td>
                             <a href="#" onClick={() => {
@@ -150,7 +164,6 @@ class ReceiptGoodList extends React.Component {
                             }} placeholder="生产日期" />
 
                         </td>
-
 
                         <td>
                             <a href="#" onClick={() => {

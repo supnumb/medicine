@@ -67,7 +67,7 @@ exports.edit = (req, res, next) => {
 
     const orderData = { ID, MemberID, EmployeeID, OperatorID, Address, Connact, Telephone, TotalAmount, ReceiptAmount, PayStyle, DeliveryCompany, DeliveryFee, DeliverCode, DeliverReceiptFee, DeliveryInsure, Remark, Date: new Date(), Goods, DeliveryReceive };
 
-    console.log(orderData);
+    // console.log(orderData);
 
     // OrderTran.edit(orderData, function (err, mem) {
     Order.edit(orderData, function (err, mem) {
