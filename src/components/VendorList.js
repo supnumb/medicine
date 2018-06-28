@@ -5,6 +5,7 @@ import { Form, Field, createFormControl } from 'form-lib';
 import { SchemaModel, StringType } from 'rsuite-schema';
 
 import VendorEditor from './VendorEditor';
+import { default as Pager } from './Pager'
 
 class VendorList extends React.Component {
     constructor(props) {
@@ -31,7 +32,7 @@ class VendorList extends React.Component {
         this.loadVendorsFromDB();
     }
 
-    _loadVendorsFromDB(event) {
+    _loadVendorsFromDB(event, page = 0, limit = 10) {
 
         let {
             vendorList: {
@@ -43,8 +44,8 @@ class VendorList extends React.Component {
 
         if (event) {
             KeyWord = $("#Keyword").val();
-            Page = 0;
-            Limit = 10;
+            Page = page;
+            Limit = limit;
         }
 
         Store.dispatch({ type: "FETCH_VENDORS", payload: { KeyWord, Page, Limit } });
@@ -58,9 +59,9 @@ class VendorList extends React.Component {
                 'Content-Type': 'application/json'
             }
         }).then(res => res.json()).then(json => {
-            console.log(json);
+            // console.log(json);
             if (json.code == 0) {
-                Store.dispatch({ type: "FETCH_VENDORS_DONE", payload: json.data })
+                Store.dispatch({ type: "FETCH_VENDORS_DONE", payload: json })
             } else {
                 alert(json.message);
             }
@@ -82,9 +83,14 @@ class VendorList extends React.Component {
             vendorList: {
                 vendors,
                 vendor,
-                isFetching
+                isFetching,
+                Page,
+                Limit,
+                Total
             }
         } = this.state;
+
+        // console.log({ Page, Limit, Total });
 
         let editorJsx = ("");
         if (vendor) {
@@ -150,6 +156,15 @@ class VendorList extends React.Component {
                     <tbody>
                         {listJsx}
                     </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colSpan={8}>
+                                <Pager start={Page} length={Limit} total={Total} onPageChanged={({ start, length }) =>
+                                    this.loadVendorsFromDB("PAGE", start, length)
+                                } />
+                            </td>
+                        </tr>
+                    </tfoot>
                 </table>
             </div>
             {editorJsx}

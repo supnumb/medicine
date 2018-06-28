@@ -22,14 +22,14 @@ class Pager extends React.Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        let {start: nextStart, length: nextLength, total: nextTotal} = nextProps;
-        let {start, length, total} = this.props;
+        let { start: nextStart, length: nextLength, total: nextTotal } = nextProps;
+        let { start, length, total } = this.props;
 
         if (nextStart == start && length == nextLength && total == nextTotal) {
             return;
         }
 
-        this.setState({start: nextStart, length: nextLength, total: nextTotal});
+        this.setState({ start: nextStart, length: nextLength, total: nextTotal });
     }
 
     render() {
@@ -48,7 +48,7 @@ class Pager extends React.Component {
         let parr = [];
 
         if (current > 1) {
-            parr.push({start: 0, label: "<<", page: 1});
+            parr.push({ start: 0, label: "<<", page: 1 });
             parr.push({
                 start: start - length,
                 label: "<",
@@ -63,7 +63,7 @@ class Pager extends React.Component {
             ? max
             : current + 4;
 
-        for (let p = _start; p < _end; p++) {
+        for (let p = _start; p <= _end; p++) {
             parr.push({
                 start: (p - 1) * length,
                 label: p,
@@ -87,9 +87,9 @@ class Pager extends React.Component {
 
         let pages = parr.map((p, index) => {
             if (current == p.page) {
-                return (<a key={index} className="current" onClick={() => this.props.onPageChanged({start: p.start, length})}>{p.label}</a>);
+                return (<a key={index} className="current" onClick={() => this.props.onPageChanged({ start: p.start, length })}>{p.label}</a>);
             } else {
-                return (<a key={index} href={`javascript:void(${p.page},${p.start})`} onClick={() => this.props.onPageChanged({start: p.start, length})}>{p.label}</a>);
+                return (<a key={index} href={`javascript:void(${p.page},${p.start})`} onClick={() => this.props.onPageChanged({ start: p.start, length })}>{p.label}</a>);
             }
         });
         return (<div className="pager_zone">{pages}&nbsp;共{current}/{max}页</div>)

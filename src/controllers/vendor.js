@@ -122,9 +122,9 @@ exports.vendorList = (req, res, next) => {
         Limit = 10
     } = req.body;
 
-    if (Page > 0) {
-        Page = (Page - 1) * Limit;
-    }
+    // if (Page > 0) {
+    //     Page = (Page - 1) * Limit;
+    // }
 
     Vendor.vendorList(KeyWord, Page, Limit, function (err, mem) {
 

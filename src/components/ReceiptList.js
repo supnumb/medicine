@@ -6,6 +6,7 @@ import { SchemaModel, StringType } from 'rsuite-schema';
 import Moment from 'moment';
 
 import ReceiptEditor from './ReceiptEditor';
+import { default as Pager } from './Pager'
 
 class ReceiptList extends React.Component {
     constructor(props) {
@@ -22,20 +23,22 @@ class ReceiptList extends React.Component {
         this.settle = this._settle.bind(this);
     }
 
-    _loadReceiptsFromDB(event, status) {
+    _loadReceiptsFromDB(event, status, page = 0, limit = 10) {
 
         let {
             receiptList: {
                 KeyWord,
                 Page,
                 Limit,
-                Status
+                Status,
+                Total
             }
         } = this.state;
 
         if (event) {
             KeyWord = $("#Keyword").val();
-            Page: 0
+            Page = page;
+            Limit = limit
         }
 
         Status = status == null ? Status : status;
@@ -44,7 +47,8 @@ class ReceiptList extends React.Component {
             KeyWord,
             Page,
             Limit,
-            Status
+            Status,
+
         };
 
         Store.dispatch({ type: "FETCH_RECEIPTS", payload: data });
@@ -61,7 +65,7 @@ class ReceiptList extends React.Component {
             console.log(json);
 
             if (json.code == 0) {
-                Store.dispatch({ type: "FETCH_RECEIPTS_DONE", payload: json.data })
+                Store.dispatch({ type: "FETCH_RECEIPTS_DONE", payload: json })
             } else {
                 alert(json.message);
             }
@@ -107,9 +111,14 @@ class ReceiptList extends React.Component {
                 receipts,
                 receipt,
                 isFetching,
-                Status
+                Status,
+                Page,
+                Limit,
+                Total
             }
         } = this.state;
+
+        // console.log({ Page, Limit, Total });
 
         let editorJsx = ("");
 
@@ -207,6 +216,15 @@ class ReceiptList extends React.Component {
                     <tbody>
                         {listJsx}
                     </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colSpan={8}>
+                                <Pager start={Page} length={Limit} total={Total} onPageChanged={({ start, length }) =>
+                                    this.loadReceiptsFromDB("PAGE", null, start, length)
+                                } />
+                            </td>
+                        </tr>
+                    </tfoot>
                 </table>
                 {loading}
             </div>

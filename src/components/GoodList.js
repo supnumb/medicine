@@ -5,6 +5,7 @@ import { Form, Field, createFormControl } from 'form-lib';
 import { SchemaModel, StringType } from 'rsuite-schema';
 
 import GoodEditor from './GoodEditor';
+import { default as Pager } from './Pager'
 
 /**
  * 药品列表管理
@@ -36,7 +37,7 @@ class GoodList extends React.Component {
         }
     }
 
-    _loadGoodListFromDB(event) {
+    _loadGoodListFromDB(event, page = 0, limit = 10) {
         let {
             goodList: {
                 KeyWord,
@@ -47,8 +48,8 @@ class GoodList extends React.Component {
 
         if (event) {
             KeyWord = $("#Keyword").val();
-            Page = 0;
-            Limit = 10;
+            Page = page;
+            Limit = limit;
         }
 
         let params = { KeyWord, Page, Limit };
@@ -66,7 +67,7 @@ class GoodList extends React.Component {
         }).then(res => res.json()).then(json => {
             console.log(json);
             if (json.code == 0) {
-                Store.dispatch({ type: "FETCH_GOODS_DONE", payload: json.data })
+                Store.dispatch({ type: "FETCH_GOODS_DONE", payload: json })
             } else {
                 alert(json.message);
             }
@@ -88,7 +89,10 @@ class GoodList extends React.Component {
             goodList: {
                 goods,
                 good,
-                action
+                action,
+                Page,
+                Limit,
+                Total
             }
         } = this.state;
 
@@ -170,6 +174,15 @@ class GoodList extends React.Component {
                     <tbody>
                         {mListJsx}
                     </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colSpan={11}>
+                                <Pager start={Page} length={Limit} total={Total} onPageChanged={({ start, length }) =>
+                                    this.loadGoodListFromDB("PAGE", start, length)
+                                } />
+                            </td>
+                        </tr>
+                    </tfoot>
                 </table>
             </div>
 

@@ -83,6 +83,8 @@ Order.prototype.orderList = function (KeyWord, Page, Limit, StartTime, EndTime, 
 
     const that = this;
 
+    console.log({ Page, Limit });
+
     async.parallel([
 
         function (cb) {
@@ -126,8 +128,6 @@ Order.prototype.orderList = function (KeyWord, Page, Limit, StartTime, EndTime, 
         const Quantity = result[0].Quantity;
 
         const rows = result[1];
-
-
 
         rows.forEach(function (element, index) {
             //支付方式 1、微信，2、支付宝，3、现金，4、货到付款，5、二维码

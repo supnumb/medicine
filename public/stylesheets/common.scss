@@ -7,8 +7,29 @@
     color: red;
 }
 
-h2{
+h2 {
     color: white;
     padding: 3px 18px;
     font-size: 1.8rem;
+}
+
+.pager_zone {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    a {
+        width: 28px;
+        height: 28px;
+        border: 1px solid #eee;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 3px 5px;
+    }
+    .current {
+        color: black;
+        border: 1px solid white;
+        background-color: #eee;
+    }
 }

@@ -10,7 +10,7 @@ function Receipt() {
     var _action = {
 
         //总数
-        _receiptQuantity: "select count(r.ID) as Quantity from Receipts r,ReceiptGoods p,Goods g,Vendors v,Members m  where r.ID=p.ReceiptID and p.GoodID=g.ID and r.VendorID=v.ID and r.OperatorID=m.ID and r.Date>=:StartTime and r.Date<=:EndTime and concat(r.ID,g.Name) like :KeyWord;",
+        _receiptQuantity: "select count(DISTINCT(r.ID)) as Quantity FROM Receipts r INNER JOIN ReceiptGoods p ON r.ID = p.ReceiptID INNER JOIN Goods g ON p.GoodID = g.ID INNER JOIN Vendors v ON r.VendorID = v.ID INNER JOIN Members m ON r.OperatorID = m.ID WHERE r.Date >=:StartTime AND r.Date <=:EndTime AND concat( r.VendorName , g.NAME , v.Telephone , v.Address , v.Contact) LIKE :KeyWord and r.Status in (:Status) ",
 
         //列表
         _search: "SELECT r.*, m. NAME AS EmployeeName , group_concat(g. NAME) AS Goods ,SUM(p.CostPrice*p.ValiableQuantity) as Amount , p.CostPrice , v.Contact , v.Telephone , v.Address FROM Receipts r INNER JOIN ReceiptGoods p ON r.ID = p.ReceiptID INNER JOIN Goods g ON p.GoodID = g.ID INNER JOIN Vendors v ON r.VendorID = v.ID INNER JOIN Members m ON r.OperatorID = m.ID WHERE r.Date >=:StartTime AND r.Date <=:EndTime AND concat( r.VendorName , g.NAME , v.Telephone , v.Address , v.Contact) LIKE :KeyWord and r.Status in (:Status) GROUP BY r.ID ORDER BY r.CreateTime DESC LIMIT :Page,:Limit;",
@@ -400,8 +400,11 @@ Receipt.prototype.search = function (KeyWord, Page, Limit, StartTime, EndTime, S
         function (cb) {
             that._receiptQuantity({
                 KeyWord: `%${KeyWord}%`,
+                Page,
+                Limit,
                 StartTime,
                 EndTime,
+                Status
             }, function (err, db) {
 
                 if (err) {
@@ -422,7 +425,7 @@ Receipt.prototype.search = function (KeyWord, Page, Limit, StartTime, EndTime, S
                 Status
             };
 
-            // console.log({ "查询进货单": param });
+            console.log({ "查询进货单": param });
 
             that._search(param, function (err, db) {
 

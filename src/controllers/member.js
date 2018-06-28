@@ -228,11 +228,9 @@ exports.deleteMember = (req, res, next) => {
  */
 exports.memberList = (req, res, next) => {
 
-    let { KeyWord = '', MobilPhone = '', Page = 0, Limit = 10, OrderBy = 'UpdateTime', StartTime = '2018-01-01', EndTime = '' } = req.body;
+    console.log(req.body);
 
-    if (Page > 0) {
-        Page = (Page - 1) * Limit;
-    }
+    let { KeyWord = '', MobilPhone = '', Page = 0, Limit = 10, OrderBy = 'UpdateTime', StartTime = '2018-01-01', EndTime = '' } = req.body;
 
     if (MobilPhone) {
         if (!validator.isMobilePhone(MobilPhone, 'zh-CN')) {

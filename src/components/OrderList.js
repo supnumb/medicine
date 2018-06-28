@@ -4,7 +4,7 @@ import Store from './Reducer';
 import { Form, Field, createFormControl } from 'form-lib';
 import { SchemaModel, StringType } from 'rsuite-schema';
 import { Icon } from 'rsuite';
-import { Pager } from './Pager'
+import { default as Pager } from './Pager'
 
 /**
  * 销售订单页面
@@ -22,15 +22,13 @@ class OrderList extends React.Component {
 
         this.loadOrderListFromDB = this._loadOrderListFromDB.bind(this);
         this.onGoOrderEditor = this._onGoOrderEditor.bind(this);
-
     }
 
     _onGoOrderEditor(order) {
         this.props.history.push("/order/editor");
     }
 
-    _loadOrderListFromDB(event) {
-
+    _loadOrderListFromDB(event, page = 0, limit = 10) {
         let {
             orderList: {
                 KeyWord,
@@ -41,13 +39,13 @@ class OrderList extends React.Component {
 
         if (event) {
             KeyWord = $("#KeyWord").val();
-            Page = 0;
-            Limit = 10;
+            Page = page;
+            Limit = limit;
         }
 
         let postData = { KeyWord, Page, Limit }
 
-        console.log(postData);
+        // console.log(postData);
 
         Store.dispatch({ type: "FETCH_ORDERS", payload: postData });
 
@@ -60,9 +58,9 @@ class OrderList extends React.Component {
                 'Content-Type': 'application/json'
             }
         }).then(res => res.json()).then(json => {
-            // console.log(json);
+            console.log(json);
             if (json.code == 0) {
-                Store.dispatch({ type: "FETCH_ORDERS_DONE", payload: json.data })
+                Store.dispatch({ type: "FETCH_ORDERS_DONE", payload: json })
             } else {
                 alert(json.message);
             }
@@ -84,9 +82,14 @@ class OrderList extends React.Component {
             orderList: {
                 orders,
                 order,
-                isFetching
+                isFetching,
+                Total,
+                Page,
+                Limit
             }
         } = this.state;
+
+        // console.log({ Page, Limit, Total });
 
         let loading = isFetching ? (<Icon icon='spinner' spin />) : ("");
 
@@ -169,7 +172,9 @@ class OrderList extends React.Component {
                 <tfoot>
                     <tr>
                         <td colSpan={14}>
-                            {/* <Pager /> */}
+                            <Pager start={Page} length={Limit} total={Total} onPageChanged={({ start, length }) =>
+                                this.loadOrderListFromDB("PAGE", start, length)
+                            } />
                         </td>
                     </tr>
                 </tfoot>

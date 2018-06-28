@@ -8,6 +8,7 @@ import MemberEditor from './MemberEditor';
 import InviteEditor from './InviteEditor';
 import IntentionEditor from './IntentionEditor';
 import { Icon } from 'rsuite';
+import { default as Pager } from './Pager'
 
 class MemberList extends React.Component {
     constructor(props) {
@@ -24,7 +25,7 @@ class MemberList extends React.Component {
         this.onMemberDetailCancel = this._onMemberDetailCancel.bind(this);
     }
 
-    _loadMemberList(event) {
+    _loadMemberList(event, page = 0, limit = 10) {
 
         let {
             memberList: {
@@ -36,7 +37,8 @@ class MemberList extends React.Component {
 
         if (event) {
             KeyWord = $("#KeyWord").val();
-            Page: 0
+            Page = page;
+            Limit = limit
         }
 
         let data = {
@@ -58,7 +60,7 @@ class MemberList extends React.Component {
         }).then(res => res.json()).then(json => {
             if (json.code == 0) {
                 console.log(json);
-                Store.dispatch({ type: "FETCH_MEMBER_DONE", payload: json.data })
+                Store.dispatch({ type: "FETCH_MEMBER_DONE", payload: json })
             } else {
                 alert(json.message);
             }
@@ -100,9 +102,15 @@ class MemberList extends React.Component {
                 members,
                 member,
                 action,
-                isFetching
+                isFetching,
+                Page,
+                Limit,
+                Total
             }
         } = this.state;
+
+        // console.log({ Page, Limit, Total });
+
 
         let editorJsx = ("");
 
@@ -202,6 +210,15 @@ class MemberList extends React.Component {
                     <tbody>
                         {mListJsx}
                     </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colSpan={8}>
+                                <Pager start={Page} length={Limit} total={Total} onPageChanged={({ start, length }) =>
+                                    this.loadMemberList("PAGE", start, length)
+                                } />
+                            </td>
+                        </tr>
+                    </tfoot>
                 </table>
                 {loading}
             </div>
