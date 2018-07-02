@@ -38,7 +38,6 @@ exports.cash = (req, res, next) => {
         EndTime = moment(new Date()).format('YYYY-MM-DD');
     }
 
-
     Order.cash(StartTime, EndTime, function(err, mem) {
 
         if (err) {

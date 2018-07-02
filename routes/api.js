@@ -116,12 +116,12 @@ router.post('/receipt/detail', member.checkUser, receipt.receiptInfo);
 router.post('/stock/search', member.checkUser, stock.stockList);
 
 //收银统计
-router.get('/stat/cash', member.checkUser, stat.cash);
+router.post('/stat/cash', member.checkUser, stat.cash);
 
 //销售员毛利率统计
-router.get('/stat/rate', member.checkUser, stat.rate);
+router.post('/stat/rate', member.checkUser, stat.rate);
 
 //品类统计
-router.get('/stat/good', member.checkUser, stat.good);
+router.post('/stat/good', member.checkUser, stat.good);
 
 module.exports = router;

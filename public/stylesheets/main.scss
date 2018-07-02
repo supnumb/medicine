@@ -1,24 +1,20 @@
 @import "./common.scss";
-
 #topper {
     background-color: #222;
 }
-
-
 
 .editor_zone {
     background: #eee;
     padding: 25px 10px 10px;
     border-top: 15px #ccc solid;
-
     h4 {
         border-bottom: 1px solid #ccc;
         padding-bottom: 10px;
         margin-bottom: 18px;
     }
 }
-//商品编辑控件
 
+//商品编辑控件
 #MemberList {
     background-color: #eee;
 }
@@ -51,4 +47,13 @@
     background: #eee;
     padding: 25px 10px 10px;
     border-top: 15px #ccc solid;
+}
+
+#StatsList {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    .stat_zone {
+        border: 1px solid red;
+    }
 }

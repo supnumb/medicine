@@ -95,13 +95,37 @@ const defaultState = {
         employee: null,
         isFetching: false,
         Total: 0
+    },
+    statList: {
+        isCashFetching: false,
+        isSalerFetching: false,
+        isCategoryFetching: false,
+        isStockFetching: false,
+        cashStat: null,
+        salerStat: null,
+        categoryStat: null,
+        stocksStat: null,
     }
 };
 
-function XXXXReducer(state = defaultState.xxxx, action) {
+function StatReducer(state = defaultState.statList, action) {
     switch (action.type) {
-        case "":
-            break;
+        case "FETCH_CASH":
+            return Object.assign({}, state, { isCashFetching: true });
+        case "FETCH_SALER":
+            return Object.assign({}, state, { isSalerFetching: true });
+        case "FETCH_CATEGORY":
+            return Object.assign({}, state, { isCategoryFetching: true });
+        case "FETCH_STOCK":
+            return Object.assign({}, state, { isStockFetching: true });
+        case "FETCH_CASH_DONE":
+            return Object.assign({}, state, { isCashFetching: false, cashStat: action.payload });
+        case "FETCH_SALER_DONE":
+            return Object.assign({}, state, { isSalerFetching: false, salerStat: action.payload });
+        case "FETCH_CATEGORY_DONE":
+            return Object.assign({}, state, { isCategoryFetching: false, categoryStat: action.payload });
+        case "FETCH_STOCK_DONE":
+            return Object.assign({}, state, { isStockFetching: false, stocksStat: action.payload });
         default:
             return state;
     }
@@ -449,7 +473,8 @@ const reducer = combineReducers({
     receiptList: ReceiptsListReducer,
     orderEditor: OrderEditorReducer,
     orderGoodList: OrderGoodListReducer,
-    employeeList: EmployeesReducer
+    employeeList: EmployeesReducer,
+    statList: StatReducer
     // vendorEditor: VendorEditorReducer
 });
 
