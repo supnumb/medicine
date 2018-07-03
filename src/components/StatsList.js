@@ -366,6 +366,8 @@ const StockState = (props) => {
                     <td>{item.Dimension}</td>
                     <td>{item.Unit}</td>
                     <td>{item.Manufacturer}</td>
+                    <td>{item.TotalQuantity}</td>
+                    <td>{item.SaledQuantity}</td>
                     <td>{item.ValiableQuantity}</td>
                     <td>{item.DefaultCostPrice}</td>
                     <td>{item.ValiableQuantity * item.DefaultCostPrice}</td>
@@ -406,7 +408,9 @@ const StockState = (props) => {
                     <th>规格</th>
                     <th>单位</th>
                     <th>生产厂家</th>
-                    <th>库存数量</th>
+                    <th>总进货</th>
+                    <th>已销售</th>
+                    <th>可用库存</th>
                     <th>进价平均</th>
                     <th>库存金额</th>
                 </tr>
