@@ -323,7 +323,7 @@ class ReceiptEditor extends React.Component {
                     </div> */}
                     <div className="form-group">
                         <label className="control-label col-md-2">
-                            进货日期&nbsp;<span className="red">*</span>
+                            操作日期&nbsp;<span className="red">*</span>
                         </label>
                         <div className="col-md-4">
                             <DatePicker name="Date" placeholder="选择进货日期" id="Date" value={Moment(values.Date)} onChange={(date) => {
@@ -345,7 +345,7 @@ class ReceiptEditor extends React.Component {
                         {message}
                     </p>
 
-                    {isEditabled ? ("") : (<button className="btn btn-primary" onClick={this.submitReceipt}>保存进货单</button>)}
+                    {isEditabled ? ("") : (<button className="btn btn-primary" onClick={this.submitReceipt}>{isReturn ? "保存退货单" : "保存进货单"}</button>)}
 
                 </Form>
 

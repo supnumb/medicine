@@ -59,12 +59,26 @@ router.get('/order/view_ticket', function (req, res, next) {
  */
 router.get('/order/view_deliver_ticket', function (req, res, next) {
 
-    Order.orderInfo(204, function (err, result) {
-        const { rows: [orderInfo] } = result;
-        console.log(orderInfo);
+    let { orderid, MemberName, MobilPhone, Address, DeliveryCompany, EmployeeName } = req.query;
 
-        res.render("deliver_ticket", { order: orderInfo })
-    })
+    let Connact = decodeURIComponent(MemberName);
+    let Telephone = decodeURIComponent(MobilPhone);
+    Address = decodeURIComponent(Address);
+    DeliveryCompany = decodeURIComponent(DeliveryCompany);
+    EmployeeName = decodeURIComponent(EmployeeName);
+
+    console.log({ orderid, Connact, Telephone, Address, DeliveryCompany, EmployeeName });
+
+    if (orderid > 0) {
+        Order.orderInfo(orderid, function (err, result) {
+            const { rows: [orderInfo] } = result;
+            console.log(orderInfo);
+
+            res.render("deliver_ticket", { order: orderInfo })
+        })
+    } else {
+        res.render("deliver_ticket", { order: { Connact, Telephone, Address, DeliveryCompany, EmployeeName } })
+    }
 })
 
 router.get('/*', member.checkUser, function (req, res, next) {

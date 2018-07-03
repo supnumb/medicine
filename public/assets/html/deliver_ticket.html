@@ -9,40 +9,80 @@
 
     <style>
         body {
-            font-size: 14px;
+            font-size: 16px;
         }
 
         .border {
-            display: inline-block;
+            position: relative;
+            display: block;
             padding: 10px;
-            margin: 0px;
-            width: 220px;
+            border: 1px solid gray;
+            width: 830px;
+            height: 530px;
         }
 
-        h1 {
-            transform: scale(1, 1.5);
-            font-size: 18px;
-            margin-bottom: 20px;
-            text-align: center
+        .connact {
+            display: block;
+            position: absolute;
+            left: 463px;
+            top: 106px;
         }
 
-        .good_line {
-            border-bottom: 1px dashed #eee;
-            padding: 5px 0px;
+        .address {
+            position: absolute;
+            left: 463px;
+            top: 169px;
+
+            width: 262px;
         }
 
-        hr {
-            border: 1px solid #cccccc;
+        .sender {
+            display: block;
+            position: absolute;
+            left: 145px;
+            top: 106px;
+
+        }
+
+        .sender_company {
+            display: block;
+            position: absolute;
+            left: 145px;
+            top: 137px;
+
+        }
+
+        .sender_address {
+            display: block;
+            position: absolute;
+            left: 145px;
+            top: 169px;
+            width: 262px;
+            border: 0px solid red;
         }
     </style>
 </head>
 
 <body>
     <div class="border">
-        
-        <%= order.Address%>
-            <%= order.Connact%>
-                <%= order.Telephone%>
+        <div class="connact">
+            <%= order.Connact%>(
+                <%= order.Telephone%>)
+        </div>
+        <div class="address">
+            <%= order.Address%>
+        </div>
+        <div class="sender">
+            <%= order.EmployeeName%>
+        </div>
+
+        <div class="sender_company">
+            北京美信康年大药房
+        </div>
+
+        <div class="sender_address">
+            北京经济技术开发区荣昌东街7号院6号楼1层1005
+        </div>
     </div>
 </body>
 

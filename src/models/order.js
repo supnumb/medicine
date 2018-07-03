@@ -16,7 +16,7 @@ function Order() {
         _orderList: "SELECT o.*, m.Name , m.MobilPhone ,( SELECT NAME FROM Members WHERE ID = o.EmployeeID) AS EmployeeName ,(SELECT NAME FROM Members WHERE ID = o.OperatorID) AS OperatorName , GROUP_CONCAT(g.GoodName) AS GoodNames FROM Orders o INNER JOIN Members m ON o.MemberID = m.ID LEFT JOIN OrderGoods g ON o.ID = g.OrderID  and g.Flag!=-1 WHERE CONCAT(m.Name, m.MobilPhone, o.Connact, o.Address) LIKE :KeyWord GROUP BY o.ID ORDER BY o.UpdateTime DESC LIMIT :Page,:Limit;",
 
         //订单记录详情
-        _orderInfo: "select * from OrderView where ID=:ID;",
+        _orderInfo: "select AA.*,BB.Name as EmployeeName from OrderView as AA inner join Members as BB on AA.EmployeeID=BB.ID where AA.ID=:ID;",
 
         //订单商品
         _orderGood: "select o.*,g.Name,g.OfficalName,g.Dimension,g.FormOfDrug,g.Unit,g.Manufacturer from OrderGoods o left join Goods g on o.GoodID=g.ID where o.OrderID=:ID;",

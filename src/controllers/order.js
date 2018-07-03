@@ -235,34 +235,39 @@ exports.printOrder = (req, res, next) => {
  * @param {Function} next 管道
  */
 exports.printDeliver = (req, res, next) => {
-    let { orderid } = req.body;
+    let { orderid, MemberName, MobilPhone, Address, DeliveryCompany, EmployeeName } = req.body;
 
-    if (orderid > 0) {
+    console.log({ orderid, MemberName, MobilPhone, Address, DeliveryCompany, EmployeeName });
+
+    let buildPdf = function (orderid, MemberName, MobilPhone, Address, DeliveryCompany) {
         page.create().then(function (ph) {
-
             ph.createPage().then(function (pg) {
-                pg.open(`http://127.0.0.1:3000/order/view_deliver_ticket?orderid=${orderid}`).then(function (status) {
+
+                console.log(`http://127.0.0.1:3000/order/view_deliver_ticket?orderid=${orderid}&MemberName=${encodeURIComponent(MemberName)}&MobilPhone=${encodeURIComponent(MobilPhone)}&Address=${encodeURIComponent(Address)}&DeliveryCompany=${encodeURIComponent(DeliveryCompany)}&EmployeeName=${encodeURIComponent(EmployeeName)}`);
+
+                pg.open(`http://127.0.0.1:3000/order/view_deliver_ticket?orderid=${orderid}&MemberName=${encodeURIComponent(MemberName)}&MobilPhone=${encodeURIComponent(MobilPhone)}&Address=${encodeURIComponent(Address)}&DeliveryCompany=${encodeURIComponent(DeliveryCompany)}&EmployeeName=${encodeURIComponent(EmployeeName)}`).then(function (status) {
                     if (status !== "success") {
                         return res.send({ code: -1, message: "打印过程出错，请重试" })
                     } else {
 
                         pg.property('viewportSize', { width: 120, height: 500 });
 
-                        let deliverTicketPdf = `${config.TempFileRoot}/${orderid}.pdf`;
-                        let url = `${config.UrlTemFile}/${orderid}.pdf`;
+                        let deliverTicketPdf = `${config.TempFileRoot}/${MobilPhone}.pdf`;
+                        let url = `${config.UrlTemFile}/${MobilPhone}.pdf`;
 
                         pg.property("plainText").then(function (jsonText) {
 
                             let isJ = isJson(jsonText);
                             if (isJ) {
                                 let json = JSON.parse(jsonText);
-                                return res.send(json);
+                                return res.status(200).send(json);
                             } else {
 
                                 pg.render(deliverTicketPdf).then(function () {
                                     console.log('Page Rendered');
                                     ph.exit();
-                                    return res.send({ code: 0, message: "开始打印...", data: { path: url } });
+                                    // return res.status(201).sendFile(deliverTicketPdf);
+                                    return res.status(200).send({ code: 0, message: "开始打印...", data: { path: url } });
                                 })
                             }
                         })
@@ -274,7 +279,13 @@ exports.printDeliver = (req, res, next) => {
             console.log(err);
             ph.exit();
         })
+    };
+
+    if (orderid) {
+        buildPdf(orderid);
+    } else if (!MemberName || !MobilPhone || !Address || !DeliveryCompany) {
+        return { code: 2, message: "请检查输入参数：会员名、联系电话、配送地址、快递公司" };
     } else {
-        return res.send({ code: 2, message: "请指定打印的订单ID" });
+        buildPdf(0, MemberName, MobilPhone, Address, DeliveryCompany);
     }
 };

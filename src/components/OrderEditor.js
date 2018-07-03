@@ -116,7 +116,7 @@ class OrderEditor extends React.Component {
 
             values.EmployeeID = value;
             values.Employee = item.data;
-            console.log(values);
+            values.EmployeeName = item.data.Name;
 
             this.setState({ values })
         }
@@ -302,9 +302,8 @@ class OrderEditor extends React.Component {
         }
         ).then(res => res.json()).then(json => {
             if (json.code == 0) {
-
-                let wPop = window.open(json.data.path, 'wPop');
-                wPop.print();
+                let wPop = window.open(json.data.path);
+                // wPop.print();
                 // wPop.close();
 
                 Store.dispatch({ type: "PRINT_ORDER_DONE" });
@@ -319,11 +318,36 @@ class OrderEditor extends React.Component {
     }
 
     _printDeliverTicket(orderid) {
-        console.log("打印快递单中....");
+
+        let {
+            orderEditor: {
+                values
+            }
+        } = this.state;
+
+        let { MemberName, MobilPhone, Address, DeliveryCompany, EmployeeName } = values;
+
+        console.log(values);
+
+        if (!MemberName || !MobilPhone || !Address) {
+            alert("请指定客户信息：客户名、电话、地址");
+            return;
+        }
+
+        if (!DeliveryCompany) {
+            alert("请选择快递公司")
+            return;
+        }
+
+        if (!EmployeeName) {
+            alert("请选择销售员");
+            return;
+        }
+
         Store.dispatch({ type: "PRINT_DELIVER_TICKET" });
 
         fetch('/api/order/print_deliver', {
-            body: JSON.stringify({ orderid }),
+            body: JSON.stringify({ orderid, MemberName, MobilPhone, Address, DeliveryCompany, EmployeeName }),
             method: 'POST',
             mode: 'same-origin',
             credentials: 'same-origin',
@@ -333,15 +357,15 @@ class OrderEditor extends React.Component {
         }
         ).then(res => res.json()).then(json => {
             if (json.code == 0) {
-                let wPop = window.open(json.data.path, 'wPop');
-                wPop.print();
-                // wPop.close();
-
-                Store.dispatch({ type: "PRINT_DELIVER_DONE" });
+                let wPop = window.open(json.data.path);
+                // wPop.print();
+                // Store.dispatch({ type: "PRINT_ORDER_DONE" });
             } else {
-                Store.dispatch({ type: "PRINT_DELIVER_DONE" });
-                alert(json.message)
+                alert(json.message);
             }
+
+            Store.dispatch({ type: "PRINT_DELIVER_DONE" });
+
         }).catch(err => {
             Store.dispatch({ type: "PRINT_DELIVER_DONE" });
             console.log(err);
@@ -458,10 +482,9 @@ class OrderEditor extends React.Component {
                                     Store.dispatch({ type: "SET_VALUES", payload: values });
                                 }
                             }>
-                                <Radio value="未发">未发</Radio>
                                 <Radio value="圆通">圆通</Radio>
                                 <Radio value="中通">中通</Radio>
-                                <Radio value="中通">中通</Radio>
+                                <Radio value="申通">申通</Radio>
                             </RadioGroup>
 
                         </div>
