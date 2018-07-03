@@ -20,7 +20,8 @@ const lib = [
     'react-bootstrap-typeahead',
     'prop-types',
     'rsuite',
-    'rsuite-utils'
+    'rsuite-utils',
+    'numeral'
 ];
 
 module.exports = {

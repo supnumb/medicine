@@ -25,13 +25,13 @@ function Order() {
         _orderQuantity: "select count(1) as Quantity from Orders o left join Members m on o.MemberID=m.ID where m.MobilPhone like :KeyWord and o.Date>=:StartTime and o.Date<=:EndTime",
 
         //收银统计
-        _cash: "select ID,EmployeeID,PayStyle,TotalAmount,ReceiptAmount,CreateTime,UpdateTime from Orders where date_format(CreateTime,'%Y-%m-%d')>=:StartTime and date_format(CreateTime,'%Y-%m-%d')<=:EndTime;",
+        _cash: "select AA.ID,EmployeeID,BB.Name as EmployeeName,PayStyle,TotalAmount,ReceiptAmount,AA.CreateTime,AA.UpdateTime from Orders as AA inner join Members as BB on AA.EmployeeID=BB.ID where date_format(AA.CreateTime,'%Y-%m-%d')>=:StartTime and date_format(AA.CreateTime,'%Y-%m-%d')<=:EndTime;",
 
         //销售员毛利率统计//销售员每个订单的毛利率
-        _rate: "select o.ID,m.Name,o.EmployeeID,o.ReceiptAmount,sum(g.TotalCostPrice) as TotalCostPrice from Orders o left join OrderGoods g on o.ID=g.OrderID left join Members m on o.EmployeeID=m.ID where date_format(o.CreateTime,'%Y-%m-%d')>=:StartTime and date_format(o.CreateTime,'%Y-%m-%d')<=:EndTime group by o.ID desc;",
+        _rate: "select AA.CreateTime , AA.ID , BB.GoodID , DD. Name , DD.OfficalName , DD.Dimension , DD.Unit , DD.Manufacturer , BB.Quantity , BB.FinalPrice , BB.Quantity * BB.FinalPrice as GoodAmount , DD.DefaultPrice , DD.DefaultCostPrice , BB.Quantity *( BB.FinalPrice - DD.DefaultCostPrice ) as GrossProfit , ( BB.FinalPrice - DD.DefaultCostPrice )/ BB.FinalPrice as GrossMargin , CC. Name as EmployeeName from Orders as AA inner join OrderGoods as BB on AA.ID = BB.OrderID inner join Members as CC on AA.EmployeeID = CC.ID inner join Goods as DD on BB.GoodID = DD.ID where date_format(AA.CreateTime,'%Y-%m-%d')>=:StartTime and date_format(AA.CreateTime,'%Y-%m-%d')<=:EndTime;",
 
         //销售商品统计
-        _good: "select g.GoodID,g.GoodName,sum(g.Quantity) as Quantity,o.CreateTime from Orders o left join OrderGoods g on o.ID=g.OrderID where date_format(o.CreateTime,'%Y-%m-%d')>=:StartTime and date_format(o.CreateTime,'%Y-%m-%d')<=:EndTime group by g.GoodID;",
+        _good: "select BB.GoodID , BB.GoodName , CC.OfficalName , CC.Dimension , CC.Unit , CC.Manufacturer , sum( BB.Quantity ) as SumQuantity , sum( BB.Quantity * BB.FinalPrice ) as SumAmount , sum( BB.Quantity *( BB.FinalPrice - CC.DefaultCostPrice )) as GrossProfit , sum( BB.Quantity *( BB.FinalPrice - CC.DefaultCostPrice ))/ sum( BB.Quantity * BB.FinalPrice ) as GrossMargin , CC.DefaultCostPrice , AA.CreateTime from Orders as AA INNER join OrderGoods as BB on AA.ID = BB.OrderID inner join Goods as CC on BB.GoodID = CC.ID where date_format(AA.CreateTime,'%Y-%m-%d')>=:StartTime and date_format(AA.CreateTime,'%Y-%m-%d')<=:EndTime  GROUP BY BB.GoodID;",
 
     };
 
@@ -184,6 +184,8 @@ Order.prototype.orderList = function (KeyWord, Page, Limit, StartTime, EndTime, 
         return callback(null, { Quantity, rows });
     });
 };
+
+
 
 /**
  * 订单记录详情
@@ -1294,9 +1296,48 @@ OrderTran.prototype.cancel = function (ID, callback) {
 
 }
 
+Order.prototype.parsePayStyleLabel = function (rows) {
+
+    rows.forEach((r, index) => {
+        //支付方式 1、微信，2、支付宝，3、现金，4、货到付款，5、二维码
+        let PayStyleLabel = '';
+
+        switch (r.PayStyle) {
+            case 1:
+                PayStyleLabel = '微信';
+                break;
+            case 2:
+                PayStyleLabel = '支付宝';
+                break;
+            case 3:
+                PayStyleLabel = '现金';
+                break;
+            case 4:
+                PayStyleLabel = '货到付款';
+                break;
+            case 5:
+                PayStyleLabel = '二维码';
+                break;
+            case 6:
+                PayStyleLabel = '刷卡';
+                break;
+            case 7:
+                PayStyleLabel = '公司微信';
+                break;
+            case 8:
+                PayStyleLabel = '网上转账';
+                break;
+        }
+
+        r.PayStyleLabel = PayStyleLabel;
+
+        console.log(index, " ", new Date().getTime());
+
+    })
+}
 
 Order.prototype.cash = function (StartTime, EndTime, callback) {
-
+    let that = this;
     this._cash({
         StartTime,
         EndTime
@@ -1307,14 +1348,18 @@ Order.prototype.cash = function (StartTime, EndTime, callback) {
 
         rows.forEach(function (element, index) {
 
-            rows[index].CreateTime = moment(rows[index].CreateTime).format('YYYY-MM-DD HH:mm:ss');
-            rows[index].UpdateTime = moment(rows[index].UpdateTime).format('YYYY-MM-DD HH:mm:ss');
+            rows[index].CreateTime = moment(rows[index].CreateTime).format('YYYY-MM-DD');
+            rows[index].UpdateTime = moment(rows[index].UpdateTime).format('YYYY-MM-DD');
 
+            // element.PayStyleLabel =
         });
+
+        that.parsePayStyleLabel(rows);
+
+        console.log("end ", new Date().getTime());
 
         callback(null, rows);
     });
-
 }
 
 

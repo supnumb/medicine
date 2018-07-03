@@ -28,6 +28,8 @@ exports.cash = (req, res, next) => {
 
     let { StartTime = '', EndTime = '', action } = req.body;
 
+    console.log(req.body);
+
     if (!StartTime && !EndTime) {
 
         const dt = new Date();
@@ -38,7 +40,7 @@ exports.cash = (req, res, next) => {
         EndTime = moment(new Date()).format('YYYY-MM-DD');
     }
 
-    Order.cash(StartTime, EndTime, function(err, mem) {
+    Order.cash(StartTime, EndTime, function (err, mem) {
 
         if (err) {
             return res.send({ code: 2, message: "数据库出错" });
@@ -73,10 +75,9 @@ exports.rate = (req, res, next) => {
 
         StartTime = moment(dt).format('YYYY-MM-DD');
         EndTime = moment(new Date()).format('YYYY-MM-DD');
-
     }
 
-    Order.rate(StartTime, EndTime, function(err, mem) {
+    Order.rate(StartTime, EndTime, function (err, mem) {
 
         if (err) {
             return res.send({ code: 2, message: "数据库出错" });
@@ -101,13 +102,13 @@ exports.rate = (req, res, next) => {
  */
 exports.good = (req, res, next) => {
 
+    console.log(req.body);
+
     let { StartTime = '', EndTime = '', action } = req.body;
 
     if (!StartTime && !EndTime) {
 
         const dt = new Date();
-
-        console.log(dt.getMonth());
 
         dt.setMonth(dt.getMonth() - 1);
 
@@ -116,7 +117,7 @@ exports.good = (req, res, next) => {
 
     }
 
-    Order.good(StartTime, EndTime, function(err, mem) {
+    Order.good(StartTime, EndTime, function (err, mem) {
 
         if (err) {
             return res.send({ code: 2, message: "数据库出错" });

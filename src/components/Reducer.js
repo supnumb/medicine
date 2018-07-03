@@ -1,5 +1,6 @@
 import { createStore, applyMiddleware, combineReducers } from 'redux';
 import thunk from 'redux-thunk';
+import Moment from 'moment';
 
 const defaultState = {
     goodList: {
@@ -105,6 +106,9 @@ const defaultState = {
         salerStat: null,
         categoryStat: null,
         stocksStat: null,
+        start: Moment().add(-7, 'day').format("YYYY-MM-DD"),
+        end: Moment().format("YYYY-MM-DD"),
+        statItem: 1
     }
 };
 
@@ -126,6 +130,12 @@ function StatReducer(state = defaultState.statList, action) {
             return Object.assign({}, state, { isCategoryFetching: false, categoryStat: action.payload });
         case "FETCH_STOCK_DONE":
             return Object.assign({}, state, { isStockFetching: false, stocksStat: action.payload });
+        case "SET_START_DATE":
+            return Object.assign({}, state, { start: action.payload });
+        case "SET_END_DATE":
+            return Object.assign({}, state, { end: action.payload });
+        case "SET_STATITEM":
+            return Object.assign({}, state, { statItem: action.payload });
         default:
             return state;
     }
