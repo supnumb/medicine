@@ -120,7 +120,6 @@ class OrderEditor extends React.Component {
 
             this.setState({ values })
         }
-
     }
 
     _loadMembersFromDB(keyword) {
@@ -141,9 +140,13 @@ class OrderEditor extends React.Component {
             }
         }).then(res => res.json()).then(json => {
             if (json.code == 0) {
-                // console.log(json);
-                // let members = json.data.map(v => ({ label: v.Name, value: v.ID, data: JSON.stringify(v) }));
-                let members = json.data.map(v => ({ label: `${v.Name}-${v.PinYin}-${v.MobilPhone}`, value: v.ID, data: JSON.stringify(v) }));
+                console.log(json);
+
+                let members = [];
+                if (json.data.length > 0) {
+                    members = json.data.map(v => ({ label: `${v.Name}-${v.PinYin}-${v.MobilPhone}`, value: v.ID, data: JSON.stringify(v) }));
+                }
+
                 Store.dispatch({ type: "FETCH_MEMBER_DONE", payload: members })
             } else {
                 alert(json.message);

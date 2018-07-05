@@ -541,7 +541,9 @@ class StatsList extends React.Component {
     _loadStockStat(event, start, end) {
         let postData = {
             StartTime: start,
-            EndTime: end
+            EndTime: end,
+            Page: 0,
+            Limit: 1000
         }
 
         Store.dispatch({ type: "FETCH_STOCK", payload: postData });

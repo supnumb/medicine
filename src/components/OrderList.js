@@ -93,30 +93,34 @@ class OrderList extends React.Component {
 
         let loading = isFetching ? (<Icon icon='spinner' spin />) : ("");
 
-        let mListJsx = orders.map((o, index) => (<tr key={index}>
-            <td>{o.ID}</td>
-            <td>{o.Name}</td>
-            <td>{o.MobilPhone}</td>
-            <td>{o.GoodNames}</td>
-            <td>{o.TotalAmount}</td>
-            <td>{o.PayStyleLabel}</td>
-            <td>{o.DeliveryCompany}</td>
-            <td>{o.DeliveryFee}</td>
-            <td>{o.DeliverCode}</td>
-            <td>{o.DeliverReceiptFee}</td>
-            <td>{o.DeliveryReceiveLabel}</td>
-            <td>{o.EmployeeName}</td>
-            <td>{o.Date}</td>
+        let mListJsx = ("")
 
-            <td style={{
-                "width": "80px"
-            }}>
-                <a href="#" onClick={() => {
-                    this.props.history.push({ pathname: "/order/editor", state: o })
-                    // Store.dispatch({type: "EDITOR_MEMBER", payload: o})
-                }}>编辑</a>
-            </td>
-        </tr>));
+        if (orders) {
+            mListJsx = orders.map((o, index) => (<tr key={index}>
+                <td>{o.ID}</td>
+                <td>{o.Name}</td>
+                <td>{o.MobilPhone}</td>
+                <td>{o.GoodNames}</td>
+                <td>{o.TotalAmount}</td>
+                <td>{o.PayStyleLabel}</td>
+                <td>{o.DeliveryCompany}</td>
+                <td>{o.DeliveryFee}</td>
+                <td>{o.DeliverCode}</td>
+                <td>{o.DeliverReceiptFee}</td>
+                <td>{o.DeliveryReceiveLabel}</td>
+                <td>{o.EmployeeName}</td>
+                <td>{o.Date}</td>
+
+                <td style={{
+                    "width": "80px"
+                }}>
+                    <a href="#" onClick={() => {
+                        this.props.history.push({ pathname: "/order/editor", state: o })
+                        // Store.dispatch({type: "EDITOR_MEMBER", payload: o})
+                    }}>编辑</a>
+                </td>
+            </tr>));
+        }
 
         return (<div id="OrderList" className="col-md-10 col-md-offset-1 main">
 

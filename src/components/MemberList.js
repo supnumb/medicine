@@ -139,32 +139,35 @@ class MemberList extends React.Component {
                 break;
         }
 
-        let mListJsx = members.map((m, index) => (<tr key={index}>
-            <td>{m.ID}</td>
-            <td style={{
-                "width": "60px"
-            }}>{m.Name}</td>
-            <td>{m.MobilPhone}</td>
-            <td>{m.Tags}</td>
-            <td>{m.Goods}</td>
-            <td>{m.VisitQuantity}</td>
-            <td>{m.OrderQuantity}</td>
-            <td style={{
-                "width": "108px"
-            }}>
-                <a href="#" onClick={() => {
-                    Store.dispatch({ type: "EDITOR_MEMBER", payload: m })
-                }}>编辑</a>&nbsp;
-                <a href="#" onClick={() => {
-                    Store.dispatch({ type: "EDITOR_MEMBER_INTENTIONS", payload: m })
-                }}>意向</a>
-                &nbsp;
-                <a href="#" onClick={() => {
-                    Store.dispatch({ type: "EDITOR_MEMBER_VISIT", payload: m })
-                }}>回访</a>
+        let mListJsx = ("")
 
-            </td>
-        </tr>));
+        if (members) {
+            mListJsx = members.map((m, index) => (<tr key={index}>
+                <td>{m.ID}</td>
+                <td style={{
+                    "width": "60px"
+                }}>{m.Name}</td>
+                <td>{m.MobilPhone}</td>
+                <td>{m.Tags}</td>
+                <td>{m.Goods}</td>
+                <td>{m.VisitQuantity}</td>
+                <td>{m.OrderQuantity}</td>
+                <td style={{
+                    "width": "108px"
+                }}>
+                    <a href="#" onClick={() => {
+                        Store.dispatch({ type: "EDITOR_MEMBER", payload: m })
+                    }}>编辑</a>&nbsp;
+                <a href="#" onClick={() => {
+                        Store.dispatch({ type: "EDITOR_MEMBER_INTENTIONS", payload: m })
+                    }}>意向</a>
+                    &nbsp;
+                <a href="#" onClick={() => {
+                        Store.dispatch({ type: "EDITOR_MEMBER_VISIT", payload: m })
+                    }}>回访</a>
+                </td>
+            </tr>));
+        }
 
         return (<div id="MemberList">
             <div className="col-md-6 col-md-offset-1 main">
