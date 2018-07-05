@@ -16,7 +16,7 @@ class EmployeeSignIn extends React.Component {
         super(props);
 
         this.state = {
-            values: { UserName: "13511111111", Password: "super1111" },
+            values: { UserName: "", Password: "" },
             errors: {},
             isFetching: false,
             message: ""
