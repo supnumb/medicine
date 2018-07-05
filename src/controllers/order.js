@@ -129,11 +129,7 @@ exports.orderList = (req, res, next) => {
 
     console.log(req.body);
 
-    let { KeyWord = '', Page = 0, Limit = 10, StartTime = '2018-01-01', EndTime = '' } = req.body;
-
-    // if (Page > 0) {
-    //     Page = (Page - 1) * Limit;
-    // }
+    let { KeyWord = '', Page = 0, Limit = 10, StartTime = '2018-06-01', EndTime = '' } = req.body;
 
     if (!EndTime) {
         EndTime = moment(new Date()).format('YYYY-MM-DD 23:59:59');

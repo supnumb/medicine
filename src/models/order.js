@@ -83,7 +83,7 @@ Order.prototype.orderList = function (KeyWord, Page, Limit, StartTime, EndTime, 
 
     const that = this;
 
-    console.log({ Page, Limit });
+    console.log({ KeyWord, Page, Limit, StartTime, EndTime });
 
     async.parallel([
 
