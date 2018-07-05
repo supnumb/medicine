@@ -41,6 +41,8 @@ class EmployeeEditor extends React.Component {
             return;
         }
 
+        this.setState({ isFetching: true });
+
         fetch('/api/employee/save', {
             body: JSON.stringify(values),
             method: 'POST',
@@ -52,21 +54,28 @@ class EmployeeEditor extends React.Component {
         }).then(res => res.json()).then(json => {
             console.log({ json });
             if (json.code == 0) {
-
                 if (this.props.onSumbitCompleted) {
                     this.props.onSumbitCompleted("SUCCESS", json)
                 }
+                
+                values = {
+                    values: {
+                        Name: "",
+                        DefaultPassword: "111111",
+                        MobilPhone: "",
+                        Flag: 1,
+                    }
+                }
+
                 alert(json.message);
+                console.log("清空", values);
+                this.setState({ isFetching: false, values })
             } else {
                 alert(json.message);
             }
         }).catch(err => {
             console.error(err);
         })
-
-
-        console.log("/employee/save");
-
     }
 
     componentWillReceiveProps(nextProps) {
@@ -85,7 +94,8 @@ class EmployeeEditor extends React.Component {
                     Name: "",
                     DefaultPassword: "111111",
                     MobilPhone: "",
-                    Flag: 1
+                    Flag: 1,
+
                 }
             });
 
@@ -102,7 +112,7 @@ class EmployeeEditor extends React.Component {
     }
 
     render() {
-        let { values, errors } = this.state;
+        let { values, errors, isFetching } = this.state;
 
         console.log(values);
 
@@ -154,7 +164,7 @@ class EmployeeEditor extends React.Component {
                         <RadioGroup name="Flag" value={values.Flag} id="Flag" inline={true} onChange={
                             (value, event) => {
                                 values.Flag = value;
-                                Store.dispatch({ type: "SET_VALUES", payload: values });
+                                this.setState({ values });
                             }
                         }>
                             <Radio value={2}>管理员</Radio>
@@ -168,7 +178,7 @@ class EmployeeEditor extends React.Component {
                     <label className="control-label col-sm-3">
 
                     </label>
-                    <button onClick={this.submitEmployee} className="btn btn-primary"> 保存 </button>
+                    <button disabled={isFetching} onClick={this.submitEmployee} className="btn btn-primary"> 保存 </button>
                 </div>
             </Form>
         </div>)

@@ -123,15 +123,13 @@ class OrderEditor extends React.Component {
 
     }
 
-    _loadMembersFromDB() {
+    _loadMembersFromDB(keyword) {
         let params = {
-            KeyWord: "",
+            KeyWord: keyword,
             MobilPhone: "",
             Page: 0,
             Limit: 20
         }
-
-        let data = {};
 
         fetch('/api/member/search', {
             body: JSON.stringify(params),
@@ -145,7 +143,7 @@ class OrderEditor extends React.Component {
             if (json.code == 0) {
                 // console.log(json);
                 // let members = json.data.map(v => ({ label: v.Name, value: v.ID, data: JSON.stringify(v) }));
-                let members = json.data.map(v => ({ label: v.Name, value: v.ID, data: JSON.stringify(v) }));
+                let members = json.data.map(v => ({ label: `${v.Name}-${v.PinYin}-${v.MobilPhone}`, value: v.ID, data: JSON.stringify(v) }));
                 Store.dispatch({ type: "FETCH_MEMBER_DONE", payload: members })
             } else {
                 alert(json.message);
@@ -417,7 +415,7 @@ class OrderEditor extends React.Component {
                         <label className="control-label col-md-2">
                             客户名&nbsp;<span className="red">*</span>
                         </label>
-                        <div className="col-md-4">
+                        <div className="col-md-5">
                             <AsyncTypeahead id="MemberName" name="MemberName" inputProps={{
                                 name: "Name",
                                 id: "ID"
@@ -485,6 +483,8 @@ class OrderEditor extends React.Component {
                                 <Radio value="圆通">圆通</Radio>
                                 <Radio value="中通">中通</Radio>
                                 <Radio value="申通">申通</Radio>
+                                <Radio value="顺丰">顺丰</Radio>
+                                <Radio value="EMS">EMS</Radio>
                             </RadioGroup>
 
                         </div>

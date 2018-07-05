@@ -33,7 +33,7 @@ function Member() {
         _memberQuantity: "select count(m.ID) as Quantity from Members m  where m.Flag=:Flag and m.Status=1 and m.CreateTime>=:StartTime and m.CreateTime<=:EndTime and m.MobilPhone like :MobilPhone and concat(m.Name,m.Address) like :KeyWord;",
 
         //会员列表
-        _memberList: "SELECT m.*, count(DISTINCT v.ID) AS VisitQuantity , count(DISTINCT o.ID) AS OrderQuantity FROM( SELECT AA.*, BB.Tags , BB.Goods FROM Members AS AA LEFT JOIN Intentions AS BB ON BB.ID =( SELECT MAX(ID) FROM Intentions WHERE MemberID = AA.ID)) m LEFT JOIN Visits v ON m.ID = v.MemberID LEFT JOIN Orders o ON m.ID = o.MemberID WHERE m.Flag =:Flag AND m.STATUS = 1 AND m.CreateTime >=:StartTime AND m.CreateTime <=:EndTime  AND concat(m.MobilPhone,m.Name,m.Address) LIKE :KeyWord GROUP BY m.ID ORDER BY m.UpdateTime DESC LIMIT :Page,:Limit;",
+        _memberList: "SELECT m.*, count(DISTINCT v.ID) AS VisitQuantity , count(DISTINCT o.ID) AS OrderQuantity FROM( SELECT AA.*, BB.Tags , BB.Goods FROM Members AS AA LEFT JOIN Intentions AS BB ON BB.ID =( SELECT MAX(ID) FROM Intentions WHERE MemberID = AA.ID)) m LEFT JOIN Visits v ON m.ID = v.MemberID LEFT JOIN Orders o ON m.ID = o.MemberID WHERE m.Flag =:Flag AND m.STATUS = 1 AND m.CreateTime >=:StartTime AND m.CreateTime <=:EndTime  AND concat(m.PinYin,m.MobilPhone,m.TelePhone,m.Name) LIKE :KeyWord GROUP BY m.ID ORDER BY m.UpdateTime DESC LIMIT :Page,:Limit;",
 
         //会员详情
         _memberInfo: "select * from Members where ID=:ID;",
@@ -189,6 +189,8 @@ Member.prototype.memberList = function (KeyWord, MobilPhone, Page, Limit, OrderB
                 if (err) {
                     return cb(err, null);
                 }
+
+                // console.log(db);
 
                 cb(null, db);
 

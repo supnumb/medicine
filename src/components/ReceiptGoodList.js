@@ -147,15 +147,6 @@ class ReceiptGoodList extends React.Component {
                         <td><input disabled={isEditabled} onChange={(event) => {
                             this.onTextChanged(event, g);
                         }} style={{ "width": "80px" }} type="text" id="BatchNo" value={g.BatchNo} placeholder="批号" /></td>
-
-                        <td>
-
-                            <DatePicker name="Date" id="Date" value={Moment(g.ExpiryDate)} onChange={(date) => {
-                                g.ExpiryDate = Moment(date).format("YYYY-MM-DD");
-                                this.setState({ goods });
-                            }} placeholder="有效期" />
-
-                        </td>
                         <td>
 
                             <DatePicker name="ManufactureDate" id="ManufactureDate" value={Moment(g.ManufactureDate)} onChange={(date) => {
@@ -164,6 +155,15 @@ class ReceiptGoodList extends React.Component {
                             }} placeholder="生产日期" />
 
                         </td>
+                        <td>
+
+                            <DatePicker name="Date" id="Date" value={Moment(g.ExpiryDate)} onChange={(date) => {
+                                g.ExpiryDate = Moment(date).format("YYYY-MM-DD");
+                                this.setState({ goods });
+                            }} placeholder="有效期" />
+
+                        </td>
+
 
                         <td>
                             <a href="#" onClick={() => {
@@ -217,8 +217,8 @@ class ReceiptGoodList extends React.Component {
                         <th>进价</th>
                         <th>数量</th>
                         <th>批号</th>
-                        <th>有效期</th>
                         <th>生产日期</th>
+                        <th>有效期</th>
                         <th>操作</th>
                     </tr>
                 </thead>

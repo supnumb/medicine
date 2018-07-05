@@ -82,10 +82,10 @@ class EmployeeList extends React.Component {
 
         switch (action) {
             case "update":
-                editorJsx = (<div className="col-md-5"><EmployeeEditor employee={employee} /></div>);
+                editorJsx = (<div className="col-md-5"><EmployeeEditor onSumbitCompleted={this.loadEmployeesFromDB} employee={employee} /></div>);
                 break;
             case "add":
-                editorJsx = (<div className="col-md-5"><EmployeeEditor /></div>);
+                editorJsx = (<div className="col-md-5"><EmployeeEditor onSumbitCompleted={this.loadEmployeesFromDB} /></div>);
                 break;
             case "resetpass":
                 editorJsx = (<div className="col-md-5"><EmployeeResetPassword employee={employee} /></div>);

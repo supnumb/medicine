@@ -280,6 +280,10 @@ Receipt.prototype.add = function (receiptData, callback) {
 
                 async.each(ReceiptGoods, function (good, callback) {
 
+                    if(good.Flag==-1){
+                        return callback();
+                    }
+
                     good.ReceiptID = receiptId;
 
                     console.log(new Date().getTime(), "添加进货商品");

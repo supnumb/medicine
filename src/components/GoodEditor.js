@@ -6,6 +6,7 @@ import { SchemaModel, StringType } from 'rsuite-schema';
 import { Icon, RadioGroup, Radio } from 'rsuite';
 
 const model = SchemaModel({ Name: StringType().isRequired('请输入药品名') });
+const TextareaField = createFormControl('textarea');
 
 /**
  * 药品基础数据编辑组件
@@ -190,7 +191,7 @@ class GoodEditor extends React.Component {
                         <span className="red">*</span>适应症:
                     </label>
                     <div className="col-sm-6">
-                        <Field name="Translation" id="Translation" />
+                        <Field name="Translation" id="Translation" accepter={TextareaField} />
                     </div>
                     <p className="text-danger">{errors.Translation}</p>
                 </div>
@@ -201,7 +202,7 @@ class GoodEditor extends React.Component {
                     </label>
 
                     <div className="col-sm-6">
-                        <Field name="UseWay" id="UseWay" />
+                        <Field name="UseWay" id="UseWay" accepter={TextareaField} />
                     </div>
 
                     <p className="text-danger">{errors.UseWay}</p>
@@ -322,7 +323,7 @@ class GoodEditor extends React.Component {
                         备注:
                     </label>
                     <div className="col-sm-6">
-                        <Field name="Remark" id="Remark" />
+                        <Field name="Remark" id="Remark" accepter={TextareaField} />
                     </div>
                 </div>
 
