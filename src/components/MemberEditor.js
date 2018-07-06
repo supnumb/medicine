@@ -9,7 +9,7 @@ import { WSAENETUNREACH } from 'constants';
 const model = SchemaModel({
     Name: StringType().isRequired('请输入姓名'),
     PinYin: StringType().isRequired('请输入拼音'),
-
+    MobilPhone: StringType().isRequired("请输入会员电话").pattern(/^1[3456789]\d{9}$/, "请检查电话格式")
 });
 
 /**

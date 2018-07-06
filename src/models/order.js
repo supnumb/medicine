@@ -394,7 +394,7 @@ OrderTran.prototype.edit = function (Obj, callback) {
 
                         //console.log("OrderGood_add", OrderGood_add);
                         //console.log("-----------------------------");
-                        console.log("ReceiptGood_update", ReceiptGood_update);
+                        // console.log("ReceiptGood_update", ReceiptGood_update);
                         //console.log("-----------------------------");
                         //console.log("Stock_update", Stock_update);
                         //console.log("-----------------------------");
@@ -587,7 +587,7 @@ OrderTran.prototype.edit = function (Obj, callback) {
                     //console.log("del_arr", del_arr);
 
                     //入库单修改
-                    console.log("ReceiptGood_update", ReceiptGood_update);
+                    // console.log("ReceiptGood_update", ReceiptGood_update);
 
                     //库存修改
                     //console.log("Stock_update", Stock_update);
@@ -944,7 +944,7 @@ Order.prototype.update = function (order, callback) {
                             //需要更新库存
                             if (delta != 0) {
 
-                                console.log("更新库存信息:", new Date().getTime());
+                                // console.log("更新库存信息:", new Date().getTime());
                                 //更新库存信息
                                 tran.query(__updateStocks, { GoodID: good.GoodID, DeltaQuantity: delta }, function (err, rest) {
                                     if (err) {
@@ -952,7 +952,7 @@ Order.prototype.update = function (order, callback) {
                                     }
 
                                     //保存库存更新记录
-                                    console.log(new Date().getTime(), "保存库存更新记录:");
+                                    // console.log(new Date().getTime(), "保存库存更新记录:");
                                     tran.query(__saveStockChangeRecord, { OperatorID, GoodID: good.GoodID, DeltaQuantity: delta, Remark: "订单修改", Type: 3, RelatedObjectID: ID, SalePrice: good.FinalPrice }, function (err, rest) {
                                         if (err) {
                                             return callback(err);
@@ -1331,7 +1331,7 @@ Order.prototype.parsePayStyleLabel = function (rows) {
 
         r.PayStyleLabel = PayStyleLabel;
 
-        console.log(index, " ", new Date().getTime());
+        // console.log(index, " ", new Date().getTime());
 
     })
 }
@@ -1356,7 +1356,7 @@ Order.prototype.cash = function (StartTime, EndTime, callback) {
 
         that.parsePayStyleLabel(rows);
 
-        console.log("end ", new Date().getTime());
+        // console.log("end ", new Date().getTime());
 
         callback(null, rows);
     });

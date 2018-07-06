@@ -11,7 +11,7 @@ import { asyncContainer, Typeahead } from 'react-bootstrap-typeahead';
 const AsyncTypeahead = asyncContainer(Typeahead);
 const model = SchemaModel({
     // MemberName: StringType().isRequired('请输入查询客户名称'),
-    MobilPhone: StringType().isRequired('请填写客户联系电话'),
+    MobilPhone: StringType().isRequired('请填写客户联系电话').pattern(/^1[3456789]\d{9}$/, "请检查电话格式"),
     Address: StringType().isRequired('请填写配送地址')
 });
 
