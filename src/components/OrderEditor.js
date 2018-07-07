@@ -201,7 +201,6 @@ class OrderEditor extends React.Component {
 
         Store.dispatch({ type: "FETCH_SUBMIT_ORDER" })
 
-        orderData.TotalAmount = _amount;
         orderData.Goods = orderGoods;
 
         console.log(JSON.stringify(orderData));
