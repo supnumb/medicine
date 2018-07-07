@@ -854,14 +854,16 @@ OrderTran.prototype.edit = function (Obj, callback) {
 };
 
 Order.prototype.calc = function (goods) {
-    let TotalAmount = 0;
+    let TotalAmount = 0, ReceiptAmount = 0;
 
     goods.forEach(good => {
         if (good.Flag != -1)
             TotalAmount += good.Quantity * good.FinalPrice;
     })
 
-    return { TotalAmount };
+    ReceiptAmount = TotalAmount;
+
+    return { TotalAmount, ReceiptAmount };
 }
 
 /**

@@ -217,9 +217,9 @@ Member.prototype.memberList = function (KeyWord, MobilPhone, Page, Limit, OrderB
             }
 
             if (element.IsWeixinFriend == 1) {
-                rows[index].IsWeixinFriend = "是";
+                rows[index].IsWeixinFriendLabel = "是";
             } else {
-                rows[index].IsWeixinFriend = "否";
+                rows[index].IsWeixinFriendLabel = "否";
             }
 
             rows[index].CreateTime = moment(rows[index].CreateTime).format('YYYY-MM-DD HH:mm:ss');

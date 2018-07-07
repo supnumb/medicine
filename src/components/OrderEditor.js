@@ -201,12 +201,6 @@ class OrderEditor extends React.Component {
 
         Store.dispatch({ type: "FETCH_SUBMIT_ORDER" })
 
-        let _amount = 0;
-        orderGoods.forEach(g => {
-            _amount = g.Quantity * g.FinalPrice;
-        })
-
-        orderData.ReceiptAmount = _amount;
         orderData.TotalAmount = _amount;
         orderData.Goods = orderGoods;
 

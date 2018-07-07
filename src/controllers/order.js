@@ -57,13 +57,13 @@ exports.edit = (req, res, next) => {
     //TODO:兼容错误，默认操作为当前登录用户
     let { user } = req.session;
 
-    let { ID, MemberID, OperatorID = user.ID, EmployeeID, Address, MemberName: Connact, Telephone, ReceiptAmount = 0, PayStyle = 3, DeliveryCompany = '', DeliveryFee = 0, DeliverCode = '', DeliverReceiptFee = 0, DeliveryReceive = 0, DeliveryInsure = 0, Remark = '', Goods } = req.body;
+    let { ID, MemberID, OperatorID = user.ID, EmployeeID, Address, MemberName: Connact, Telephone, PayStyle = 3, DeliveryCompany = '', DeliveryFee = 0, DeliverCode = '', DeliverReceiptFee = 0, DeliveryReceive = 0, DeliveryInsure = 0, Remark = '', Goods } = req.body;
 
-    if (!MemberID || !EmployeeID || !Address || !Connact || !Telephone || !ReceiptAmount || !PayStyle || Goods.length == 0) {
-        return res.send({ code: 2, message: "参数不完整" });
+    if (!MemberID || !EmployeeID || !Address || !Connact || !Telephone || !PayStyle || Goods.length == 0) {
+        return res.send({ code: 2, message: "参数不完整:请检查会员信息、销售员、会员地址，支付方式，药品（>0）" });
     };
 
-    let { TotalAmount } = Order.calc(Goods);
+    let { TotalAmount, ReceiptAmount } = Order.calc(Goods);
 
     const orderData = { ID, MemberID, EmployeeID, OperatorID, Address, Connact, Telephone, TotalAmount, ReceiptAmount, PayStyle, DeliveryCompany, DeliveryFee, DeliverCode, DeliverReceiptFee, DeliveryInsure, Remark, Date: new Date(), Goods, DeliveryReceive };
 
