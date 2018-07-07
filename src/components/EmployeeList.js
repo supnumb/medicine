@@ -24,6 +24,10 @@ class EmployeeList extends React.Component {
         this.toggleEnableStatus = this._toggleEnableStatus.bind(this);
     }
 
+    componentWillUnmount() {
+        this.unSubscribe();
+    }
+
     _loadEmployeesFromDB() {
         Store.dispatch({ type: "FETCH_EMPLOYEES" });
 

@@ -29,7 +29,7 @@ class ReceiptEditor extends React.Component {
             errors: {},
             receiptGoods: [],
             employees: [],
-            vendors: [],
+            vendors: [{ label: "", value: "" }],
             isShowGoodSelector: false,
             message: "",
             isReturn: false
@@ -170,6 +170,7 @@ class ReceiptEditor extends React.Component {
             }
         }).catch(err => {
             console.error(err);
+            alert("网络请求中断，请稍后再试")
         })
     }
 
@@ -251,8 +252,8 @@ class ReceiptEditor extends React.Component {
                 }
             })
 
-            console.log(selected);
-            console.log(receiptGoods);
+            // console.log(selected);
+            // console.log(receiptGoods);
 
             receiptGoods.forEach(g => g.Flag = 0);
 

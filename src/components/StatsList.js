@@ -13,8 +13,8 @@ const CashStat = (props) => {
 
     let { data, isFetching } = props;
 
-    let jsxData = ("");
-    let jsxFooter = ("");
+    let jsxData = (<tbody><tr><td colSpan={6}>暂无数据</td></tr></tbody>);
+    let jsxFooter = (<tfoot><tr><td colSpan={6}></td></tr></tfoot>);
 
     if (data && data.length > 0) {
 
@@ -25,21 +25,20 @@ const CashStat = (props) => {
             totalAmount += item.TotalAmount;
             receiptTotalAmount += item.ReceiptAmount;
 
-            return (
-
-                <tr key={index}>
-                    <td>{item.CreateTime}</td>
-                    <td>{item.ID}</td>
-                    <td>{item.TotalAmount}</td>
-                    <td>{item.PayStyleLabel}</td>
-                    <td>{item.ReceiptAmount}</td>
-                    <td>{item.EmployeeName}</td>
-                </tr>
-
+            return (<tr key={index}>
+                <td>{item.CreateTime}</td>
+                <td>{item.ID}</td>
+                <td>{item.TotalAmount}</td>
+                <td>{item.PayStyleLabel}</td>
+                <td>{item.ReceiptAmount}</td>
+                <td>{item.EmployeeName}</td>
+            </tr>
             );
         });
 
-        jsxData = (<tbody> {jsxList} </tbody>);
+        if (jsxList) {
+            jsxData = (<tbody>{jsxList}</tbody>);
+        }
 
         jsxFooter = (<tfoot>
             <tr key="total">
@@ -53,7 +52,7 @@ const CashStat = (props) => {
 
     }
 
-    let loading = isFetching ? (<Icon />) : ("");
+    let loading = isFetching ? (<Icon icon="spinner" spin />) : ("");
 
     return (
         <div id="cash_stat">
@@ -81,7 +80,7 @@ const CashStat = (props) => {
 const CashStyleStat = (props) => {
     let { data, isFetching } = props;
 
-    let jsx = ("暂无数据");
+    let jsx = (<tr><td colSpan={3}>暂无数据</td></tr>);
 
     if (data && data.length > 0) {
 
@@ -99,8 +98,6 @@ const CashStyleStat = (props) => {
             }
         });
 
-        console.log(statData);
-
         jsx = [...statData.values()].map((item, index) => {
             return (
                 <tr key={index}>
@@ -112,7 +109,7 @@ const CashStyleStat = (props) => {
         });
     }
 
-    let loading = isFetching ? (<Icon />) : ("");
+    let loading = isFetching ? (<Icon icon="spinner" spin />) : ("");
 
     return (
         <div id="cash_stat">
@@ -138,10 +135,10 @@ const CashStyleStat = (props) => {
  */
 const SalerStat = (props) => {
     let { data, isFetching } = props;
-    let jsxData = ("");
-    let jsxFooter = ("");
+    let jsxData = (<tbody><tr><td>&nbsp;</td></tr></tbody>);
+    let jsxFooter = (<tfoot><tr><td>&nbsp;</td></tr></tfoot>);
 
-    if (data) {
+    if (data && data.length > 0) {
         let count = 0, totalQuantity = 0, avagePirce, totalAmount = 0, avageGrossMargin = 0, totalGrossPrifit = 0;
         let jsxList = data.map((item, index) => {
             count++;
@@ -204,7 +201,7 @@ const SalerStat = (props) => {
         </tfoot>);
     }
 
-    let loading = isFetching ? (<Icon />) : ("");
+    let loading = isFetching ? (<Icon icon="spinner" spin />) : ("");
 
     return (
         <div id="saler_stat">
@@ -246,8 +243,8 @@ const SalerStat = (props) => {
 const CategoryState = (props) => {
 
     let { data, isFetching } = props;
-    let jsxData = ("无数据");
-    let jsxFooter = ("");
+    let jsxData = (<tbody><tr><td>&nbsp;</td></tr></tbody>);
+    let jsxFooter = (<tfoot><tr><td>&nbsp;</td></tr></tfoot>);
 
     if (data) {
         let count = 0, totalQuantity = 0, avagePirce, totalAmount = 0, avageGrossMargin = 0, totalGrossPrifit = 0;
@@ -309,7 +306,7 @@ const CategoryState = (props) => {
 
     }
 
-    let loading = isFetching ? (<Icon />) : ("");
+    let loading = isFetching ? (<Icon icon="spinner" spin />) : ("");
 
     return (<div id="category_stat">
         <h4>品类销售统计</h4>
@@ -332,7 +329,6 @@ const CategoryState = (props) => {
             </thead>
             {jsxData}
             {jsxFooter}
-
         </table>
 
         {loading}
@@ -395,7 +391,7 @@ const StockState = (props) => {
 
         </tfoot>);
     }
-    let loading = isFetching ? (<Icon />) : ("");
+    let loading = isFetching ? (<Icon icon="spinner" spin />) : ("");
 
     return (<div id="stock_stat">
         <h4>品类库存统计</h4>
@@ -443,8 +439,12 @@ class StatsList extends React.Component {
         this.loadStockStat = this._loadStockStat.bind(this);
     }
 
+    componentWillUnmount() {
+        this.unSubscribe();
+    }
+
     componentDidMount() {
-        let start = Moment().add("day", -7).format("YYYY-MM-DD");
+        let start = Moment().add("day", -2).format("YYYY-MM-DD");
         let end = Moment().format("YYYY-MM-DD");
 
         this.loadCashStat(null, start, end);

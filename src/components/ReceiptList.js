@@ -101,7 +101,7 @@ class ReceiptList extends React.Component {
         this.loadReceiptsFromDB();
     }
 
-    componentUnMount() {
+    componentWillUnmount() {
         this.unSubscribe();
     }
 

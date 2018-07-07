@@ -69,7 +69,7 @@ class MemberList extends React.Component {
         })
     }
 
-    componentUnMount() {
+    componentWillUnmount() {
         this.unSubscribe();
     }
 

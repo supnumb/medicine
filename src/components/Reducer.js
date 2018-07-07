@@ -35,7 +35,7 @@ const defaultState = {
         message: "",
         isShowGoodSearchZone: false,
         employees: [],
-        members: [],
+        members: [{label:"",value:""}],
         isPrintingOrder: false,
         isPrintingDeliverTicket: false
     },
@@ -106,7 +106,7 @@ const defaultState = {
         salerStat: null,
         categoryStat: null,
         stocksStat: null,
-        start: Moment().add(-7, 'day').format("YYYY-MM-DD"),
+        start: Moment().add(-1, 'day').format("YYYY-MM-DD"),
         end: Moment().format("YYYY-MM-DD"),
         statItem: 1
     }

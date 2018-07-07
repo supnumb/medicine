@@ -80,7 +80,7 @@ class GoodList extends React.Component {
         this.loadGoodListFromDB();
     }
 
-    componentUnMount() {
+    componentWillUnmount() {
         this.unSubscribe();
     }
 
