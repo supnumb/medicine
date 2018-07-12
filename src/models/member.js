@@ -9,7 +9,7 @@ function Member() {
     var _action = {
 
         //根据电话号码查找
-        _getByTel: "select * from Members where MobilPhone=:MobilPhone;",
+        _getByTel: "select * from Members where MobilPhone=:MobilPhone and Status=1;",
 
         //根据ID进行查找
         _getByID: "select * from Members where ID=:ID;",
@@ -179,8 +179,8 @@ Member.prototype.memberList = function (KeyWord, MobilPhone, Page, Limit, OrderB
                 Flag: 0,
                 KeyWord: `%${KeyWord}%`,
                 MobilPhone: `%${MobilPhone}%`,
-                Page,
-                Limit,
+                Page:Number.parseInt(Page),
+                Limit:Number.parseInt(Limit),
                 OrderBy: `m.${OrderBy}`,
                 StartTime,
                 EndTime,

@@ -6,6 +6,8 @@ import { SchemaModel, StringType } from 'rsuite-schema';
 import { Icon, RadioGroup, Radio } from 'rsuite';
 import { WSAENETUNREACH } from 'constants';
 
+const TextareaField = createFormControl('textarea');
+
 const model = SchemaModel({
     Name: StringType().isRequired('请输入姓名'),
     PinYin: StringType().isRequired('请输入拼音'),
@@ -260,7 +262,7 @@ class MemberEditor extends React.Component {
                         备注
                     </label>
                     <div className="col-sm-6">
-                        <Field name="Remark" id="Remark" />
+                        <Field name="Remark" id="Remark" accepter={TextareaField} />
                     </div>
                     <p className="text-danger">{errors.Remark}</p>
                 </div>

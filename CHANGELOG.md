@@ -11,9 +11,13 @@
 2、
 
 
+7.9
+-----
+1. 增加税点和税点的统计
+
+ALTER TABLE `Medicine`.`Orders` ADD COLUMN `Tax` int NOT NULL DEFAULT 0 AFTER `DeliveryReceive`;
+
 # 规划一下：出库单和进货单的关联？
-
-
 
 ##  2018-04-25
 1、完成会员模块
@@ -27,10 +31,6 @@
 
 ## 2018-04-30
 1、完成销售统计
-
-
-
-
 
 #### 问题总结
 

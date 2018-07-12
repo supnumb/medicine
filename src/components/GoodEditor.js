@@ -132,7 +132,7 @@ class GoodEditor extends React.Component {
                     <div className="col-sm-6">
                         <Field name="Name" id="Name" />
                     </div>
-                    <Field type="hidden" className="" name="ID"></Field>
+                    <Field type="hidden" name="ID"></Field>
                     <p className="text-danger">{errors.Name}</p>
                 </div>
 

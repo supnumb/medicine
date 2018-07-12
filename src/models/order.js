@@ -31,7 +31,7 @@ function Order() {
         _rate: "select AA.CreateTime , AA.ID , BB.GoodID , DD. Name , DD.OfficalName , DD.Dimension , DD.Unit , DD.Manufacturer , BB.Quantity , BB.FinalPrice , BB.Quantity * BB.FinalPrice as GoodAmount , DD.DefaultPrice , DD.DefaultCostPrice , BB.Quantity *( BB.FinalPrice - DD.DefaultCostPrice ) as GrossProfit , ( BB.FinalPrice - DD.DefaultCostPrice )/ BB.FinalPrice as GrossMargin , CC. Name as EmployeeName from Orders as AA inner join OrderGoods as BB on AA.ID = BB.OrderID inner join Members as CC on AA.EmployeeID = CC.ID inner join Goods as DD on BB.GoodID = DD.ID where date_format(AA.CreateTime,'%Y-%m-%d')>=:StartTime and date_format(AA.CreateTime,'%Y-%m-%d')<=:EndTime;",
 
         //销售商品统计
-        _good: "select BB.GoodID , BB.GoodName , CC.OfficalName , CC.Dimension , CC.Unit , CC.Manufacturer , sum( BB.Quantity ) as SumQuantity , sum( BB.Quantity * BB.FinalPrice ) as SumAmount , sum( BB.Quantity *( BB.FinalPrice - CC.DefaultCostPrice )) as GrossProfit , sum( BB.Quantity *( BB.FinalPrice - CC.DefaultCostPrice ))/ sum( BB.Quantity * BB.FinalPrice ) as GrossMargin , CC.DefaultCostPrice , AA.CreateTime from Orders as AA INNER join OrderGoods as BB on AA.ID = BB.OrderID inner join Goods as CC on BB.GoodID = CC.ID where date_format(AA.CreateTime,'%Y-%m-%d')>=:StartTime and date_format(AA.CreateTime,'%Y-%m-%d')<=:EndTime  GROUP BY BB.GoodID;",
+        _good: "select BB.GoodID , BB.GoodName , CC.OfficalName , CC.Dimension , CC.Unit , CC.Manufacturer , sum( BB.Quantity ) as SumQuantity ,BB.FinalPrice, sum( BB.Quantity * BB.FinalPrice ) as SumAmount , sum( BB.Quantity *( BB.FinalPrice - CC.DefaultCostPrice )) as GrossProfit , sum( BB.Quantity *( BB.FinalPrice - CC.DefaultCostPrice ))/ sum( BB.Quantity * BB.FinalPrice ) as GrossMargin , CC.DefaultCostPrice , AA.CreateTime from Orders as AA INNER join OrderGoods as BB on AA.ID = BB.OrderID inner join Goods as CC on BB.GoodID = CC.ID where date_format(AA.CreateTime,'%Y-%m-%d')>=:StartTime and date_format(AA.CreateTime,'%Y-%m-%d')<=:EndTime  GROUP BY BB.GoodID;",
 
     };
 
@@ -41,11 +41,6 @@ function Order() {
     this.prototype = base;
     Base.apply(this, arguments);
 };
-
-function OrderTran() {
-
-}
-
 
 /**
  * 订单记录搜索
@@ -256,6 +251,11 @@ Order.prototype.orderInfo = function (ID, callback) {
  * 5、修改库存
  * 6、添加库存变动记录
  */
+
+function OrderTran() {
+
+}
+
 
 /**
  * 修改订单
@@ -880,7 +880,7 @@ Order.prototype.calc = function (goods) {
  */
 Order.prototype.update = function (order, callback) {
 
-    let __updateOrder = "update Orders set MemberID=:MemberID,OperatorID=:OperatorID,Address=:Address,Connact=:Connact,Telephone=:Telephone,TotalAmount=:TotalAmount,ReceiptAmount=:ReceiptAmount,PayStyle=:PayStyle,DeliveryCompany=:DeliveryCompany,DeliveryFee=:DeliveryFee,DeliverCode=:DeliverCode,DeliverReceiptFee=:DeliverReceiptFee,DeliveryInsure=:DeliveryInsure,Remark=:Remark,Date=:Date,DeliveryReceive=:DeliveryReceive where ID=:ID";
+    let __updateOrder = "update Orders set MemberID=:MemberID,OperatorID=:OperatorID,Address=:Address,Connact=:Connact,Telephone=:Telephone,TotalAmount=:TotalAmount,ReceiptAmount=:ReceiptAmount,PayStyle=:PayStyle,DeliveryCompany=:DeliveryCompany,DeliveryFee=:DeliveryFee,DeliverCode=:DeliverCode,DeliverReceiptFee=:DeliverReceiptFee,DeliveryInsure=:DeliveryInsure,Tax=:Tax,Remark=:Remark,DeliveryReceive=:DeliveryReceive where ID=:ID";
 
     let __listOrderGoods = "select ID,GoodID,Quantity,ReceiptGoodID,ReceiptQuantity from OrderGoods where OrderID=:ID;";
 
@@ -1045,7 +1045,7 @@ Order.prototype.update = function (order, callback) {
  */
 Order.prototype.save = function (order, callback) {
 
-    let __addOrder = 'insert into Orders (MemberID,OperatorID,EmployeeID,Address,Connact,Telephone,TotalAmount,ReceiptAmount,PayStyle,DeliveryCompany,DeliveryFee,DeliverCode,DeliverReceiptFee,DeliveryInsure,Remark,Date,CreateTime,DeliveryReceive) values (:MemberID,:OperatorID,:EmployeeID,:Address,:Connact,:Telephone,:TotalAmount,:ReceiptAmount,:PayStyle,:DeliveryCompany,:DeliveryFee,:DeliverCode,:DeliverReceiptFee,:DeliveryInsure,:Remark,:Date,now(),:DeliveryReceive)';
+    let __addOrder = 'insert into Orders (MemberID,OperatorID,EmployeeID,Address,Connact,Telephone,TotalAmount,ReceiptAmount,PayStyle,DeliveryCompany,DeliveryFee,DeliverCode,DeliverReceiptFee,DeliveryInsure,Tax,Remark,Date,CreateTime,DeliveryReceive) values (:MemberID,:OperatorID,:EmployeeID,:Address,:Connact,:Telephone,:TotalAmount,:ReceiptAmount,:PayStyle,:DeliveryCompany,:DeliveryFee,:DeliverCode,:DeliverReceiptFee,:DeliveryInsure,:Tax,:Remark,:Date,now(),:DeliveryReceive)';
 
     let __addOrderGoods = "insert into OrderGoods(GoodID,OrderID,GoodName,Quantity,FinalPrice) values (:GoodID,:OrderID,:GoodName,:Quantity,:FinalPrice);";
 

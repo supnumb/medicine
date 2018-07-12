@@ -12,9 +12,10 @@
  */
 
 const moment = require('moment');
+var fs = require('fs');
 
 const { Order } = require('../models/index');
-
+const config = require('../../config');
 
 /**
  * 收银统计
@@ -27,8 +28,6 @@ const { Order } = require('../models/index');
 exports.cash = (req, res, next) => {
 
     let { StartTime = '', EndTime = '', action } = req.body;
-
-    console.log(req.body);
 
     if (!StartTime && !EndTime) {
 
@@ -47,11 +46,25 @@ exports.cash = (req, res, next) => {
         };
 
         if (action == 'export') {
+            let csvStr = `日期,零售总单id,总单金额,收银方式,收银金额,收银员\r\n`;
 
+            mem.forEach(item => {
+                csvStr += `${moment(item.CreateTime).format("YYYY-MM-DD")},${item.ID},{item.TotalAmount},${item.PayStyleLabel},${item.ReceiptAmount},${item.EmployeeName}\r\n`;
+            })
+
+            let filename = `cash_${moment(StartTime).format("YYYY-MM-DD")}_${moment(EndTime).format("YYYY-MM-DD")}.csv`;
+            let urlfile = `${config.UrlTemFile}/${filename}`;
+
+            console.log(csvStr);
+
+            fs.writeFile(config.TempFileRoot + "/" + filename, csvStr, function (err) {
+                console.log(err);
+            });
+
+            return res.send({ code: 0, message: "收银统计操作成功！", data: mem, url: urlfile });
         }
 
         return res.send({ code: 0, message: "收银统计操作成功！", data: mem });
-
     });
 }
 
@@ -64,6 +77,8 @@ exports.cash = (req, res, next) => {
  * @param  {Date}     req.body.EndTime 结束时间
  */
 exports.rate = (req, res, next) => {
+
+    // console.log(req.body);
 
     let { StartTime = '', EndTime = '', action } = req.body;
 
@@ -84,11 +99,25 @@ exports.rate = (req, res, next) => {
         };
 
         if (action == 'export') {
+            let csvStr = `日期,零售总单id,商品id,商品名称,通用名称,规格,单位,生产厂家,数量,单价,销售金额,默认单价,进价,毛利,毛利率,销售员\r\n`;
 
+            mem.forEach(item => {
+                csvStr += `${moment(item.CreateTime).format("YYYY-MM-DD")},${item.ID},${item.GoodID},${item.Name},${item.OfficalName},${item.Dimension},${item.Unit},${item.Manufacturer},${item.Quantity},${item.FinalPrice},${item.GoodAmount},${item.DefaultPrice},${item.DefaultCostPrice},${item.GrossProfit},${item.GrossMargin},${item.EmployeeName}\r\n`;
+            })
+
+            let filename = `rate_${moment(StartTime).format("YYYY-MM-DD")}_${moment(EndTime).format("YYYY-MM-DD")}.csv`;
+            let urlfile = `${config.UrlTemFile}/${filename}`;
+
+            console.log(csvStr);
+
+            fs.writeFile(config.TempFileRoot + "/" + filename, csvStr, function (err) {
+                console.log(err);
+            });
+
+            return res.send({ code: 0, message: "销售员毛利率统计操作成功！", data: mem, url: urlfile });
+        } else {
+            return res.send({ code: 0, message: "销售员毛利率统计操作成功！", data: mem });
         }
-
-        return res.send({ code: 0, message: "销售员毛利率统计操作成功！", data: mem });
-
     });
 }
 
@@ -124,7 +153,22 @@ exports.good = (req, res, next) => {
         };
 
         if (action == 'export') {
+            let csvStr = `商品id,商品名称,通用名称,规格,单位,生产厂家,数量之和,单价平均,销售金额之和,毛利之和,毛利率,默认单价\r\n`;
 
+            mem.forEach(item => {
+                csvStr += `${item.GoodID},${item.GoodName},${item.OfficalName},${item.Dimension},${item.Unit},${item.Manufacturer},${item.SumQuantity},${item.FinalPrice},${item.SumAmount},${item.GrossProfit},${item.GrossMargin},${item.DefaultCostPrice}\r\n`;
+            })
+
+            let filename = `good_${moment(StartTime).format("YYYY-MM-DD")}_${moment(EndTime).format("YYYY-MM-DD")}.csv`;
+            let urlfile = `${config.UrlTemFile}/${filename}`;
+
+            console.log(csvStr);
+
+            fs.writeFile(config.TempFileRoot + "/" + filename, csvStr, function (err) {
+                console.log(err);
+            });
+
+            return res.send({ code: 0, message: "收银统计操作成功！", data: mem, url: urlfile });
         }
 
         return res.send({ code: 0, message: "销售统计操作成功！", data: mem });

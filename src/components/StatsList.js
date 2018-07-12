@@ -4,6 +4,9 @@ import Moment from 'moment';
 import numeral from 'numeral';
 import { Icon, RadioGroup, Radio, DatePicker, SelectPicker } from 'rsuite';
 import Table from 'rsuite/lib/Table';
+import { Form, Field, createFormControl } from 'form-lib';
+
+
 
 /**
  * 收银统计数据
@@ -265,7 +268,7 @@ const CategoryState = (props) => {
                     <td>{item.Unit}</td>
                     <td>{item.Manufacturer}</td>
                     <td>{item.SumQuantity}</td>
-                    <td>{item.AvagePrice}</td>
+                    <td>{item.FinalPrice}</td>
                     <td>{item.SumAmount}</td>
                     <td>{item.GrossProfit}</td>
                     <td>{item.GrossMargin}</td>
@@ -380,6 +383,7 @@ const StockState = (props) => {
                 <th>总量</th>
                 <th></th>
                 <th>总金额</th>
+                <th colSpan="2"></th>
             </tr>
             <tr key="total_data">
                 <th colSpan="5">合计</th>
@@ -387,9 +391,10 @@ const StockState = (props) => {
                 <th>{totalQuantity}</th>
                 <th></th>
                 <th>{numeral(totalAmount).format("0.00")}</th>
+                <th colSpan="2"></th>
             </tr>
 
-        </tfoot>);
+        </tfoot >);
     }
     let loading = isFetching ? (<Icon icon="spinner" spin />) : ("");
 
@@ -450,14 +455,16 @@ class StatsList extends React.Component {
         this.loadCashStat(null, start, end);
         this.loadSalerStat(null, start, end);
         this.loadCategoryStat(null, start, end);
-        this.loadStockStat(null, start, end);
+        this.loadStockStat("");
+
     }
 
     _loadCashStat(event, start, end) {
 
         let postData = {
             StartTime: start,
-            EndTime: end
+            EndTime: end,
+            action: "export"
         }
 
         Store.dispatch({ type: "FETCH_CASH", payload: postData });
@@ -485,7 +492,8 @@ class StatsList extends React.Component {
     _loadSalerStat(event, start, end) {
         let postData = {
             StartTime: start,
-            EndTime: end
+            EndTime: end,
+            action: "export"
         }
 
         Store.dispatch({ type: "FETCH_SALER", payload: postData });
@@ -513,7 +521,8 @@ class StatsList extends React.Component {
     _loadCategoryStat(event, start, end) {
         let postData = {
             StartTime: start,
-            EndTime: end
+            EndTime: end,
+            action: "export"
         }
 
         Store.dispatch({ type: "FETCH_CATEGORY", payload: postData });
@@ -538,17 +547,17 @@ class StatsList extends React.Component {
         })
     }
 
-    _loadStockStat(event, start, end) {
+    _loadStockStat( keyword) {
         let postData = {
-            StartTime: start,
-            EndTime: end,
+            keyword,
             Page: 0,
-            Limit: 1000
+            Limit: 1000,
+            action: "export"
         }
 
         Store.dispatch({ type: "FETCH_STOCK", payload: postData });
 
-        fetch('/api/stock/search', {
+        fetch('/api/stat/stocks', {
             body: JSON.stringify(postData),
             method: 'POST',
             mode: 'same-origin',
@@ -587,7 +596,7 @@ class StatsList extends React.Component {
                 this.loadCategoryStat(null, start, end);
                 break;
             case 5:
-                this.loadStockStat(null, start, end);
+                this.loadStockStat("");
                 break;
         }
     }
@@ -599,6 +608,26 @@ class StatsList extends React.Component {
         let zone = (<div className="stat_zone">
             <CashStat isFetching={isCashFetching} data={cashStat} />
         </div>);
+
+        let search_bar = (<tbody>
+            <tr>
+                <td>日期范围</td>
+                <td><DatePicker name="StartDate" placeholder="起始日期" id="Date" value={Moment(start)} onChange={(date) => {
+                    Store.dispatch({ type: "SET_START_DATE", payload: date });
+                    this._onDateRangeChanged(date);
+                    // this.loadCashStat(null, date, end);
+                }} /></td>
+                <td>~</td>
+                <td><DatePicker name="EndDate" placeholder="终止日期" id="Date" value={Moment(end)} onChange={(date) => {
+                    Store.dispatch({ type: "SET_END_DATE", payload: date });
+                    this._onDateRangeChanged(null, date);
+                    // this.loadCashStat(null, start, date);
+                }} /></td>
+                <td>
+                    <button className="btn btn-default"> 导出.csv </button>
+                </td>
+            </tr>
+        </tbody>);
 
         switch (statItem) {
             case 1:
@@ -625,6 +654,25 @@ class StatsList extends React.Component {
                 zone = (<div className="stat_zone">
                     <StockState isFetching={isStockFetching} data={stocksStat} />
                 </div>);
+                search_bar = (<tbody>
+                    <tr>
+                        <td>药品</td>
+                        <td  width="150px">
+                            <Field  id="keyword" name="keyword" value="" placeholder="药品名\通用名\" />
+                        </td>
+                        <td width="60px" style={{"padding":"10px"}}>
+                        <button className="btn btn-primary" onClick={()=>{
+ let keyword=$("#keyword").val();
+ this.loadStockStat(keyword);
+                        }
+                           
+                        }>查询</button>
+                        </td>
+                        <td>
+                            <button className="btn btn-default"> 导出.csv </button>
+                        </td>
+                    </tr>
+                </tbody>);
                 break;
         }
 
@@ -643,24 +691,11 @@ class StatsList extends React.Component {
                 <Radio value={5}>库存统计</Radio>
             </RadioGroup>
 
-            <table style={{ "width": "350px" }}>
-                <tbody>
-                    <tr>
-                        <td>日期范围</td>
-                        <td><DatePicker name="StartDate" placeholder="起始日期" id="Date" value={Moment(start)} onChange={(date) => {
-                            Store.dispatch({ type: "SET_START_DATE", payload: date });
-                            this._onDateRangeChanged(date);
-                            // this.loadCashStat(null, date, end);
-                        }} /></td>
-                        <td>~</td>
-                        <td><DatePicker name="EndDate" placeholder="终止日期" id="Date" value={Moment(end)} onChange={(date) => {
-                            Store.dispatch({ type: "SET_END_DATE", payload: date });
-                            this._onDateRangeChanged(null, date);
-                            // this.loadCashStat(null, start, date);
-                        }} /></td>
-                    </tr>
-                </tbody>
+<Form id="form">
+            <table style={{ "width": "440px" }}>
+               {search_bar}
             </table>
+    </Form>
 
             {zone}
         </div>)

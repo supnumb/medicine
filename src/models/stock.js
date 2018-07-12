@@ -15,6 +15,8 @@ function Stock() {
         //库存查询
         _search: "select AA.GoodID , BB. Name , BB.OfficalName , BB.Dimension , BB.Unit , BB.Manufacturer , BB.DefaultCostPrice , AA.TotalQuantity , AA.ValiableQuantity , AA.SaledQuantity from Stocks as AA INNER join Goods as BB on AA.GoodID = BB.ID where AA.CreateTime>=:StartTime and AA.CreateTime<=:EndTime and BB.Name like :KeyWord order by AA.CreateTime desc limit :Page,:Limit;",
 
+        _stocks: "select AA.GoodID , BB. Name , BB.OfficalName , BB.Dimension , BB.Unit , BB.Manufacturer , BB.DefaultCostPrice , AA.TotalQuantity , AA.ValiableQuantity , AA.SaledQuantity from Stocks as AA INNER join Goods as BB on AA.GoodID = BB.ID where BB.Name like :KeyWord;"
+
     };
 
     var base = new Base();
@@ -24,10 +26,12 @@ function Stock() {
     Base.apply(this, arguments);
 };
 
-function StockTran() {
 
+Stock.prototype.stocks = function (keyword, callback) {
+    this._stocks({
+        KeyWord: `%${keyword}%`,
+    }, callback);
 }
-
 
 /**
  * 库存查询
@@ -38,9 +42,7 @@ Stock.prototype.search = function (KeyWord, Page, Limit, StartTime, EndTime, cal
     const that = this;
 
     async.parallel([
-
         function (cb) {
-
             that._stockQuantity({
                 KeyWord: `%${KeyWord}%`,
                 StartTime,
@@ -99,6 +101,9 @@ Stock.prototype.search = function (KeyWord, Page, Limit, StartTime, EndTime, cal
     });
 };
 
+function StockTran() {
+
+}
 
 /**
  * 调整单录入

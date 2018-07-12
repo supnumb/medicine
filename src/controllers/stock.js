@@ -39,7 +39,7 @@ exports.stockList = (req, res, next) => {
         EndTime = moment(new Date()).format('YYYY-MM-DD 23:59:59');
     }
 
-    Stock.search(KeyWord, Page, Limit, StartTime, EndTime, function(err, mem) {
+    Stock.search(KeyWord, Page, Limit, StartTime, EndTime, function (err, mem) {
 
         if (err) {
             return res.send({ code: 2, message: "数据库出错" });
@@ -49,6 +49,26 @@ exports.stockList = (req, res, next) => {
 
         return res.status(200).send({ code: 0, message: "查询库存列表操作成功！", Quantity, data: rows });
 
+    });
+}
+
+/**
+ * 库存当前的状态
+ * @param {Object} req 
+ * @param {Object} res 
+ * @param {Function} next 
+ */
+exports.stocks = (req, res, next) => {
+
+    let { keyword = '' } = req.body;
+
+    Stock.stocks(keyword, function (err, rows) {
+
+        if (err) {
+            return res.send({ code: 2, message: "数据库出错" });
+        };
+
+        return res.status(200).send({ code: 0, message: "查询库存列表操作成功！", data: rows });
     });
 }
 
@@ -71,7 +91,7 @@ exports.revision = (req, res, next) => {
 
     const StockData = { OperatorID, StockGoods };
 
-    StockTran.revision(StockData, function(err, mem) {
+    StockTran.revision(StockData, function (err, mem) {
 
         if (err) {
             return res.send({ code: 2, message: "数据库出错" });

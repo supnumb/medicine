@@ -44,7 +44,7 @@ function Receipt() {
  * @param {function} callback 回调
  */
 Receipt.prototype.update = function (receiptData, callback) {
-    let __updateReceipt = "update Receipts set VendorName=:VendorName,VendorID=:VendorID,OperatorID=:OperatorID,Date=:Date where ID=:ID;";
+    let __updateReceipt = "update Receipts set VendorName=:VendorName,VendorID=:VendorID,OperatorID=:OperatorID,Date=:Date,Remark=:Remark where ID=:ID;";
 
     let __updateReceiptGood = "update ReceiptGoods set Quantity=:Quantity,ExpiryDate=:ExpiryDate,ManufactureDate=:ManufactureDate,BatchNo=:BatchNo,CostPrice=:CostPrice,Flag=:Flag,ValiableQuantity=Quantity-:ReturnQuantity,ReturnQuantity=:ReturnQuantity where ReceiptID=:ReceiptID and GoodID=:GoodID;";
 
@@ -242,7 +242,7 @@ Receipt.prototype.update = function (receiptData, callback) {
  * @param {function} callback 回调
  */
 Receipt.prototype.add = function (receiptData, callback) {
-    let __addReceipt = "insert into Receipts (VendorName,VendorID,OperatorID,Date,CreateTime,Flag) values (:VendorName,:VendorID,:OperatorID,:Date,now(),:Flag);";
+    let __addReceipt = "insert into Receipts (VendorName,VendorID,OperatorID,Date,Remark,CreateTime,Flag) values (:VendorName,:VendorID,:OperatorID,:Date,:Remark,now(),:Flag);";
 
     let __addReceiptGood = "insert into ReceiptGoods (ReceiptID,GoodID,CostPrice,Quantity,ValiableQuantity,ExpiryDate,ManufactureDate,BatchNo) values (:ReceiptID,:GoodID,:CostPrice,:Quantity,:Quantity,:ExpiryDate,:ManufactureDate,:BatchNo)";
 
@@ -280,7 +280,7 @@ Receipt.prototype.add = function (receiptData, callback) {
 
                 async.each(ReceiptGoods, function (good, callback) {
 
-                    if(good.Flag==-1){
+                    if (good.Flag == -1) {
                         return callback();
                     }
 

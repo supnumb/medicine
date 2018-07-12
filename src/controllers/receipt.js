@@ -29,13 +29,13 @@ const { Receipt } = require('../models/index');
  * @param  {Function} next 管道操作，传递到下一步
  */
 exports.save = (req, res, next) => {
-    let { ID, VendorName, VendorID, Date, IsReturn, ReceiptGoods } = req.body;
+    let { ID, VendorName, VendorID, Date, IsReturn, ReceiptGoods, Remark = "" } = req.body;
 
     if (!VendorName || !VendorID || !Date || ReceiptGoods.length == 0) {
         return res.status(200).send({ code: 2, message: "VendorName|VendorID|Date|ReceiptGoods参数不匹配！" });
     };
 
-    const ReceiptData = { ID, VendorName, VendorID, Date: moment(Date).format("YYYY-MM-DD"), ReceiptGoods, Flag: IsReturn ? 1 : 0 };
+    const ReceiptData = { ID, VendorName, VendorID, Date: moment(Date).format("YYYY-MM-DD"), ReceiptGoods, Remark, Flag: IsReturn ? 1 : 0 };
 
     let { user } = req.session;
 

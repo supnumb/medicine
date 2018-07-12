@@ -88,6 +88,7 @@ class OrderGoodList extends React.Component {
                     <td>{og.GoodName || og.Name}</td>
                     <td>{og.Dimension}</td>
                     <td>{og.Unit}</td>
+                    <td>{og.Manufacturer}</td>
                     <td>
                         <input style={{ "width": "60px" }} id="FinalPrice" value={og.FinalPrice} onChange={(event) => { this.onTextChanged(event, og); }} />
                     </td>
@@ -97,13 +98,12 @@ class OrderGoodList extends React.Component {
                         }} />
                     </td>
                     <td>{og.GoodSumPrice}</td>
-                    <td>{og.Manufacturer}</td>
                     <td>
-                        <a href="#" onClick={() => {
+                        <button onClick={() => {
                             let { orderGoods } = this.state;
                             this.calcGoodSumPrice(orderGoods);
                             this.setState({ orderGood: null });
-                        }}>确定</a>
+                        }}>确定</button>
                     </td>
                 </tr>);
             } else {
@@ -112,22 +112,20 @@ class OrderGoodList extends React.Component {
                     <td>{og.GoodName || og.Name}</td>
                     <td>{og.Dimension}</td>
                     <td>{og.Unit}</td>
+                    <td>{og.Manufacturer}</td>
                     <td>{og.FinalPrice}</td>
                     <td>{og.Quantity}</td>
                     <td>{og.GoodSumPrice}</td>
-                    <td>{og.Manufacturer}</td>
 
                     <td>
-                        <a href="#" onClick={() => {
+                        <button onClick={() => {
                             this.setState({ orderGood: og })
-                        }}>编辑</a>
-
+                        }}>编辑</button>
                         <br />
-                        <a href="#" onClick={() => {
+                        <button onClick={() => {
                             og.Flag = -1;
                             this.setState({ orderGood: null })
-                        }}>删除</a>
-
+                        }}>删除</button>
                     </td>
                 </tr>);
             }
@@ -141,10 +139,10 @@ class OrderGoodList extends React.Component {
                         <th>药品名</th>
                         <th>规格</th>
                         <th>单位</th>
+                        <th>厂家</th>
                         <th>售价</th>
                         <th>数量</th>
                         <th>金额</th>
-                        <th>厂家</th>
                         <th>操作</th>
                     </tr>
                 </thead>

@@ -126,34 +126,56 @@ class OrderEditor extends React.Component {
         let params = {
             KeyWord: keyword,
             MobilPhone: "",
-            Page: 0,
-            Limit: 20
         }
 
-        fetch('/api/member/search', {
-            body: JSON.stringify(params),
-            method: "POST",
-            mode: 'same-origin',
-            credentials: 'same-origin',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }).then(res => res.json()).then(json => {
-            if (json.code == 0) {
-                console.log(json);
+        // fetch('/api/member/search', {
+        //     body: JSON.stringify(params),
+        //     method: "POST",
+        //     mode: 'same-origin',
+        //     credentials: 'same-origin',
+        //     headers: {
+        //         'Content-Type': 'application/json'
+        //     }
+        // }).then(res => res.json()).then(json => {
+        //     if (json.code == 0) {
+        //         console.log(json);
 
-                let members = [];
-                if (json.data.length > 0) {
-                    members = json.data.map(v => ({ label: `${v.Name}-${v.PinYin}-${v.MobilPhone}`, value: v.ID, data: JSON.stringify(v) }));
+        //         let members = [];
+        //         if (json.data.length > 0) {
+        //             members = json.data.map(v => ({ label: `${v.Name}-${v.PinYin}-${v.MobilPhone}`, value: v.ID, data: JSON.stringify(v) }));
+        //         }
+
+        //         Store.dispatch({ type: "FETCH_MEMBER_DONE", payload: members })
+        //     } else {
+        //         alert(json.message);
+        //     }
+        // }).catch(err => {
+        //     console.error(err);
+        // })
+
+        if (this.xhr && this.xhr.readystate != 4) {
+            this.xhr.abort();
+        }
+
+        this.xhr = $.ajax({
+            url: `/api/member/search`,
+            type: 'POST',
+            data: params,
+            success: function (json) {
+
+                if (json.code == 0) {
+                    console.log(json);
+
+                    let members = [];
+                    if (json.data.length > 0) {
+                        members = json.data.map(v => ({ label: `${v.Name}-${v.PinYin}-${v.MobilPhone}`, value: v.ID, data: JSON.stringify(v) }));
+                    }
+
+                    Store.dispatch({ type: "FETCH_MEMBER_DONE", payload: members })
                 }
 
-                Store.dispatch({ type: "FETCH_MEMBER_DONE", payload: members })
-            } else {
-                alert(json.message);
-            }
-        }).catch(err => {
-            console.error(err);
-        })
+            }.bind(this)
+        });
     }
 
     /**
@@ -203,7 +225,7 @@ class OrderEditor extends React.Component {
 
         orderData.Goods = orderGoods;
 
-        console.log(JSON.stringify(orderData));
+        // console.log(JSON.stringify(orderData));
 
         fetch('/api/order/submit', {
             body: JSON.stringify(orderData),
@@ -542,6 +564,16 @@ class OrderEditor extends React.Component {
                                 <Radio value={2}>已经收到</Radio>
                             </RadioGroup>
                         </div>
+                    </div>
+
+                    <div className="form-group">
+                        <label className="control-label col-md-2">
+                            税:
+                        </label>
+                        <div className="col-md-4 ">
+                            <Field name="Tax" id="Tax" />
+                        </div>
+                        <p className="text-danger">{errors.Tax}</p>
                     </div>
 
                     <div className="form-group">

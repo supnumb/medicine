@@ -11,6 +11,7 @@ const model = SchemaModel({ VendorName: StringType().isRequired('请选择供应
 
 import ReceiptGoodList from './ReceiptGoodList';
 import GoodSelector from './GoodSelector';
+const TextareaField = createFormControl('textarea');
 
 import store from './Reducer';
 
@@ -339,6 +340,16 @@ class ReceiptEditor extends React.Component {
                     <ReceiptGoodList isEditabled={isEditabled} isReturn={isReturn} goods={receiptGoods} onAddGood={() => {
                         this.setState({ isShowGoodSelector: true })
                     }} />
+
+                    <div className="form-group">
+                        <label className="control-label col-md-2">
+                            备注&nbsp;
+                        </label>
+                        <div className="col-md-10">
+                            <Field disabled={isEditabled} name="Remark" id="Remark" placeholder="备注" accepter={TextareaField} />
+                        </div>
+                        <p className="text-danger">{errors.Remark}</p>
+                    </div>
 
                     {loading}
 

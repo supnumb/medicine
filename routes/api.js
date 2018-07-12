@@ -115,6 +115,9 @@ router.post('/receipt/detail', member.checkUser, receipt.receiptInfo);
 //库存查询
 router.post('/stock/search', member.checkUser, stock.stockList);
 
+//最新库存信息
+router.post('/stat/stocks', member.checkUser, stock.stocks);
+
 //收银统计
 router.post('/stat/cash', member.checkUser, stat.cash);
 
