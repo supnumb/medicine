@@ -69,7 +69,6 @@ exports.edit = (req, res, next) => {
 
     // console.log(orderData);
 
-    // OrderTran.edit(orderData, function (err, mem) {
     Order.edit(orderData, function (err, mem) {
         if (err) {
             console.error(err);

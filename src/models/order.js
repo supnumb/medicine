@@ -170,7 +170,7 @@ Order.prototype.orderList = function (KeyWord, Page, Limit, StartTime, EndTime, 
 
             rows[index].PayStyleLabel = PayStyleLabel;
 
-            rows[index].Date = moment(rows[index].Date).format('YYYY-MM-DD');
+            rows[index].Date = moment(rows[index].CreateTime).format('YYYY-MM-DD');
             rows[index].CreateTime = moment(rows[index].CreateTime).format('YY-MM-DD HH:mm:ss');
             rows[index].UpdateTime = moment(rows[index].UpdateTime).format('YY-MM-DD HH:mm:ss');
 
@@ -1045,7 +1045,7 @@ Order.prototype.update = function (order, callback) {
  */
 Order.prototype.save = function (order, callback) {
 
-    let __addOrder = 'insert into Orders (MemberID,OperatorID,EmployeeID,Address,Connact,Telephone,TotalAmount,ReceiptAmount,PayStyle,DeliveryCompany,DeliveryFee,DeliverCode,DeliverReceiptFee,DeliveryInsure,Tax,Remark,Date,CreateTime,DeliveryReceive) values (:MemberID,:OperatorID,:EmployeeID,:Address,:Connact,:Telephone,:TotalAmount,:ReceiptAmount,:PayStyle,:DeliveryCompany,:DeliveryFee,:DeliverCode,:DeliverReceiptFee,:DeliveryInsure,:Tax,:Remark,:Date,now(),:DeliveryReceive)';
+    let __addOrder = 'insert into Orders (MemberID,OperatorID,EmployeeID,Address,Connact,Telephone,TotalAmount,ReceiptAmount,PayStyle,DeliveryCompany,DeliveryFee,DeliverCode,DeliverReceiptFee,DeliveryInsure,Tax,Remark,CreateTime,DeliveryReceive) values (:MemberID,:OperatorID,:EmployeeID,:Address,:Connact,:Telephone,:TotalAmount,:ReceiptAmount,:PayStyle,:DeliveryCompany,:DeliveryFee,:DeliverCode,:DeliverReceiptFee,:DeliveryInsure,:Tax,:Remark,now(),:DeliveryReceive)';
 
     let __addOrderGoods = "insert into OrderGoods(GoodID,OrderID,GoodName,Quantity,FinalPrice) values (:GoodID,:OrderID,:GoodName,:Quantity,:FinalPrice);";
 
