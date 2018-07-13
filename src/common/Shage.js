@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 
 
 
@@ -146,4 +147,12 @@ class engine {
     onMoveingAll() {
 
     }
+=======
+class Shage{
+
+    
+    
+
+
+>>>>>>> Stashed changes
 }

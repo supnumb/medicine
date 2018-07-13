@@ -548,6 +548,18 @@ class OrderEditor extends React.Component {
                         <p className="text-danger">{errors.DeliveryInsure}</p>
                     </div>
 
+
+                    <div className="form-group">
+                        <label className="control-label col-md-2">
+                            税:
+                        </label>
+                        <div className="col-md-4 ">
+                            <Field name="Tax" id="Tax" />
+                        </div>
+                        <p className="text-danger">{errors.Tax}</p>
+                    </div>
+
+
                     <div className="form-group">
                         <label className="control-label col-md-2">
                             是否收到
@@ -564,16 +576,6 @@ class OrderEditor extends React.Component {
                                 <Radio value={2}>已经收到</Radio>
                             </RadioGroup>
                         </div>
-                    </div>
-
-                    <div className="form-group">
-                        <label className="control-label col-md-2">
-                            税:
-                        </label>
-                        <div className="col-md-4 ">
-                            <Field name="Tax" id="Tax" />
-                        </div>
-                        <p className="text-danger">{errors.Tax}</p>
                     </div>
 
                     <div className="form-group">

@@ -181,8 +181,8 @@ class ReceiptGoodList extends React.Component {
                     <td>{g.CostPrice}</td>
                     <td>{g.Quantity}</td>
                     <td>{g.BatchNo}</td>
-                    <td>{g.ExpiryDate}</td>
                     <td>{g.ManufactureDate}</td>
+                    <td>{g.ExpiryDate}</td>
                     <td>
                         {
                             isEditabled ? ("编辑") : (<a href="#" onClick={() => { this.setState({ receiptGood: g }) }}>编辑</a>)
