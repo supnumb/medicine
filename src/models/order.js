@@ -285,7 +285,7 @@ OrderTran.prototype.edit = function (Obj, callback) {
         }
 
         if (!ID) {
-            let Order_add = 'insert into Orders (MemberID,OperatorID,EmployeeID,Address,Connact,Telephone,TotalAmount,ReceiptAmount,PayStyle,DeliveryCompany,DeliveryFee,DeliverCode,DeliverReceiptFee,DeliveryInsure,Remark,Date,CreateTime,DeliveryReceive) values (:MemberID,:OperatorID,:EmployeeID,:Address,:Connact,:Telephone,:TotalAmount,:ReceiptAmount,:PayStyle,:DeliveryCompany,:DeliveryFee,:DeliverCode,:DeliverReceiptFee,:DeliveryInsure,:Remark,:Date,now(),:DeliveryReceive)';
+            let Order_add = 'insert into Orders (MemberID,OperatorID,EmployeeID,Address,Connact,Telephone,TotalAmount,ReceiptAmount,PayStyle,DeliveryCompany,DeliveryFee,DeliverCode,DeliverReceiptFee,DeliveryInsure,Remark,CreateTime,DeliveryReceive) values (:MemberID,:OperatorID,:EmployeeID,:Address,:Connact,:Telephone,:TotalAmount,:ReceiptAmount,:PayStyle,:DeliveryCompany,:DeliveryFee,:DeliverCode,:DeliverReceiptFee,:DeliveryInsure,:Remark,now(),:DeliveryReceive)';
 
             let ReceiptGood_search = 'select ID,ReceiptID,GoodID,CostPrice,ValiableQuantity from ReceiptGoods where GoodID=:GoodID and ValiableQuantity>0;';
 
