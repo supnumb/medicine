@@ -128,31 +128,6 @@ class OrderEditor extends React.Component {
             MobilPhone: "",
         }
 
-        // fetch('/api/member/search', {
-        //     body: JSON.stringify(params),
-        //     method: "POST",
-        //     mode: 'same-origin',
-        //     credentials: 'same-origin',
-        //     headers: {
-        //         'Content-Type': 'application/json'
-        //     }
-        // }).then(res => res.json()).then(json => {
-        //     if (json.code == 0) {
-        //         console.log(json);
-
-        //         let members = [];
-        //         if (json.data.length > 0) {
-        //             members = json.data.map(v => ({ label: `${v.Name}-${v.PinYin}-${v.MobilPhone}`, value: v.ID, data: JSON.stringify(v) }));
-        //         }
-
-        //         Store.dispatch({ type: "FETCH_MEMBER_DONE", payload: members })
-        //     } else {
-        //         alert(json.message);
-        //     }
-        // }).catch(err => {
-        //     console.error(err);
-        // })
-
         if (this.xhr && this.xhr.readystate != 4) {
             this.xhr.abort();
         }
@@ -406,6 +381,11 @@ class OrderEditor extends React.Component {
 
         // console.log({ values, orderGoods });
 
+
+        if (!members && !Object.prototype.toString.call(members) === '[object Array]') {
+            members = [];
+        }
+
         let loading = isFetching ? (<Icon icon='spinner' spin />) : ("");
 
         let goodSelector = ("");
@@ -550,6 +530,16 @@ class OrderEditor extends React.Component {
 
                     <div className="form-group">
                         <label className="control-label col-md-2">
+                            税:
+                        </label>
+                        <div className="col-md-4 ">
+                            <Field name="Tax" id="Tax" />
+                        </div>
+                        <p className="text-danger">{errors.Tax}</p>
+                    </div>
+
+                    <div className="form-group">
+                        <label className="control-label col-md-2">
                             是否收到
                         </label>
                         <div className="col-md-6">
@@ -564,16 +554,6 @@ class OrderEditor extends React.Component {
                                 <Radio value={2}>已经收到</Radio>
                             </RadioGroup>
                         </div>
-                    </div>
-
-                    <div className="form-group">
-                        <label className="control-label col-md-2">
-                            税:
-                        </label>
-                        <div className="col-md-4 ">
-                            <Field name="Tax" id="Tax" />
-                        </div>
-                        <p className="text-danger">{errors.Tax}</p>
                     </div>
 
                     <div className="form-group">

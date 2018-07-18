@@ -442,6 +442,7 @@ class StatsList extends React.Component {
         this.loadSalerStat = this._loadSalerStat.bind(this);
         this.loadCategoryStat = this._loadCategoryStat.bind(this);
         this.loadStockStat = this._loadStockStat.bind(this);
+        this.downloadCSV=this._downloadCSV.bind(this);
     }
 
     componentWillUnmount() {
@@ -456,7 +457,6 @@ class StatsList extends React.Component {
         this.loadSalerStat(null, start, end);
         this.loadCategoryStat(null, start, end);
         this.loadStockStat("");
-
     }
 
     _loadCashStat(event, start, end) {
@@ -480,8 +480,12 @@ class StatsList extends React.Component {
         }).then(res => res.json()).then(json => {
             console.log(json);
             if (json.code == 0) {
+                this.downurl=json.url;
+                this.filename=json.filename;
                 Store.dispatch({ type: "FETCH_CASH_DONE", payload: json.data })
             } else {
+                this.downurl=null;
+                this.filename=null;
                 alert(json.message);
             }
         }).catch(err => {
@@ -509,8 +513,12 @@ class StatsList extends React.Component {
         }).then(res => res.json()).then(json => {
             console.log(json);
             if (json.code == 0) {
+                this.downurl=json.url;
+                this.filename=json.filename;
                 Store.dispatch({ type: "FETCH_SALER_DONE", payload: json.data })
             } else {
+                this.downurl=null;
+                this.filename=null;
                 alert(json.message);
             }
         }).catch(err => {
@@ -538,8 +546,12 @@ class StatsList extends React.Component {
         }).then(res => res.json()).then(json => {
             console.log(json);
             if (json.code == 0) {
+                this.downurl=json.url;
+                this.filename=json.filename;
                 Store.dispatch({ type: "FETCH_CATEGORY_DONE", payload: json.data })
             } else {
+                this.downurl=null;
+                this.filename=null;
                 alert(json.message);
             }
         }).catch(err => {
@@ -568,8 +580,12 @@ class StatsList extends React.Component {
         }).then(res => res.json()).then(json => {
             console.log(json);
             if (json.code == 0) {
+                this.downurl=json.url;
+                this.filename=json.filename;
                 Store.dispatch({ type: "FETCH_STOCK_DONE", payload: json.data })
             } else {
+                this.downurl=null;
+                this.filename=null;
                 alert(json.message);
             }
         }).catch(err => {
@@ -601,6 +617,25 @@ class StatsList extends React.Component {
         }
     }
 
+    _downloadCSV(){
+
+        console.log("aaa",this.downurl);
+        
+        if(this.downurl){
+            fetch(this.downurl).then(res=>res.blob()).then(blob=>{
+                let a = document.createElement('a');
+      var url = window.URL.createObjectURL(blob);
+    //   var filename = res.headers.get('Content-Disposition'); 
+      a.href = url; 
+      a.download = this.filename||"temp.csv"; 
+      a.click(); 
+      window.URL.revokeObjectURL(url); 
+            });
+        }else{
+            alert("出现错误,请重新刷新页面后再下载");
+        }
+    }
+
     render() {
 
         let { statList: { isCashFetching, cashStat, isSalerFetching, salerStat, isCategoryFetching, categoryStat, isStockFetching, stocksStat, start, end, statItem } } = this.state;
@@ -624,7 +659,7 @@ class StatsList extends React.Component {
                     // this.loadCashStat(null, start, date);
                 }} /></td>
                 <td>
-                    <button className="btn btn-default"> 导出.csv </button>
+                    <button className="btn btn-default" onClick={this.downloadCSV}> 导出.csv </button>
                 </td>
             </tr>
         </tbody>);
@@ -669,7 +704,7 @@ class StatsList extends React.Component {
                         }>查询</button>
                         </td>
                         <td>
-                            <button className="btn btn-default"> 导出.csv </button>
+                            <button className="btn btn-default"  onClick={this.downloadCSV}> 导出.csv </button>
                         </td>
                     </tr>
                 </tbody>);

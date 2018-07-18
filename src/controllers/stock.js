@@ -11,8 +11,9 @@
  */
 
 const moment = require('moment');
-const eventproxy = require('eventproxy');
-
+// const eventproxy = require('eventproxy');
+const config = require('../../config');
+var fs = require('fs');
 const { Stock, StockTran } = require('../models/index');
 
 
@@ -60,7 +61,7 @@ exports.stockList = (req, res, next) => {
  */
 exports.stocks = (req, res, next) => {
 
-    let { keyword = '' } = req.body;
+    let { keyword = '', action = "" } = req.body;
 
     Stock.stocks(keyword, function (err, rows) {
 
@@ -68,7 +69,26 @@ exports.stocks = (req, res, next) => {
             return res.send({ code: 2, message: "数据库出错" });
         };
 
-        return res.status(200).send({ code: 0, message: "查询库存列表操作成功！", data: rows });
+        if (action == 'export') {
+            let csvStr = `商品id,商品名称,通用名称,规格,单位,生产厂家,总进货,已销售,可用库存,进价平均,库存金额\r\n`;
+
+            rows.forEach(item => {
+                csvStr += `${item.GoodID},${item.Name},${item.OfficalName},${item.Dimension},${item.Unit},${item.Manufacturer},${item.TotalQuantity},${item.SaledQuantity},${item.ValiableQuantity},${item.DefaultCostPrice},${item.ValiableQuantity * item.DefaultCostPrice}\r\n`;
+            })
+
+            let filename = `stock_${moment().format("YYYY-MM-DD")}.csv`;
+            let urlfile = `${config.UrlTemFile}/${filename}`;
+
+            console.log(csvStr);
+
+            fs.writeFile(config.TempFileRoot + "/" + filename, csvStr, function (err) {
+                console.log(err);
+            });
+
+            return res.send({ code: 0, message: "查询库存列表操作成功！", data: rows, url: urlfile, filename });
+        } else {
+            return res.status(200).send({ code: 0, message: "查询库存列表操作成功！", data: rows });
+        }
     });
 }
 
@@ -97,8 +117,6 @@ exports.revision = (req, res, next) => {
             return res.send({ code: 2, message: "数据库出错" });
         };
 
-
         return res.send({ code: 0, message: "库存调整操作成功！", data: mem });
-
     });
 }

@@ -35,7 +35,7 @@ const defaultState = {
         message: "",
         isShowGoodSearchZone: false,
         employees: [],
-        members: [{label:"",value:""}],
+        members: [],
         isPrintingOrder: false,
         isPrintingDeliverTicket: false
     },

@@ -49,7 +49,7 @@ exports.cash = (req, res, next) => {
             let csvStr = `日期,零售总单id,总单金额,收银方式,收银金额,收银员\r\n`;
 
             mem.forEach(item => {
-                csvStr += `${moment(item.CreateTime).format("YYYY-MM-DD")},${item.ID},{item.TotalAmount},${item.PayStyleLabel},${item.ReceiptAmount},${item.EmployeeName}\r\n`;
+                csvStr += `${moment(item.CreateTime).format("YYYY-MM-DD")},${item.ID},${item.TotalAmount},${item.PayStyleLabel},${item.ReceiptAmount},${item.EmployeeName}\r\n`;
             })
 
             let filename = `cash_${moment(StartTime).format("YYYY-MM-DD")}_${moment(EndTime).format("YYYY-MM-DD")}.csv`;
@@ -61,7 +61,7 @@ exports.cash = (req, res, next) => {
                 console.log(err);
             });
 
-            return res.send({ code: 0, message: "收银统计操作成功！", data: mem, url: urlfile });
+            return res.send({ code: 0, message: "收银统计操作成功！", data: mem, url: urlfile, filename });
         }
 
         return res.send({ code: 0, message: "收银统计操作成功！", data: mem });
@@ -114,7 +114,7 @@ exports.rate = (req, res, next) => {
                 console.log(err);
             });
 
-            return res.send({ code: 0, message: "销售员毛利率统计操作成功！", data: mem, url: urlfile });
+            return res.send({ code: 0, message: "销售员毛利率统计操作成功！", data: mem, url: urlfile, filename });
         } else {
             return res.send({ code: 0, message: "销售员毛利率统计操作成功！", data: mem });
         }
@@ -168,10 +168,9 @@ exports.good = (req, res, next) => {
                 console.log(err);
             });
 
-            return res.send({ code: 0, message: "收银统计操作成功！", data: mem, url: urlfile });
+            return res.send({ code: 0, message: "销售统计操作成功！", data: mem, url: urlfile, filename });
+        } else {
+            return res.send({ code: 0, message: "销售统计操作成功！", data: mem });
         }
-
-        return res.send({ code: 0, message: "销售统计操作成功！", data: mem });
-
     });
 }
