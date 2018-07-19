@@ -27,7 +27,7 @@ const config = require('../../config');
  */
 exports.cash = (req, res, next) => {
 
-    let { StartTime = '', EndTime = '', action } = req.body;
+    let { StartTime = '', EndTime = '', Keyword = "", action } = req.body;
 
     if (!StartTime && !EndTime) {
 
@@ -39,7 +39,7 @@ exports.cash = (req, res, next) => {
         EndTime = moment(new Date()).format('YYYY-MM-DD');
     }
 
-    Order.cash(StartTime, EndTime, function (err, mem) {
+    Order.cash(StartTime, EndTime, Keyword, function (err, mem) {
 
         if (err) {
             return res.send({ code: 2, message: "数据库出错" });
@@ -78,9 +78,9 @@ exports.cash = (req, res, next) => {
  */
 exports.rate = (req, res, next) => {
 
-    // console.log(req.body);
+    console.log(req.body);
 
-    let { StartTime = '', EndTime = '', action } = req.body;
+    let { EmployeeID = -1, StartTime = '', EndTime = '', action } = req.body;
 
     if (!StartTime && !EndTime) {
 
@@ -92,7 +92,7 @@ exports.rate = (req, res, next) => {
         EndTime = moment(new Date()).format('YYYY-MM-DD');
     }
 
-    Order.rate(StartTime, EndTime, function (err, mem) {
+    Order.rate(EmployeeID, StartTime, EndTime, function (err, mem) {
 
         if (err) {
             return res.send({ code: 2, message: "数据库出错" });
@@ -107,8 +107,6 @@ exports.rate = (req, res, next) => {
 
             let filename = `rate_${moment(StartTime).format("YYYY-MM-DD")}_${moment(EndTime).format("YYYY-MM-DD")}.csv`;
             let urlfile = `${config.UrlTemFile}/${filename}`;
-
-            console.log(csvStr);
 
             fs.writeFile(config.TempFileRoot + "/" + filename, csvStr, function (err) {
                 console.log(err);
@@ -131,9 +129,7 @@ exports.rate = (req, res, next) => {
  */
 exports.good = (req, res, next) => {
 
-    console.log(req.body);
-
-    let { StartTime = '', EndTime = '', action } = req.body;
+    let { Keyword = "", StartTime = '', EndTime = '', action } = req.body;
 
     if (!StartTime && !EndTime) {
 
@@ -146,7 +142,7 @@ exports.good = (req, res, next) => {
 
     }
 
-    Order.good(StartTime, EndTime, function (err, mem) {
+    Order.good(Keyword, StartTime, EndTime, function (err, mem) {
 
         if (err) {
             return res.send({ code: 2, message: "数据库出错" });

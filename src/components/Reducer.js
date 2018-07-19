@@ -104,7 +104,8 @@ const defaultState = {
         stocksStat: null,
         start: Moment().add(-1, 'day').format("YYYY-MM-DD"),
         end: Moment().format("YYYY-MM-DD"),
-        statItem: 1
+        statItem: 1,
+        employees: []
     }
 };
 
@@ -132,6 +133,8 @@ function StatReducer(state = defaultState.statList, action) {
             return Object.assign({}, state, { end: action.payload });
         case "SET_STATITEM":
             return Object.assign({}, state, { statItem: action.payload });
+        case "FETCH_EMPLOYEES_DONE":
+            return Object.assign({}, state, { employees: action.payload });
         default:
             return state;
     }

@@ -61,13 +61,16 @@ class OrderEditor extends React.Component {
             state
         } } = this.props;
 
+        let { action, MemberID } = state;
         Store.dispatch({ type: "SWITCH_SELECTOR_SHOW", payload: false })
-
-        if (state) {
+        //给指定的会员添加销售订单
+        if (action == "NEW_ORDER") {
+            this._loadMemberDetailFromDB(MemberID)
+        } else if (state) {//修改订单
             this.loadOrderDetailFromDB(state);
             Store.dispatch({ type: "SET_CHECKED_ORDER", payload: state })
         } else {
-            //新增
+            // 添加销售订单
             Store.dispatch({
                 type: "SET_CHECKED_ORDER", payload: {
                     DeliveryCode: "",
@@ -120,6 +123,44 @@ class OrderEditor extends React.Component {
 
             this.setState({ values })
         }
+    }
+
+    _loadMemberDetailFromDB(memberID) {
+        fetch(`/api/member/${memberID}`, {
+            method: 'POST',
+            mode: 'same-origin',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(res => res.json()).then(json => {
+            console.log(json);
+
+            if (json.code == 0) {
+                let { data } = json;
+                let { orderEditor: { values } } = this.state;
+                
+                let result = Object.assign({}, values, {
+                    Connact: data.Name,
+                    Name: data.Name,
+                    MemberName: data.Name,
+                    MobilPhone: data.MobilPhone,
+                    Telephone: data.MobilPhone,
+                    Address: data.Address,
+                    MemberID: data.ID,
+                    DeliveryCode: "",
+                    DeliveryCompany: "",
+                    DeliveryFee: 0,
+                    DeliverReceiptFee: 0,
+                    orderGoods: [],
+                    PayStyle: 3
+                });
+
+                Store.dispatch({ type: "SET_VALUES", payload: result });
+            } else { alert(json.message) }
+        }).catch(err => {
+            console.error(err);
+        })
     }
 
     _loadMembersFromDB(keyword) {

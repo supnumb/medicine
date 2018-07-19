@@ -117,8 +117,7 @@ exports.signOut = (req, res, next) => {
  */
 exports.save = (req, res, next) => {
 
-    console.log(req.body);
-
+    // console.log(req.body);
     const {
         ID,
         Name,
@@ -169,7 +168,7 @@ exports.save = (req, res, next) => {
                 return res.status(200).send({ code: 2, message: "未找到对应信息！", data: mem });
             }
 
-            return res.status(200).send({ code: 0, message: "修改会员信息操作成功！", data: mem });
+            return res.status(200).send({ code: 0, message: "修改会员信息操作成功！", data: ID });
 
         });
 
@@ -181,8 +180,9 @@ exports.save = (req, res, next) => {
                 return res.send({ code: 2, message: "数据库出错" });
             };
 
-            return res.status(200).send({ code: 0, message: "添加会员信息操作成功！", data: mem });
+            console.log(mem);
 
+            return res.status(200).send({ code: 0, message: "添加会员信息操作成功！", data: mem.insertId });
         });
 
     }

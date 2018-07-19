@@ -37,9 +37,6 @@ router.post('/member/delete', member.checkUser, member.deleteMember);
 //会员列表(会员信息、意向单数量、回访记录数量、成单数量)
 router.post('/member/search', member.checkUser, member.memberList);
 
-//会员详情(会员信息、意向记录、回访记录、、成单记录)
-router.post('/member/:MemberID', member.checkUser, member.memberInfo);
-
 //回访记录添加
 router.post('/visit/save', member.checkUser, member.addVisit);
 
@@ -78,6 +75,8 @@ router.post('/order/cancel', member.checkUser, order.cancel);
 
 //销售单列表
 router.post('/order/search', member.checkUser, order.orderList);
+
+router.post('/member/orders', member.checkUser, order.orderListOfMember);
 
 //销售订单详情
 router.post('/order/info', member.checkUser, order.orderInfo);
@@ -126,5 +125,8 @@ router.post('/stat/rate', member.checkUser, stat.rate);
 
 //品类统计
 router.post('/stat/good', member.checkUser, stat.good);
+
+//会员详情(会员信息、意向记录、回访记录、、成单记录)
+router.post('/member/:MemberID', member.checkUser, member.memberInfo);
 
 module.exports = router;

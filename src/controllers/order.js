@@ -59,6 +59,8 @@ exports.edit = (req, res, next) => {
 
     let { ID, MemberID, OperatorID = user.ID, EmployeeID, Address, MemberName: Connact, Telephone, PayStyle = 3, DeliveryCompany = '', DeliveryFee = 0, DeliverCode = '', DeliverReceiptFee = 0, DeliveryReceive = 0, DeliveryInsure = 0, Tax = 0, Remark = '', Goods } = req.body;
 
+    console.log(req.body);
+
     if (!MemberID || !EmployeeID || !Address || !Connact || !Telephone || !PayStyle || Goods.length == 0) {
         return res.send({ code: 2, message: "参数不完整:请检查会员信息、销售员、会员地址，支付方式，药品（>0）" });
     };
@@ -143,6 +145,28 @@ exports.orderList = (req, res, next) => {
 
         return res.send({ code: 0, message: "查询订单列表操作成功！", Quantity, data: rows });
     });
+}
+
+/**
+ * 查询指定会员的订单列表
+ * @param  {Object}   req  http 请求对象
+ * @param  {Object}   res  http 响应对象
+  * @param  {Function} next 管道操作，传递到下一步
+ */
+exports.orderListOfMember = (req, res, next) => {
+    let { MemberID, Page = 0, Limit = 10000 } = req.body;
+
+    if (!MemberID) {
+        return res.send({ code: 1, message: "请指定会员ID" });
+    }
+
+    Order.orderListByMember(MemberID, Page, Limit, function (err, rows) {
+        if (err) {
+            return res.send({ code: -1, message: "数据库操作错误" });
+        }
+
+        res.send({ code: 0, message: "查询成功", data: rows });
+    })
 }
 
 /**

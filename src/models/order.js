@@ -15,6 +15,8 @@ function Order() {
         //订单记录列表
         _orderList: "SELECT o.*, m.Name , m.MobilPhone ,( SELECT NAME FROM Members WHERE ID = o.EmployeeID) AS EmployeeName ,(SELECT NAME FROM Members WHERE ID = o.OperatorID) AS OperatorName , GROUP_CONCAT(g.GoodName) AS GoodNames FROM Orders o INNER JOIN Members m ON o.MemberID = m.ID LEFT JOIN OrderGoods g ON o.ID = g.OrderID  and g.Flag!=-1 WHERE CONCAT(m.Name, m.MobilPhone, o.Connact, o.Address) LIKE :KeyWord GROUP BY o.ID ORDER BY o.UpdateTime DESC LIMIT :Page,:Limit;",
 
+        _orderListByMember: "SELECT BB.CreateTime , AA.GoodName , CC.Dimension , CC.Manufacturer , CC.Unit , AA.Quantity , AA.FinalPrice , AA.Quantity * AA.FinalPrice AS Amount FROM OrderGoods AS AA INNER JOIN Orders AS BB ON BB.ID = AA.OrderID INNER JOIN Goods AS CC ON AA.GoodID = CC.ID WHERE BB.MemberID = :MemberID AND BB.Flag = 0 AND AA.Flag = 0 ORDER BY AA.UpdateTime DESC LIMIT :Page,:Limit;",
+
         //订单记录详情
         _orderInfo: "select AA.*,BB.Name as EmployeeName from OrderView as AA inner join Members as BB on AA.EmployeeID=BB.ID where AA.ID=:ID;",
 
@@ -25,13 +27,13 @@ function Order() {
         _orderQuantity: "select count(1) as Quantity from Orders o left join Members m on o.MemberID=m.ID where m.MobilPhone like :KeyWord and o.Date>=:StartTime and o.Date<=:EndTime",
 
         //收银统计
-        _cash: "select AA.ID,EmployeeID,BB.Name as EmployeeName,PayStyle,TotalAmount,ReceiptAmount,AA.CreateTime,AA.UpdateTime from Orders as AA inner join Members as BB on AA.EmployeeID=BB.ID where date_format(AA.CreateTime,'%Y-%m-%d')>=:StartTime and date_format(AA.CreateTime,'%Y-%m-%d')<=:EndTime;",
+        _cash: "SELECT AA.ID , AA.CreateTime , AA.EmployeeID , Connact , AA.Telephone , AA.DeliveryCompany , DeliveryFee , DeliverReceiptFee , DeliveryInsure , Tax , BB.NAME AS EmployeeName , PayStyle , TotalAmount , ReceiptAmount , AA.CreateTime , AA.UpdateTime FROM Orders AS AA INNER JOIN Members AS BB ON AA.EmployeeID = BB.ID where date_format(AA.CreateTime,'%Y-%m-%d')>=:StartTime and date_format(AA.CreateTime,'%Y-%m-%d')<=:EndTime and concat(Connact,AA.Telephone,DeliveryCompany) like :Keyword;",
 
         //销售员毛利率统计//销售员每个订单的毛利率
-        _rate: "select AA.CreateTime , AA.ID , BB.GoodID , DD. Name , DD.OfficalName , DD.Dimension , DD.Unit , DD.Manufacturer , BB.Quantity , BB.FinalPrice , BB.Quantity * BB.FinalPrice as GoodAmount , DD.DefaultPrice , DD.DefaultCostPrice , BB.Quantity *( BB.FinalPrice - DD.DefaultCostPrice ) as GrossProfit , ( BB.FinalPrice - DD.DefaultCostPrice )/ BB.FinalPrice as GrossMargin , CC. Name as EmployeeName from Orders as AA inner join OrderGoods as BB on AA.ID = BB.OrderID inner join Members as CC on AA.EmployeeID = CC.ID inner join Goods as DD on BB.GoodID = DD.ID where date_format(AA.CreateTime,'%Y-%m-%d')>=:StartTime and date_format(AA.CreateTime,'%Y-%m-%d')<=:EndTime;",
+        _rate: "select AA.CreateTime , AA.ID , BB.GoodID , DD. Name , DD.OfficalName , DD.Dimension , DD.Unit , DD.Manufacturer , BB.Quantity , BB.FinalPrice , BB.Quantity * BB.FinalPrice as GoodAmount , DD.DefaultPrice , DD.DefaultCostPrice , BB.Quantity *( BB.FinalPrice - DD.DefaultCostPrice ) as GrossProfit , ( BB.FinalPrice - DD.DefaultCostPrice )/ BB.FinalPrice as GrossMargin , CC.Name as EmployeeName,AA.EmployeeID from Orders as AA inner join OrderGoods as BB on AA.ID = BB.OrderID inner join Members as CC on AA.EmployeeID = CC.ID inner join Goods as DD on BB.GoodID = DD.ID where (AA.EmployeeID=:EmployeeID or :EmployeeID=-1) and  date_format(AA.CreateTime,'%Y-%m-%d')>=:StartTime and date_format(AA.CreateTime,'%Y-%m-%d')<=:EndTime;",
 
         //销售商品统计
-        _good: "select BB.GoodID , BB.GoodName , CC.OfficalName , CC.Dimension , CC.Unit , CC.Manufacturer , sum( BB.Quantity ) as SumQuantity ,BB.FinalPrice, sum( BB.Quantity * BB.FinalPrice ) as SumAmount , sum( BB.Quantity *( BB.FinalPrice - CC.DefaultCostPrice )) as GrossProfit , sum( BB.Quantity *( BB.FinalPrice - CC.DefaultCostPrice ))/ sum( BB.Quantity * BB.FinalPrice ) as GrossMargin , CC.DefaultCostPrice , AA.CreateTime from Orders as AA INNER join OrderGoods as BB on AA.ID = BB.OrderID inner join Goods as CC on BB.GoodID = CC.ID where date_format(AA.CreateTime,'%Y-%m-%d')>=:StartTime and date_format(AA.CreateTime,'%Y-%m-%d')<=:EndTime  GROUP BY BB.GoodID;",
+        _good: "select BB.GoodID , BB.GoodName , CC.OfficalName , CC.Dimension , CC.Unit , CC.Manufacturer , sum( BB.Quantity ) as SumQuantity ,BB.FinalPrice, sum( BB.Quantity * BB.FinalPrice ) as SumAmount , sum( BB.Quantity *( BB.FinalPrice - CC.DefaultCostPrice )) as GrossProfit , sum( BB.Quantity *( BB.FinalPrice - CC.DefaultCostPrice ))/ sum( BB.Quantity * BB.FinalPrice ) as GrossMargin , CC.DefaultCostPrice , AA.CreateTime from Orders as AA INNER join OrderGoods as BB on AA.ID = BB.OrderID inner join Goods as CC on BB.GoodID = CC.ID where CONCAT(CC.Name,CC.OfficalName,CC.PinYin) LIKE :Keyword and date_format(AA.CreateTime,'%Y-%m-%d')>=:StartTime and date_format(AA.CreateTime,'%Y-%m-%d')<=:EndTime  GROUP BY BB.GoodID;",
 
     };
 
@@ -65,6 +67,82 @@ Order.prototype.search = function (MemberID, callback) {
         callback(null, rows);
     });
 };
+
+/**
+ * 列出指定会员的所有订单
+ * @param {Number}} MemberID 会员ID
+ * @param {Number} Page 页码
+ * @param {Number} Limit 数量
+ * @param {function} callback 回调
+ */
+Order.prototype.orderListByMember = function (MemberID, Page, Limit, callback) {
+    const that = this;
+
+    that._orderListByMember({
+        MemberID,
+        Page,
+        Limit,
+    }, function (err, rows) {
+        if (err) {
+            return callback(err, null);
+        }
+
+        rows.forEach(function (element, index) {
+            //支付方式 1、微信，2、支付宝，3、现金，4、货到付款，5、二维码
+            let PayStyleLabel = '';
+
+            switch (element.PayStyle) {
+                case 1:
+                    PayStyleLabel = '微信';
+                    break;
+                case 2:
+                    PayStyleLabel = '支付宝';
+                    break;
+                case 3:
+                    PayStyleLabel = '现金';
+                    break;
+                case 4:
+                    PayStyleLabel = '货到付款';
+                    break;
+                case 5:
+                    PayStyleLabel = '二维码';
+                    break;
+                case 6:
+                    PayStyleLabel = '刷卡';
+                    break;
+                case 7:
+                    PayStyleLabel = '公司微信';
+                    break;
+                case 8:
+                    PayStyleLabel = '网上转账';
+                    break;
+            }
+
+            switch (element.DeliveryReceive) {
+                case 0:
+                    rows[index].DeliveryReceiveLabel = "不明确";
+                    break;
+                case 1:
+                    rows[index].DeliveryReceiveLabel = "未收到";
+                    break;
+                case 2:
+                    rows[index].DeliveryReceiveLabel = "已经收到";
+                    break;
+
+            }
+
+            rows[index].PayStyleLabel = PayStyleLabel;
+
+            rows[index].Date = moment(rows[index].CreateTime).format('YYYY-MM-DD');
+            // rows[index].CreateTime = moment(rows[index].CreateTime).format('YYYYY-MM-DD HH:mm:ss');
+            // rows[index].UpdateTime = moment(rows[index].UpdateTime).format('YY-MM-DD HH:mm:ss');
+
+        });
+
+        callback(null, rows);
+    });
+}
+
 
 /**
  * 订单记录列表
@@ -1338,11 +1416,12 @@ Order.prototype.parsePayStyleLabel = function (rows) {
     })
 }
 
-Order.prototype.cash = function (StartTime, EndTime, callback) {
+Order.prototype.cash = function (StartTime, EndTime, Keyword, callback) {
     let that = this;
     this._cash({
         StartTime,
-        EndTime
+        EndTime,
+        Keyword: `%${Keyword}%`
     }, function (err, rows) {
         if (err) {
             return callback(err, null);
@@ -1365,11 +1444,12 @@ Order.prototype.cash = function (StartTime, EndTime, callback) {
 }
 
 
-Order.prototype.rate = function (StartTime, EndTime, callback) {
+Order.prototype.rate = function (EmployeeID, StartTime, EndTime, callback) {
 
     this._rate({
+        EmployeeID,
         StartTime,
-        EndTime
+        EndTime,
     }, function (err, rows) {
         if (err) {
             return callback(err, null);
@@ -1387,9 +1467,11 @@ Order.prototype.rate = function (StartTime, EndTime, callback) {
 
 }
 
-Order.prototype.good = function (StartTime, EndTime, callback) {
+
+Order.prototype.good = function (Keyword, StartTime, EndTime, callback) {
 
     this._good({
+        Keyword:`%${Keyword}%`,
         StartTime,
         EndTime
     }, function (err, rows) {

@@ -37,6 +37,23 @@ describe("#会员模块测试", function () {
         });
     })
 
+    it.only("### 列出指定会员的订单列表", function (done) {
+        let MemberID = 88;
+
+        console.log("1===========");
+
+        agent.post('/api/member/orders').send({ MemberID }).expect(200).end(function (err, res) {
+            if (err) {
+                return done(err);
+            }
+
+            console.log(JSON.parse(res.text));
+
+            res.text.should.containEql("0");
+            done();
+        });
+    })
+
     it("##005.01 会员添加", function (done) {
         agent.post('/api/member/save').send(memberData).expect(200).end(function (err, res) {
             if (err) {
@@ -220,7 +237,7 @@ describe("#会员模块测试", function () {
         });
     })
 
-    it.only("## 公司雇员添加 ", function (done) {
+    it("## 公司雇员添加 ", function (done) {
         let employeeData = {
             Name: "张三",
             MobilPhone: "13511111111",

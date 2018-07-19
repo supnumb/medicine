@@ -1,10 +1,8 @@
 import React from 'react';
-import Store from './Reducer'
-
+import { withRouter } from 'react-router-dom';
 import { Form, Field, createFormControl } from 'form-lib';
 import { SchemaModel, StringType } from 'rsuite-schema';
 import { Icon, RadioGroup, Radio } from 'rsuite';
-import { WSAENETUNREACH } from 'constants';
 
 const TextareaField = createFormControl('textarea');
 
@@ -28,12 +26,9 @@ class MemberEditor extends React.Component {
             message: ""
         };
 
-        this.loadObjectDetail = this._loadObjectDetail.bind(this);
         this.submit = this._submit.bind(this);
         this.cancel = this._cancel.bind(this);
     }
-
-    _loadObjectDetail() { }
 
     _cancel() {
         if (this.props.onCanceled) {
@@ -41,7 +36,7 @@ class MemberEditor extends React.Component {
         }
     }
 
-    _submit() {
+    _submit(isGoNext = false) {
         if (!this.form.check()) {
             this.setState({ message: "数据格式有错误" })
             return;
@@ -50,8 +45,6 @@ class MemberEditor extends React.Component {
         let { values } = this.state;
 
         let postData = values;
-
-        console.log(postData);
 
         fetch('/api/member/save', {
             body: JSON.stringify(postData),
@@ -68,6 +61,13 @@ class MemberEditor extends React.Component {
                 if (this.props.onSaveCompleted) {
                     this.props.onSaveCompleted(json);
                 }
+
+                if (isGoNext) {
+                    this.props.history.push({
+                        pathname: "/order/editor",
+                        state: { action: "NEW_ORDER", MemberID: json.data }
+                    })
+                }
             } else {
                 alert(json.message);
             }
@@ -80,7 +80,7 @@ class MemberEditor extends React.Component {
         let { member, action } = nextProps;
         let { member: oldMember } = this.props;
 
-        console.log({ action, member });
+        // console.log({ action, member });
 
         if (member && oldMember) {
             if (member.ID != oldMember.ID) {
@@ -290,6 +290,10 @@ class MemberEditor extends React.Component {
                     <button onClick={this.submit} className="btn btn-primary">
                         保存
                     </button>
+                    &nbsp;
+                    <button onClick={() => this.submit(true)} className="btn btn-default">
+                        保存并添加销售单
+                    </button>
                 </div>
 
             </Form>
@@ -297,4 +301,4 @@ class MemberEditor extends React.Component {
     }
 }
 
-export default MemberEditor;
+export default withRouter(MemberEditor);

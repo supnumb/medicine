@@ -143,7 +143,7 @@ class OrderList extends React.Component {
                             &nbsp;
                             &nbsp;
                             <button onClick={() => {
-                                this.props.history.push({ pathname: "/order/editor", state: null })
+                                this.props.history.push({ pathname: "/order/editor", state: {action:"NEW_ORDER"} })
                             }} className="btn btn-default">
                                 添加销售订单
                             </button>

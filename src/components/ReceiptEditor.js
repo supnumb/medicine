@@ -229,35 +229,29 @@ class ReceiptEditor extends React.Component {
 
         if (selected) {
             selected.forEach(sg => {
-                let isHas = false;
-                receiptGoods.forEach(g => {
-                    if (g.GoodID == sg.ID) {
-                        isHas = true;
-                    }
-                })
+                // let isHas = false;
+                // receiptGoods.forEach(g => {
+                //     if (g.GoodID == sg.ID) {
+                //         isHas = true;
+                //     }
+                // })
 
-                if (!isHas) {
-                    receiptGoods.push({
-                        GoodID: sg.ID,
-                        ValiableQuantity: 1,
-                        ExpiryDate: Moment().add(0, 'days').format("YYYY-MM-DD"),
-                        ManufactureDate: Moment().format("YYYY-MM-DD"),
-                        BatchNo: "",
-                        CostPrice: sg.DefaultCostPrice,
-                        Name: sg.Name,
-                        Dimension: sg.Dimension,
-                        Manufacturer: sg.Manufacturer,
-                        OfficalName: sg.OfficalName,
-                        Flag: 0
-                    });
-                }
+                receiptGoods.push({
+                    GoodID: sg.ID,
+                    ValiableQuantity: 1,
+                    ExpiryDate: Moment().add(0, 'days').format("YYYY-MM-DD"),
+                    ManufactureDate: Moment().format("YYYY-MM-DD"),
+                    BatchNo: "",
+                    CostPrice: sg.DefaultCostPrice,
+                    Name: sg.Name,
+                    Dimension: sg.Dimension,
+                    Manufacturer: sg.Manufacturer,
+                    OfficalName: sg.OfficalName,
+                    Flag: 0
+                });
             })
 
-            // console.log(selected);
-            // console.log(receiptGoods);
-
             receiptGoods.forEach(g => g.Flag = 0);
-
             this.setState({ receiptGoods });
         }
     }

@@ -16,7 +16,7 @@ function Receipt() {
         _search: "SELECT r.*, m. NAME AS EmployeeName , group_concat(g. NAME) AS Goods ,SUM(p.CostPrice*p.ValiableQuantity) as Amount , p.CostPrice , v.Contact , v.Telephone , v.Address FROM Receipts r INNER JOIN ReceiptGoods p ON r.ID = p.ReceiptID INNER JOIN Goods g ON p.GoodID = g.ID INNER JOIN Vendors v ON r.VendorID = v.ID INNER JOIN Members m ON r.OperatorID = m.ID WHERE r.Date >=:StartTime AND r.Date <=:EndTime AND concat( r.VendorName , g.NAME , v.Telephone , v.Address , v.Contact) LIKE :KeyWord and r.Status in (:Status) GROUP BY r.ID ORDER BY r.CreateTime DESC LIMIT :Page,:Limit;",
 
         //详情
-        _receiptInfo: "select r.*,v.Name,v.Telephone,v.Address,v.Contact,v.Remark from Receipts r left join Vendors v on r.VendorID=v.ID left join Members m on r.OperatorID=m.ID where r.ID=:ID;",
+        _receiptInfo: "select r.*,v.Name,v.Telephone,v.Address,v.Contact,r.Remark from Receipts r left join Vendors v on r.VendorID=v.ID left join Members m on r.OperatorID=m.ID where r.ID=:ID;",
 
         _receiptGoodInfo: "select r.*,g.* from ReceiptGoods r inner join Goods g on r.GoodID=g.ID where r.ReceiptID=:ID and r.Flag>=0;",
 

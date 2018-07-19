@@ -7,6 +7,78 @@ import Table from 'rsuite/lib/Table';
 import { Form, Field, createFormControl } from 'form-lib';
 
 
+const FeeStat=(props)=>{
+let {data,isFetching}=props;
+
+let jsxData = (<tbody><tr><td colSpan={8}>暂无数据</td></tr></tbody>);
+let jsxFooter = (<tfoot><tr><td colSpan={8}></td></tr></tfoot>);
+
+if (data && data.length > 0) {
+
+    let count = 0, totalDeliveryInsure = 0, totalTax = 0,totalDeliverReceiptFee=0,totalDeliveryFee=0;
+
+    let jsxList = data.map((item, index) => {
+        count++;
+        totalDeliveryFee += item.DeliveryFee;
+        totalDeliverReceiptFee += item.DeliverReceiptFee;
+        totalDeliveryInsure += item.DeliveryInsure;
+        totalTax += item.Tax;
+
+        return (<tr key={index}>
+            <td>{item.CreateTime}</td>
+            <td>{item.Connact}</td>
+            <td>{item.Telephone}</td>
+            <td>{item.DeliveryCompany}</td>
+            <td>{item.DeliveryFee}</td>
+            <td>{item.DeliverReceiptFee}</td>
+            <td>{item.DeliveryInsure}</td>
+            <td>{item.Tax}</td>
+        </tr>
+        );
+    });
+
+    if (jsxList) {
+        jsxData = (<tbody>{jsxList}</tbody>);
+    }
+
+    jsxFooter = (<tfoot>
+        <tr key="total">
+            <th colSpan={2}></th>
+            <th>合计</th>
+            <th>共{count}记录</th>
+            <th>{totalDeliveryFee}</th>
+            <th>{totalDeliverReceiptFee}</th>
+            <th>{totalDeliveryInsure}</th>
+            <th>{totalTax}</th>
+        </tr></tfoot>);
+
+}
+
+let loading = isFetching ? (<Icon icon="spinner" spin />) : ("");
+
+return (
+    <div id="cash_stat">
+        <h4>收银统计</h4>
+        <table className="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>日期</th>
+                    <th>客户</th>
+                    <th>电话</th>
+                    <th>快递公司</th>
+                    <th>快递费用</th>
+                    <th>代收费用</th>
+                    <th>保价费用</th>
+                    <th>税点费用</th>
+                </tr>
+            </thead>
+            {jsxData}
+            {jsxFooter}
+        </table>
+        {loading}
+    </div>
+);
+}
 
 /**
  * 收银统计数据
@@ -443,6 +515,7 @@ class StatsList extends React.Component {
         this.loadCategoryStat = this._loadCategoryStat.bind(this);
         this.loadStockStat = this._loadStockStat.bind(this);
         this.downloadCSV=this._downloadCSV.bind(this);
+        this.loadEmployeesFromDB=this._loadEmployeesFromDB.bind(this);
     }
 
     componentWillUnmount() {
@@ -457,6 +530,7 @@ class StatsList extends React.Component {
         this.loadSalerStat(null, start, end);
         this.loadCategoryStat(null, start, end);
         this.loadStockStat("");
+        this.loadEmployeesFromDB();
     }
 
     _loadCashStat(event, start, end) {
@@ -493,8 +567,9 @@ class StatsList extends React.Component {
         })
     }
 
-    _loadSalerStat(event, start, end) {
+    _loadSalerStat(event, start, end,EmployeeID) {
         let postData = {
+            EmployeeID,
             StartTime: start,
             EndTime: end,
             action: "export"
@@ -526,8 +601,9 @@ class StatsList extends React.Component {
         })
     }
 
-    _loadCategoryStat(event, start, end) {
+    _loadCategoryStat(event, start, end,Keyword) {
         let postData = {
+            Keyword,
             StartTime: start,
             EndTime: end,
             action: "export"
@@ -593,7 +669,29 @@ class StatsList extends React.Component {
         })
     }
 
-    _onDateRangeChanged(startTemp, endTemp, statItemTemp) {
+    _loadEmployeesFromDB(){
+        fetch('/api/employee/search', {
+            method: 'POST',
+            mode: 'same-origin',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(res => res.json()).then(json => {
+            console.log(json);
+            
+            if (json.code == 0) {
+                let employees = json.data.map((e) => ({ "value": e.ID, "label": e.Name, "data": e }));
+                Store.dispatch({ type: "FETCH_EMPLOYEES_DONE", payload: employees });
+            } else {
+                alert(json.message);
+            }
+        }).catch(err => {
+            console.error(err);
+        })
+    }
+
+    _onDateRangeChanged(startTemp, endTemp, statItemTemp,keyword) {
         let { statList: { start, end, statItem } } = this.state;
 
         start = startTemp || start;
@@ -603,13 +701,14 @@ class StatsList extends React.Component {
         switch (statItem) {
             case 1:
             case 2:
+            case 6:
                 this.loadCashStat(null, start, end);
                 break;
             case 3:
-                this.loadSalerStat(null, start, end);
+                this.loadSalerStat(null, start, end,keyword);
                 break;
             case 4:
-                this.loadCategoryStat(null, start, end);
+                this.loadCategoryStat(null, start, end,keyword);
                 break;
             case 5:
                 this.loadStockStat("");
@@ -638,7 +737,7 @@ class StatsList extends React.Component {
 
     render() {
 
-        let { statList: { isCashFetching, cashStat, isSalerFetching, salerStat, isCategoryFetching, categoryStat, isStockFetching, stocksStat, start, end, statItem } } = this.state;
+        let { statList: { isCashFetching, cashStat, isSalerFetching, salerStat, isCategoryFetching, categoryStat, isStockFetching, stocksStat, start, end, statItem,employees } } = this.state;
 
         let zone = (<div className="stat_zone">
             <CashStat isFetching={isCashFetching} data={cashStat} />
@@ -675,7 +774,36 @@ class StatsList extends React.Component {
                     <CashStyleStat isFetching={isCashFetching} data={cashStat} />
                 </div>);
                 break;
+            case 6:
+                zone=(<div className="stat_zone">
+                <FeeStat data={cashStat} isFetching={isCashFetching}/>
+                </div>);
+                break;
             case 3:
+            search_bar=(<tbody>
+                <tr>
+                    <td>日期范围</td>
+                    <td><DatePicker name="StartDate" placeholder="起始日期" id="Date" value={Moment(start)} onChange={(date) => {
+                        Store.dispatch({ type: "SET_START_DATE", payload: date });
+                        this._onDateRangeChanged(date);
+                        // this.loadCashStat(null, date, end);
+                    }} /></td>
+                    <td>~</td>
+                    <td><DatePicker name="EndDate" placeholder="终止日期" id="Date" value={Moment(end)} onChange={(date) => {
+                        Store.dispatch({ type: "SET_END_DATE", payload: date });
+                        this._onDateRangeChanged(null, date);
+                        // this.loadCashStat(null, start, date);
+                    }} /></td>
+                    <td>
+                        <SelectPicker placeholder="选择销售员" searchable={false} data={employees} onChange={(value)=>{
+                            this._onDateRangeChanged(null,null,null,value);
+                        }} />
+                    </td>
+                    <td>
+                        <button className="btn btn-default" onClick={this.downloadCSV}> 导出.csv </button>
+                    </td>
+                </tr>
+            </tbody>)
                 zone = (<div className="stat_zone">
                     <SalerStat isFetching={isSalerFetching} data={salerStat} />
                 </div>);
@@ -684,6 +812,28 @@ class StatsList extends React.Component {
                 zone = (<div className="stat_zone">
                     <CategoryState isFetching={isCategoryFetching} data={categoryStat} />
                 </div>);
+                  search_bar=(<tbody>
+                    <tr>
+                        <td>日期范围</td>
+                        <td><DatePicker name="StartDate" placeholder="起始日期" id="Date" value={Moment(start)} onChange={(date) => {
+                            Store.dispatch({ type: "SET_START_DATE", payload: date });
+                            this._onDateRangeChanged(date);
+                        }} /></td>
+                        <td>~</td>
+                        <td><DatePicker name="EndDate" placeholder="终止日期" id="Date" value={Moment(end)} onChange={(date) => {
+                            Store.dispatch({ type: "SET_END_DATE", payload: date });
+                            this._onDateRangeChanged(null, date);
+                        }} /></td>
+                        <td>
+                            <Field placeholder="药名、通用名、拼音" data={employees} onChange={(value)=>{
+                                this._onDateRangeChanged(null,null,null,value);
+                            }} />
+                        </td>
+                        <td>
+                            <button className="btn btn-default" onClick={this.downloadCSV}> 导出.csv </button>
+                        </td>
+                    </tr>
+                </tbody>)
                 break;
             case 5:
                 zone = (<div className="stat_zone">
@@ -697,8 +847,8 @@ class StatsList extends React.Component {
                         </td>
                         <td width="60px" style={{"padding":"10px"}}>
                         <button className="btn btn-primary" onClick={()=>{
- let keyword=$("#keyword").val();
- this.loadStockStat(keyword);
+                            let keyword=$("#keyword").val();
+                            this.loadStockStat(keyword);
                         }
                            
                         }>查询</button>
@@ -709,28 +859,32 @@ class StatsList extends React.Component {
                     </tr>
                 </tbody>);
                 break;
+              
         }
 
         return (<div id="StatsList" className="col-md-10 col-md-offset-1 main">
 
-            <RadioGroup name="StatItem" id="StatItem" value={statItem} inline={true} onChange={
-                (value, event) => {
-                    Store.dispatch({ type: "SET_STATITEM", payload: value });
-                    this._onDateRangeChanged(null, null, value);
-                }
-            }>
-                <Radio value={1}>收银明细</Radio>
-                <Radio value={2}>收银方式统计</Radio>
-                <Radio value={3}>销售人员毛利率统计</Radio>
-                <Radio value={4}>品类销售统计</Radio>
-                <Radio value={5}>库存统计</Radio>
-            </RadioGroup>
+            <div style={{background:"#eee","padding":"5px"}}>
+                <RadioGroup name="StatItem" id="StatItem" value={statItem} inline={true} onChange={
+                    (value, event) => {
+                        Store.dispatch({ type: "SET_STATITEM", payload: value });
+                        this._onDateRangeChanged(null, null, value);
+                    }
+                }>
+                    <Radio value={1}>收银明细</Radio>
+                    <Radio value={2}>收银方式统计</Radio>
+                    <Radio value={3}>销售人员毛利率统计</Radio>
+                    <Radio value={4}>品类销售统计</Radio>
+                    <Radio value={5}>库存统计</Radio>
+                    <Radio value={6}>费用统计</Radio>
+                </RadioGroup>
+            </div>
 
-<Form id="form">
-            <table style={{ "width": "440px" }}>
-               {search_bar}
-            </table>
-    </Form>
+            <Form id="form">
+                <table style={{ "width": "800px",}}>
+                    {search_bar}
+                </table>
+            </Form>
 
             {zone}
         </div>)

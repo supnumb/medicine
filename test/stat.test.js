@@ -16,10 +16,11 @@ describe("#数据统计模块测试", function () {
     })
 
     it("##013 收银统计 应该返回成功，Code=0", function (done) {
-        let StartTime = Moment().add(-7, 'day').format('YYYY-MM-DD');
+        let StartTime = Moment().add(-30, 'day').format('YYYY-MM-DD');
         let EndTime = Moment().format('YYYY-MM-DD');
+        let Keyword = "111";
 
-        agent.post('/api/stat/cash').send({ StartTime, EndTime }).expect(200).end(function (err, res) {
+        agent.post('/api/stat/cash').send({ StartTime, EndTime, Keyword }).expect(200).end(function (err, res) {
             if (err) {
                 return done(err);
             }
@@ -33,8 +34,9 @@ describe("#数据统计模块测试", function () {
     it("##014 销售员毛利率统计 应该返回成功，Code=0", function (done) {
         let StartTime = "";
         let EndTime = "";
+        let EmployeeID = 9474;
 
-        agent.post('/api/stat/rate').send({ StartTime, EndTime }).expect(200).end(function (err, res) {
+        agent.post('/api/stat/rate').send({ EmployeeID, StartTime, EndTime }).expect(200).end(function (err, res) {
             if (err) {
                 return done(err);
             }
@@ -45,11 +47,12 @@ describe("#数据统计模块测试", function () {
         });
     })
 
-    it("##015 品类统计 应该返回成功，Code=0", function (done) {
+    it.only("##015 品类统计 应该返回成功，Code=0", function (done) {
         let StartTime = "";
         let EndTime = "";
+        let Keyword = "感冒";
 
-        agent.post('/api/stat/good').send({ StartTime, EndTime }).expect(200).end(function (err, res) {
+        agent.post('/api/stat/good').send({ Keyword, StartTime, EndTime }).expect(200).end(function (err, res) {
             if (err) {
                 return done(err);
             }
@@ -61,7 +64,7 @@ describe("#数据统计模块测试", function () {
     })
 
 
-    it.only("##015 库存统计 应该返回成功，Code=0", function (done) {
+    it("##015 库存统计 应该返回成功，Code=0", function (done) {
         let StartTime = "";
         let EndTime = "";
 

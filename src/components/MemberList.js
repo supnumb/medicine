@@ -151,7 +151,14 @@ class MemberList extends React.Component {
                 <td>{m.Tags}</td>
                 <td>{m.Goods}</td>
                 <td>{m.VisitQuantity}</td>
-                <td>{m.OrderQuantity}</td>
+                <td>
+                    <button className="btn-link" onClick={
+                        () =>
+                            this.props.history.push({ pathname: "/member/orders", state: m })
+                    }>
+                        {m.OrderQuantity}
+                    </button>
+                </td>
                 <td style={{
                     "width": "108px"
                 }}>
