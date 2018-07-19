@@ -49,11 +49,7 @@ const defaultState = {
         Limit: 10,
         Total: 0
     },
-    memberEditor: {
-        isFetching: false,
-        values: [],
-        errors: {}
-    },
+
     intentionList: {
         isFetching: false,
         intentions: [],
@@ -265,21 +261,6 @@ function IntentionsListReducer(state = defaultState.intentionList, action) {
     }
 }
 
-function MemberEditorReducer(state = defaultState.memberEditor, action) {
-    switch (action.type) {
-        case "FETCH_MEMBER":
-            return Object.assign({}, state, { isFetching: true });
-        case "FETCH_MEMBER_DONE":
-            return Object.assign({}, state, {
-                isFetching: false,
-                members: action.payload
-            });
-
-        default:
-            return state;
-    }
-}
-
 function MemberListReducer(state = defaultState.memberList, action) {
     switch (action.type) {
         case "FETCH_MEMBER":
@@ -397,7 +378,7 @@ function OrderEditorReducer(state = defaultState.orderEditor, action) {
             return Object.assign({}, state, {
                 employees: action.payload
             });
-        case "FETCH_MEMBER_DONE":
+        case "FETCH_MEMBERS_DONE":
             return Object.assign({}, state, {
                 members: action.payload
             });

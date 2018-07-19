@@ -115,10 +115,10 @@ class OrderList extends React.Component {
                 <td style={{
                     "width": "80px"
                 }}>
-                    <a href="#" onClick={() => {
+                    <button className="btn-link" onClick={() => {
                         this.props.history.push({ pathname: "/order/editor", state: o })
                         // Store.dispatch({type: "EDITOR_MEMBER", payload: o})
-                    }}>编辑</a>
+                    }}>编辑</button>
                 </td>
             </tr>));
         }

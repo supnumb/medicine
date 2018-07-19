@@ -170,8 +170,8 @@ class ReceiptEditor extends React.Component {
                 alert(json.message);
             }
         }).catch(err => {
-            console.error(err);
-            alert("网络请求中断，请稍后再试")
+            // console.error(err);
+            // alert("网络请求中断，请稍后再试"+JSON.stringify(err))
         })
     }
 

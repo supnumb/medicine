@@ -146,7 +146,9 @@ class OrderEditor extends React.Component {
                         members = json.data.map(v => ({ label: `${v.Name}-${v.PinYin}-${v.MobilPhone}`, value: v.ID, data: JSON.stringify(v) }));
                     }
 
-                    Store.dispatch({ type: "FETCH_MEMBER_DONE", payload: members })
+                    console.log({ members });
+
+                    Store.dispatch({ type: "FETCH_MEMBERS_DONE", payload: members })
                 }
 
             }.bind(this)
@@ -379,8 +381,7 @@ class OrderEditor extends React.Component {
             }
         } = this.state;
 
-        // console.log({ values, orderGoods });
-
+        console.log({ members });
 
         if (!members && !Object.prototype.toString.call(members) === '[object Array]') {
             members = [];
@@ -417,7 +418,7 @@ class OrderEditor extends React.Component {
                             <AsyncTypeahead id="MemberName" name="MemberName" inputProps={{
                                 name: "Name",
                                 id: "ID"
-                            }} placeholder={values.MemberName} onSearch={this.loadMembersFromDB} labelKey="label" onChange={this.onSelectMember} isLoading={isFetching} options={members} />
+                            }} placeholder={values.MemberName} useCache={true} onSearch={this.loadMembersFromDB} labelKey="label" onChange={this.onSelectMember} isLoading={isFetching} options={members} />
 
                             <p className="text-danger">{errors.MemberName}</p>
                         </div>

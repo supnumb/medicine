@@ -138,7 +138,7 @@ const CashStyleStat = (props) => {
  */
 const SalerStat = (props) => {
     let { data, isFetching } = props;
-    let jsxData = (<tbody><tr><td>&nbsp;</td></tr></tbody>);
+    let jsxData = (<tbody><tr><td colSpan={16}>暂无数据</td></tr></tbody>);
     let jsxFooter = (<tfoot><tr><td>&nbsp;</td></tr></tfoot>);
 
     if (data && data.length > 0) {

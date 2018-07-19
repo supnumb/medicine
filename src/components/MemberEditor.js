@@ -269,7 +269,15 @@ class MemberEditor extends React.Component {
 
                 <div className="form-group">
                     <label className="control-label col-sm-3">
+                        建档时间
+                    </label>
+                    <div className="col-sm-6">
+                        {values.CreateTime}
+                    </div>
+                </div>
 
+                <div className="form-group">
+                    <label className="control-label col-sm-3">
                     </label>
                     <p className="text-danger">
                         {message}
@@ -277,9 +285,7 @@ class MemberEditor extends React.Component {
                 </div>
 
                 <div className="form-group">
-
                     <label className="control-label col-sm-3">
-
                     </label>
                     <button onClick={this.submit} className="btn btn-primary">
                         保存

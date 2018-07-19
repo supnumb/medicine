@@ -71,6 +71,7 @@ class ReceiptList extends React.Component {
             }
         }).catch(err => {
             console.error(err);
+            alert("ssssss")
         })
     }
 
@@ -139,20 +140,19 @@ class ReceiptList extends React.Component {
             <td>{r.Date}</td>
             <td>{Moment(r.CreateTime).format("YYYY-MM-DD")}</td>
             <td>
-
-                <a href="#" disabled={true} onClick={() => {
+                <button className="btn-link" onClick={() => {
                     this.props.history.push({
                         pathname: "/receipt/editor",
                         state: { receipt: r, isReturn: Number.parseInt(r.Flag) == 1 }
                     })
-                }}>编辑</a>
+                }}>编辑</button>
 
                 &nbsp;
-                  <a href="#" onClick={() => {
+                  <button className="btn-link" onClick={() => {
                     this.settle(r.ID, r.Status === 0 ? 1 : 0)
                 }}>{
-                        r.Status === 1 ? "已结算" : "未结算"
-                    } </a>
+                        r.Status === 1 ? "已结" : "未结"
+                    } </button>
             </td>
         </tr>));
         return (<div id="ReceiptList">
