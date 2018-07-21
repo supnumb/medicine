@@ -57,7 +57,7 @@ exports.cash = (req, res, next) => {
 
             console.log(csvStr);
 
-            fs.writeFile(config.TempFileRoot + "/" + filename, csvStr, function (err) {
+            fs.writeFile(config.TempFileRoot + "/" + filename, csvStr, 'utf8', function (err) {
                 console.log(err);
             });
 
@@ -108,7 +108,7 @@ exports.rate = (req, res, next) => {
             let filename = `rate_${moment(StartTime).format("YYYY-MM-DD")}_${moment(EndTime).format("YYYY-MM-DD")}.csv`;
             let urlfile = `${config.UrlTemFile}/${filename}`;
 
-            fs.writeFile(config.TempFileRoot + "/" + filename, csvStr, function (err) {
+            fs.writeFile(config.TempFileRoot + "/" + filename, csvStr, 'utf8', function (err) {
                 console.log(err);
             });
 
@@ -160,7 +160,7 @@ exports.good = (req, res, next) => {
 
             console.log(csvStr);
 
-            fs.writeFile(config.TempFileRoot + "/" + filename, csvStr, function (err) {
+            fs.writeFile(config.TempFileRoot + "/" + filename, csvStr, 'utf8', function (err) {
                 console.log(err);
             });
 
