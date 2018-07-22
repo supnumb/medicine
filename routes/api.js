@@ -19,7 +19,7 @@ router.post('/employee/signout', member.signOut);
 router.post('/employee/search', member.checkUser, employee.search);
 
 //添加雇员
-router.post('/employee/save', member.checkUser, employee.addEmployee);
+router.post('/employee/save',  employee.addEmployee);
 
 // 雇员详情
 router.get('/employee/profile', employee.profile);
