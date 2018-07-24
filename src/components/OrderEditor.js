@@ -63,26 +63,31 @@ class OrderEditor extends React.Component {
 
         let { action, MemberID } = state;
         Store.dispatch({ type: "SWITCH_SELECTOR_SHOW", payload: false })
+
+        console.log(state);
+
         //给指定的会员添加销售订单
         if (action == "NEW_ORDER") {
-            this._loadMemberDetailFromDB(MemberID)
+            if (MemberID > 0) {
+                this._loadMemberDetailFromDB(MemberID)
+            } else {
+                // 添加销售订单
+                Store.dispatch({
+                    type: "SET_CHECKED_ORDER", payload: {
+                        DeliveryCode: "",
+                        DeliveryCompany: "",
+                        DeliveryFee: 0,
+                        DeliverReceiptFee: 0,
+                        orderGoods: [],
+                        MobilPhone: "",
+                        Address: "",
+                        PayStyle: 3
+                    }
+                });
+            }
         } else if (state) {//修改订单
             this.loadOrderDetailFromDB(state);
             Store.dispatch({ type: "SET_CHECKED_ORDER", payload: state })
-        } else {
-            // 添加销售订单
-            Store.dispatch({
-                type: "SET_CHECKED_ORDER", payload: {
-                    DeliveryCode: "",
-                    DeliveryCompany: "",
-                    DeliveryFee: 0,
-                    DeliverReceiptFee: 0,
-                    orderGoods: [],
-                    MobilPhone: "",
-                    Address: "",
-                    PayStyle: 3
-                }
-            });
         }
 
         this.loadEmployeesFromDB();

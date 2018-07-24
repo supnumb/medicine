@@ -24,20 +24,20 @@ let memberData = {
 let MemberID = 0;
 
 describe("#会员模块测试", function () {
-    before(function (done) {
-        agent.post('/api/employee/signin').send({ login_name: "13511111111", password: "super1111" }).expect(200).end(function (err, res) {
-            if (err) {
-                return done(err);
-            }
+    // before(function (done) {
+    //     agent.post('/api/employee/signin').send({ login_name: "13511111111", password: "super1111" }).expect(200).end(function (err, res) {
+    //         if (err) {
+    //             return done(err);
+    //         }
 
-            console.log(res.text);
+    //         console.log(res.text);
 
-            res.text.should.containEql("登录成功");
-            done();
-        });
-    })
+    //         res.text.should.containEql("登录成功");
+    //         done();
+    //     });
+    // })
 
-    it.only("### 列出指定会员的订单列表", function (done) {
+    it("### 列出指定会员的订单列表", function (done) {
         let MemberID = 88;
 
         console.log("1===========");
@@ -60,7 +60,9 @@ describe("#会员模块测试", function () {
                 return done(err);
             }
 
-            MemberID = res.body.data.insertId;
+            console.log(res.text);
+            
+            // MemberID = res.body.data.insertId;
 
             res.text.should.containEql("0");
             done();
@@ -237,11 +239,11 @@ describe("#会员模块测试", function () {
         });
     })
 
-    it("## 公司雇员添加 ", function (done) {
+    it.only("## 公司雇员添加 ", function (done) {
         let employeeData = {
             Name: "张三",
             MobilPhone: "13511111111",
-            Password: "123456",
+            DefaultPassword: "123456",
             Flag: 1
         };
 

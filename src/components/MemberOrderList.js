@@ -1,5 +1,8 @@
 import React from 'react';
 import moment from 'moment';
+
+
+
 /**
  * 指定会员的订单列表
  */
@@ -60,7 +63,10 @@ class MemberOrderList extends React.Component {
 
         return (<div id='MemberOrderList' className="col-md-10 col-md-offset-1 main">
             <div id="page_title">
-                <h4>{member ? member.Name : ""}---会员订单</h4>
+                <h4>{member ? member.Name : ""}---会员订单 <button className="btn-link" onClick={() => {
+                    this.props.history.goBack()
+                }}>返回</button></h4>
+
             </div>
 
             <table className="table table-striped table-hover">
@@ -81,7 +87,7 @@ class MemberOrderList extends React.Component {
                 </tbody>
             </table>
 
-        </div>)
+        </div >)
     }
 }
 

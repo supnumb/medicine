@@ -57,12 +57,14 @@ class MemberEditor extends React.Component {
         }).then(res => res.json()).then(json => {
             console.log(json);
 
+            console.log({ isGoNext });
+
             if (json.code == 0) {
                 if (this.props.onSaveCompleted) {
                     this.props.onSaveCompleted(json);
                 }
 
-                if (isGoNext) {
+                if (isGoNext == true) {
                     this.props.history.push({
                         pathname: "/order/editor",
                         state: { action: "NEW_ORDER", MemberID: json.data }
