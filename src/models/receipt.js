@@ -304,6 +304,9 @@ Receipt.prototype.add = function (receiptData, callback) {
                                 Quantity = -Quantity;
                                 Remark = "退货单入库";
                                 Type: 4
+                            } else if (receiptData.Flag == 2) {
+                                Remark = "调整单入库";
+                                Type: 5
                             } else {
                                 Remark = "进货单入库";
                                 Type: 1

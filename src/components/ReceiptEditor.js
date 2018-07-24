@@ -33,7 +33,7 @@ class ReceiptEditor extends React.Component {
             vendors: [{ label: "", value: "" }],
             isShowGoodSelector: false,
             message: "",
-            isReturn: false
+            Type: 0  //0 -- 入库单 1 --退货单  2 --调整单
         };
 
         this.loadReceiptDetailFromDB = this._loadReceiptDetailFromDB.bind(this);
@@ -51,7 +51,7 @@ class ReceiptEditor extends React.Component {
             return;
         }
 
-        let { values, receiptGoods, receipt, isReturn = false } = this.state;
+        let { values, receiptGoods, receipt, Type = 0 } = this.state;
         let receiptData = Object.assign({}, receipt, values);
 
         let _amount = 0;
@@ -64,9 +64,7 @@ class ReceiptEditor extends React.Component {
         receiptData.ReceiptAmount = _amount;
         receiptData.TotalAmount = _amount;
         receiptData.ReceiptGoods = receiptGoods;
-        receiptData.IsReturn = isReturn;
-
-        console.log(receiptData);
+        receiptData.Type = Type;
 
         fetch('/api/receipt/save', {
             body: JSON.stringify(receiptData),
@@ -77,7 +75,6 @@ class ReceiptEditor extends React.Component {
                 'Content-Type': 'application/json'
             }
         }).then(res => res.json()).then(json => {
-            console.log(json);
 
             if (json.code == 0) {
 
@@ -85,7 +82,7 @@ class ReceiptEditor extends React.Component {
                     pathname: '/receipts'
                 });
 
-                alert("进货单保存成功");
+                alert("进货单据保存成功");
                 // Store.dispatch({ type: "SET_FORM_CHECK_RESULT", payload: "" });
             } else {
                 alert(json.message)
@@ -187,6 +184,7 @@ class ReceiptEditor extends React.Component {
                 state: oldReceipt
             }
         } = this.props;
+
         if (oldReceipt) {
             if (receipt && receipt.ID != oldReceipt.ID) {
                 this.loadReceiptDetailFromDB(receipt);
@@ -206,13 +204,13 @@ class ReceiptEditor extends React.Component {
         } = this.props;
 
         if (state) {
-            let { receipt, isReturn } = state;
+            let { receipt, Type } = state;
 
             if (receipt) {
-                this.setState({ values: receipt, isReturn });
+                this.setState({ values: receipt, Type });
                 this.loadReceiptDetailFromDB(receipt);
             } else {
-                this.setState({ isReturn });
+                this.setState({ Type });
             }
 
             this.loadVendorListFromDB();
@@ -257,7 +255,7 @@ class ReceiptEditor extends React.Component {
     }
 
     render() {
-        let { receipt, values, errors, receiptGoods, employees, vendors, isShowGoodSelector, isFetching, message, isReturn } = this.state;
+        let { receipt, values, errors, receiptGoods, employees, vendors, isShowGoodSelector, isFetching, message, Type } = this.state;
 
         let isEditabled = receipt && (receipt.Status == 1);
 
@@ -271,7 +269,7 @@ class ReceiptEditor extends React.Component {
 
         return (<div id="ReceiptEditor">
             <div className="col-md-6 col-md-offset-1 main">
-                <h4>{isReturn ? "退货单编辑" : "进货单编辑"}</h4>
+                <h4>{["退货单编辑", "进货单编辑", "调整单编辑"][Type]}</h4>
                 <Form className="form-horizontal" ref={ref => this.form = ref} values={values} id="form" model={model} onChange={(values) => {
                     this.setState({ values });
                     this.form.cleanErrors();
@@ -308,15 +306,7 @@ class ReceiptEditor extends React.Component {
                         </div>
                         <p className="text-danger">{errors.Telephone}</p>
                     </div>
-                    {/* <div className="form-group">
-                        <label className="control-label col-md-2">
-                            操作员&nbsp;<span className="red">*</span>
-                        </label>
-                        <div className="col-md-4">
-                            <SelectPicker id="EmployeeName" value={values.OperatorID} name="EmployeeName" onSelect={this.onEmployeeSelect} placeholder="请选择销售员" data={employees} />
-                        </div>
-                        <p className="text-danger">{errors.EmployeeName}</p>
-                    </div> */}
+
                     <div className="form-group">
                         <label className="control-label col-md-2">
                             操作日期&nbsp;<span className="red">*</span>
@@ -331,7 +321,7 @@ class ReceiptEditor extends React.Component {
                         </div>
                     </div>
 
-                    <ReceiptGoodList isEditabled={isEditabled} isReturn={isReturn} goods={receiptGoods} onAddGood={() => {
+                    <ReceiptGoodList isEditabled={isEditabled} isReturn={Type == 1} goods={receiptGoods} onAddGood={() => {
                         this.setState({ isShowGoodSelector: true })
                     }} />
 
@@ -351,7 +341,7 @@ class ReceiptEditor extends React.Component {
                         {message}
                     </p>
 
-                    {isEditabled ? ("") : (<button className="btn btn-primary" onClick={this.submitReceipt}>{isReturn ? "保存退货单" : "保存进货单"}</button>)}
+                    {isEditabled ? ("") : (<button className="btn btn-primary" onClick={this.submitReceipt}>保存单据</button>)}
 
                 </Form>
 

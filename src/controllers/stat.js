@@ -31,17 +31,21 @@ exports.visit = (req, res, next) => {
 
     let { StartTime = '', EndTime = '', Keyword = "" } = req.body;
 
+    console.log(req.body);
+
     if (!StartTime && !EndTime) {
         StartTime = moment().add(-1, "days").format('YYYY-MM-DD');
         EndTime = moment().add(1, "days").format('YYYY-MM-DD');
     }
 
-    // console.log({ StartTime, EndTime });
+    console.log({ StartTime, EndTime });
 
     Member.visitStat(StartTime, EndTime, function (err, rows) {
         if (err) {
             return res.send({ code: -2, message: "数据操作错误，请重试" });
         }
+
+        rows.forEach(r => r.StyleLabel = ["电话", "微信", "短信", "其它"][r.Style]);
 
         return res.send({ code: 0, message: "获取数据成功", data: rows });
     });
@@ -84,8 +88,6 @@ exports.cash = (req, res, next) => {
 
             let filename = `cash_${moment(StartTime).format("YYYY-MM-DD")}_${moment(EndTime).format("YYYY-MM-DD")}.csv`;
             let urlfile = `${config.UrlTemFile}/${filename}`;
-
-            console.log(csvStr);
 
             fs.writeFile(config.TempFileRoot + "/" + filename, csvStr, 'utf8', function (err) {
                 console.log(err);
@@ -169,7 +171,6 @@ exports.good = (req, res, next) => {
 
         StartTime = moment(dt).format('YYYY-MM-DD');
         EndTime = moment(new Date()).format('YYYY-MM-DD');
-
     }
 
     Order.good(Keyword, StartTime, EndTime, function (err, mem) {
@@ -187,8 +188,6 @@ exports.good = (req, res, next) => {
 
             let filename = `good_${moment(StartTime).format("YYYY-MM-DD")}_${moment(EndTime).format("YYYY-MM-DD")}.csv`;
             let urlfile = `${config.UrlTemFile}/${filename}`;
-
-            console.log(csvStr);
 
             fs.writeFile(config.TempFileRoot + "/" + filename, csvStr, 'utf8', function (err) {
                 console.log(err);

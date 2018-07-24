@@ -23,6 +23,51 @@ class MemberList extends React.Component {
         this.loadMemberList = this._loadMemberList.bind(this);
         this.onMemberDetailSaveCompleted = this._onMemberDetailSaveCompleted.bind(this);
         this.onMemberDetailCancel = this._onMemberDetailCancel.bind(this);
+        this.exportMemberList = this._exportMemberList.bind(this);
+    }
+
+    _exportMemberList() {
+        let {
+            memberList: {
+                KeyWord,
+            },
+        } = this.state;
+
+        let { Employee } = this.props;
+
+        if (Employee.Flag !== 2) {
+            alert("请以管理员角色登录！");
+            return;
+        }
+
+        let data = {
+            KeyWord,
+            Page: 0,
+            Limit: 100 * 10000,
+            Action: "export"
+        };
+
+        fetch('/api/member/search', {
+            body: JSON.stringify(data),
+            method: "POST",
+            mode: 'same-origin',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(res => res.blob()).then(blob => {
+
+            var a = document.createElement('a');
+            var url = window.URL.createObjectURL(blob);
+            var filename = '会员导出文件.csv';
+            a.href = url;
+            a.download = filename;
+            a.click();
+            window.URL.revokeObjectURL(url);
+
+        }).catch(err => {
+            console.error(err);
+        })
     }
 
     _loadMemberList(event, page = 0, limit = 10) {
@@ -108,9 +153,6 @@ class MemberList extends React.Component {
                 Total
             }
         } = this.state;
-
-        // console.log({ Page, Limit, Total });
-
 
         let editorJsx = ("");
 
@@ -198,8 +240,9 @@ class MemberList extends React.Component {
                             <button className="btn btn-default" onClick={() => {
                                 Store.dispatch({ type: "SET_ADD_MODE" })
                             }}>添加新会员</button>
+                            &nbsp;
+                            <button className="btn btn-default" onClick={this.exportMemberList}>导出</button>
                         </Form>
-
                     </div>
                 </div>
 

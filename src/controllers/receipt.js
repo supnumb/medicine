@@ -29,13 +29,15 @@ const { Receipt } = require('../models/index');
  * @param  {Function} next 管道操作，传递到下一步
  */
 exports.save = (req, res, next) => {
-    let { ID, VendorName, VendorID, Date, IsReturn, ReceiptGoods, Remark = "" } = req.body;
+    let { ID, VendorName, VendorID, Date, Type, ReceiptGoods, Remark = "" } = req.body;
 
     if (!VendorName || !VendorID || !Date || ReceiptGoods.length == 0) {
         return res.status(200).send({ code: 2, message: "VendorName|VendorID|Date|ReceiptGoods参数不匹配！" });
     };
 
-    const ReceiptData = { ID, VendorName, VendorID, Date: moment(Date).format("YYYY-MM-DD"), ReceiptGoods, Remark, Flag: IsReturn ? 1 : 0 };
+    console.log(req.body);
+
+    const ReceiptData = { ID, VendorName, VendorID, Date: moment(Date).format("YYYY-MM-DD"), ReceiptGoods, Remark, Flag: Type };
 
     let { user } = req.session;
 
@@ -55,8 +57,6 @@ exports.save = (req, res, next) => {
                 if (receiptInfo.Status == 1) {
                     return res.send({ code: 3, message: "进货单已经结算，不能修改" })
                 }
-
-                // console.log({ ReceiptData });
 
                 Receipt.update(ReceiptData, function (err, mem) {
                     if (err) {
@@ -97,8 +97,6 @@ exports.save = (req, res, next) => {
  * @param  {Function} next 管道操作，传递到下一步
  */
 exports.receiptList = (req, res, next) => {
-
-    // console.log(req.body);
 
     let { KeyWord = '', Page = 0, Limit = 10, StartTime = '2018-01-01', EndTime = '', Status = [0, 1] } = req.body;
 

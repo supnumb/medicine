@@ -82,6 +82,7 @@ class InviteList extends React.Component {
         let listJsx = invists.map((i, index) => (<tr key={index}>
             <td>{i.ID}</td>
             <td>{i.Remarks}</td>
+            <td>{i.StyleLabel}</td>
             <td>{i.OperatorName}</td>
             <td>{i.UpdateTime}</td>
         </tr>));
@@ -92,6 +93,7 @@ class InviteList extends React.Component {
                     <tr>
                         <th>ID</th>
                         <th>回访记录</th>
+                        <th>方式</th>
                         <th>药师</th>
                         <th>时间</th>
                     </tr>

@@ -81,8 +81,6 @@ exports.stocks = (req, res, next) => {
             let filename = `stock_${moment().format("YYYY-MM-DD")}.csv`;
             let urlfile = `${config.UrlTemFile}/${filename}`;
 
-            console.log(csvStr);
-
             fs.writeFile(config.TempFileRoot + "/" + filename, csvStr, function (err) {
                 console.log(err);
             });

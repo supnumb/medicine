@@ -43,7 +43,7 @@ function Member() {
 
         _toggleStatus: "update Members set Status=:Status where ID=:EmployeeID",
 
-        _visitStat: "SELECT AA.CreateTime , BB. NAME , BB.MobilPhone , AA.Style , AA.Remarks , CC. NAME AS EmployeeName FROM Visits AS AA INNER JOIN Members AS BB ON AA.MemberID = BB.ID INNER JOIN Members AS CC ON AA.OperatorID = CC.ID where AA.CreateTime >=:START and AA.CreateTime <=:END",
+        _visitStat: "SELECT AA.ID,AA.CreateTime , BB. NAME , BB.MobilPhone , AA.Style , AA.Remarks , CC. NAME AS EmployeeName FROM Visits AS AA INNER JOIN Members AS BB ON AA.MemberID = BB.ID INNER JOIN Members AS CC ON AA.OperatorID = CC.ID where AA.CreateTime >=:START and AA.CreateTime <=:END",
     };
 
     var base = new Base();

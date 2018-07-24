@@ -309,106 +309,6 @@ const SalerStat = (props) => {
     )
 }
 
-
-/**
- * 品类销售统计
- * @param {Object} props 
- */
-const CategoryState = (props) => {
-
-    let { data, isFetching } = props;
-    let jsxData = (<tbody><tr><td>&nbsp;</td></tr></tbody>);
-    let jsxFooter = (<tfoot><tr><td>&nbsp;</td></tr></tfoot>);
-
-    if (data) {
-        let count = 0, totalQuantity = 0, avagePirce, totalAmount = 0, avageGrossMargin = 0, totalGrossPrifit = 0;
-
-        let jsxList = data.map((item, index) => {
-
-            count++;
-            totalQuantity += item.SumQuantity;
-            totalAmount += item.SumAmount;
-            totalGrossPrifit += item.GrossProfit;
-
-            return (
-                <tr key={index}>
-                    <td>{item.GoodID}</td>
-                    <td>{item.GoodName}</td>
-                    <td>{item.OfficalName}</td>
-                    <td>{item.Dimension}</td>
-                    <td>{item.Unit}</td>
-                    <td>{item.Manufacturer}</td>
-                    <td>{item.SumQuantity}</td>
-                    <td>{item.FinalPrice}</td>
-                    <td>{item.SumAmount}</td>
-                    <td>{item.GrossProfit}</td>
-                    <td>{item.GrossMargin}</td>
-                    <td>{item.DefaultCostPrice}</td>
-                </tr>
-            );
-        });
-
-        jsxData = (<tbody> {jsxList} </tbody>);
-
-        avageGrossMargin = totalGrossPrifit / totalAmount;
-
-        jsxFooter = (
-            <tfoot>
-                <tr key="total">
-                    <th colSpan="5"></th>
-                    <th>记录数</th>
-                    <th>总量</th>
-                    <th></th>
-                    <th>总金额</th>
-                    <th>毛利</th>
-                    <th>平均毛利率</th>
-                    <th></th>
-                </tr>
-                <tr key="total_data">
-                    <th colSpan="5">合计</th>
-                    <th>共{count}条</th>
-                    <th>{totalQuantity}</th>
-                    <th></th>
-                    <th>{numeral(totalAmount).format("0.00")}</th>
-                    <th>{numeral(totalGrossPrifit).format("0.00")}</th>
-                    <th>{numeral(avageGrossMargin).format("0.000")}</th>
-                    <th></th>
-                </tr>
-
-            </tfoot>
-        );
-
-    }
-
-    let loading = isFetching ? (<Icon icon="spinner" spin />) : ("");
-
-    return (<div id="category_stat">
-        <h4>品类销售统计</h4>
-        <table className="table table-striped table-hover">
-            <thead>
-                <tr>
-                    <th>商品id</th>
-                    <th>商品名称</th>
-                    <th>通用名称</th>
-                    <th>规格</th>
-                    <th>单位</th>
-                    <th>生产厂家</th>
-                    <th>数量之和</th>
-                    <th>单价平均</th>
-                    <th>销售金额之和</th>
-                    <th>毛利之和</th>
-                    <th>毛利率</th>
-                    <th>默认单价</th>
-                </tr>
-            </thead>
-            {jsxData}
-            {jsxFooter}
-        </table>
-
-        {loading}
-    </div>)
-}
-
 /**
  * 数据统计组件
  */
@@ -626,7 +526,6 @@ class StatsList extends React.Component {
                 'Content-Type': 'application/json'
             }
         }).then(res => res.json()).then(json => {
-            console.log(json);
             
             if (json.code == 0) {
                 let employees = json.data.map((e) => ({ "value": e.ID, "label": e.Name, "data": e }));
@@ -641,6 +540,10 @@ class StatsList extends React.Component {
 
     _onDateRangeChanged(startTemp, endTemp, statItemTemp,keyword) {
         let { statList: { start, end, statItem } } = this.state;
+
+        if(endTemp){
+            endTemp=Moment(endTemp).add(1,"days");
+        }
 
         start = startTemp || start;
         end = endTemp || end;
@@ -661,18 +564,18 @@ class StatsList extends React.Component {
             case 5:
                 this.loadStockStat("");
                 break;
+            case 7:
+                this.loadVisitStat(null, start, end);
+                break;
         }
     }
 
     _downloadCSV(){
 
-        console.log("aaa",this.downurl);
-        
         if(this.downurl){
             fetch(this.downurl).then(res=>res.blob()).then(blob=>{
                 let a = document.createElement('a');
       var url = window.URL.createObjectURL(blob);
-    //   var filename = res.headers.get('Content-Disposition'); 
       a.href = url; 
       a.download = this.filename||"temp.csv"; 
       a.click(); 

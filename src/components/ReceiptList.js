@@ -2,7 +2,6 @@ import React from 'react';
 import Store from './Reducer';
 import { Icon, Radio, RadioGroup } from 'rsuite';
 import { Form, Field, createFormControl } from 'form-lib';
-import { SchemaModel, StringType } from 'rsuite-schema';
 import Moment from 'moment';
 
 import ReceiptEditor from './ReceiptEditor';
@@ -136,7 +135,7 @@ class ReceiptList extends React.Component {
             <td>{r.VendorName}</td>
             <td>{r.Goods}</td>
             <td>{r.Amount}</td>
-            <td>{r.Flag == 0 ? "进货单" : "退货单"}</td>
+            <td>{["进货单", "退货单", "调整单"][r.Flag]}</td>
             <td>{r.Date}</td>
             <td>{Moment(r.CreateTime).format("YYYY-MM-DD")}</td>
             <td>
@@ -173,7 +172,7 @@ class ReceiptList extends React.Component {
                                 <button onClick={() => {
                                     this.props.history.push({
                                         pathname: "/receipt/editor",
-                                        state: { ID: 0, isReturn: false }
+                                        state: { ID: 0, Type: 0 }
                                     })
                                 }} className="btn btn-default">
                                     添加进货单
@@ -182,10 +181,19 @@ class ReceiptList extends React.Component {
                                 <button onClick={() => {
                                     this.props.history.push({
                                         pathname: "/receipt/editor",
-                                        state: { ID: 0, isReturn: true }
+                                        state: { ID: 0, Type: 1 }
                                     })
                                 }} className="btn btn-default">
                                     添加退货单
+                                </button>
+                                &nbsp;
+                                <button onClick={() => {
+                                    this.props.history.push({
+                                        pathname: "/receipt/editor",
+                                        state: { ID: 0, Type: 2 }
+                                    })
+                                }} className="btn btn-default">
+                                    添加调整单
                                 </button>
                             </div>
                         </Form>

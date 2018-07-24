@@ -4,8 +4,7 @@ import { Form, Field, createFormControl } from 'form-lib';
 import { SchemaModel, StringType } from 'rsuite-schema';
 
 import InviteList from './InviteList';
-import { RadioGroup, Radio } from 'rsuite';
-
+import { RadioGroup, Radio, SelectPicker } from 'rsuite';
 const TextareaField = createFormControl('textarea');
 const model = SchemaModel({ Remarks: StringType().isRequired('请输入回访内容') });
 
@@ -21,10 +20,33 @@ class InviteEditor extends React.Component {
             values: {},
             errors: {},
             isFetching: false,
-            updateInvite: null
+            updateInvite: null, employees: []
         };
 
         this.submitInvite = this._submitInvite.bind(this);
+        this.loadEmployeesFromDB = this._loadEmployeesFromDB.bind(this);
+    }
+
+    _loadEmployeesFromDB() {
+        fetch('/api/employee/search', {
+            method: 'POST',
+            mode: 'same-origin',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(res => res.json()).then(json => {
+            console.log({ json });
+            if (json.code == 0) {
+
+                let employees = json.data.map((e) => ({ "value": e.ID, "label": e.Name, "data": e }));
+                this.setState({ employees });
+            } else {
+                alert(json.message);
+            }
+        }).catch(err => {
+            console.error(err);
+        })
     }
 
     _submitInvite() {
@@ -37,11 +59,13 @@ class InviteEditor extends React.Component {
         this.setState({ isFetching: true })
 
         let { member } = this.props;
-        let { values } = this.state;
+        let { values, EmployeeID } = this.state;
 
         let postData = {
             MemberID: member.ID,
-            Remarks: values.Remarks
+            Remarks: values.Remarks,
+            Style: values.Style,
+            EmployeeID
         }
 
         fetch('/api/visit/save', {
@@ -66,9 +90,13 @@ class InviteEditor extends React.Component {
 
     componentDidMount() {
         let { member } = this.props;
+        //电话
+        member.Style = 0;
         if (member) {
             this.setState({ values: member });
         }
+
+        this.loadEmployeesFromDB();
     }
 
     componentUnMount() {
@@ -76,7 +104,7 @@ class InviteEditor extends React.Component {
     }
 
     render() {
-        let { values, errors, isFetching, updateInvite } = this.state;
+        let { values, isFetching, updateInvite, employees } = this.state;
         let { member } = this.props;
 
         return (<div id="InviteEditor">
@@ -100,17 +128,29 @@ class InviteEditor extends React.Component {
                     <label >
                         方式
                     </label>
-                    <RadioGroup name="StatItem" id="Style" inline={true} onChange={
-                        (value, event) => {
-                            // this.setState({})
-                            // Store.dispatch({ type: "SET_STATITEM", payload: value });
+                    <RadioGroup name="Style" id="Style" value={values.Style} inline={true} onChange={
+                        (value) => {
+                            let { values } = this.state;
+                            values.Style = value;
+                            this.setState({ values })
                         }
                     }>
-                        <Radio value={1}>电话</Radio>
-                        <Radio value={2}>微信</Radio>
-                        <Radio value={3}>短信</Radio>
-                        <Radio value={4}>其他</Radio>
+                        <Radio value={0}>电话</Radio>
+                        <Radio value={1}>微信</Radio>
+                        <Radio value={2}>短信</Radio>
+                        <Radio value={3}>其他</Radio>
                     </RadioGroup>
+                </div>
+
+                <div className="form-group">
+                    <label >
+                        药师
+                    </label>
+                    <SelectPicker id="EmployeeName" name="EmployeeName" onSelect={(value) => {
+                        values.EmployeeID = value;
+                        this.setState({ values });
+
+                    }} placeholder="请选择回访者" data={employees} searchable={false} />
                 </div>
 
                 <div className="form-group">

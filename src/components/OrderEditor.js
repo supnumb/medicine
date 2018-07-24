@@ -427,8 +427,6 @@ class OrderEditor extends React.Component {
             }
         } = this.state;
 
-        console.log({ members });
-
         if (!members && !Object.prototype.toString.call(members) === '[object Array]') {
             members = [];
         }

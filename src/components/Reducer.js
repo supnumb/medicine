@@ -104,7 +104,7 @@ const defaultState = {
         stocksStat: null,
         visitStat: null,
         start: Moment().add(-1, 'day').format("YYYY-MM-DD"),
-        end: Moment().format("YYYY-MM-DD"),
+        end: Moment().add(1, "days").format("YYYY-MM-DD"),
         statItem: 1,
         employees: []
     }
@@ -282,6 +282,7 @@ function MemberListReducer(state = defaultState.memberList, action) {
                 members: action.payload.data,
                 Total: action.payload.Quantity
             });
+            
         case "EDITOR_MEMBER":
             return Object.assign({}, state, {
                 member: action.payload,

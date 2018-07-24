@@ -21,7 +21,7 @@ const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const async = require('async');
 const moment = require('moment');
-
+var fs = require('fs');
 const { Member, Intention, Order, Visit } = require('../models/index');
 
 exports.checkUser = (req, res, next) => {
@@ -228,9 +228,7 @@ exports.deleteMember = (req, res, next) => {
  */
 exports.memberList = (req, res, next) => {
 
-    console.log(req.body);
-
-    let { KeyWord = '', MobilPhone = '', Page = 0, Limit = 10, OrderBy = 'UpdateTime', StartTime = '2018-01-01', EndTime = '' } = req.body;
+    let { KeyWord = '', MobilPhone = '', Page = 0, Limit = 10, OrderBy = 'UpdateTime', StartTime = '2018-01-01', EndTime = '', Action = "" } = req.body;
 
     if (MobilPhone) {
         if (!validator.isMobilePhone(MobilPhone, 'zh-CN')) {
@@ -250,10 +248,37 @@ exports.memberList = (req, res, next) => {
 
         const { Quantity, rows } = mem;
 
-        // console.log(mem);
+        if (Action == "export") {
+            //TODO:在这里完成会员导出的逻辑
 
-        return res.status(200).send({ code: 0, message: "查询会员列表操作成功！", Quantity, data: rows });
+            let csvStr = `ID,电话,姓名,Tags,意向单内容,回访记录数量,成单数量\r\n`;
 
+            rows.forEach(item => {
+                csvStr += `${item.ID},${item.Name},${item.MobilPhone},${item.Tags || ""},${item.Goods || ""},${item.VisitQuantity},${item.OrderQuantity}\r\n`;
+            })
+
+            let filename = `members_${moment(EndTime).format("YYYY-MM-DD")}.csv`;
+            // let urlfile = `${config.UrlTemFile}/${filename}`;
+
+            console.log("开始写文件");
+
+            fs.writeFile(config.TempFileRoot + "/" + filename, csvStr, 'utf8', function (err) {
+                console.log(err);
+
+                console.log("写文件完成");
+                if (err) {
+                    console.error(err);
+                    return res.send({ code: -1, message: "生成导出文件失败，请重试" })
+                } else {
+                    console.log("发送文件到客户羰");
+                    res.sendFile(config.TempFileRoot + "/" + filename);
+                    // res.send({ code: 0, message: "生成导出文件成功", data: urlfile });
+                }
+            });
+
+        } else {
+            return res.status(200).send({ code: 0, message: "查询会员列表操作成功！", Quantity, data: rows });
+        }
     });
 }
 
@@ -357,19 +382,20 @@ exports.memberInfo = (req, res, next) => {
  */
 exports.addVisit = (req, res, next) => {
 
-    let { MemberID, Remarks } = req.body;
-    console.log(req.body);
+    let { MemberID, Remarks, Style = 0, EmployeeID } = req.body;
 
     if (!MemberID || !Remarks) {
         res.status(422);
         return res.send({ code: 2, message: "参数不完整" });
     };
 
-    const OperatorID = req.session ?
-        req.session.user.ID :
-        1;
+    const OperatorID = req.session ? req.session.user.ID : 1;
 
-    Visit.add(MemberID, OperatorID, Remarks, function (err, mem) {
+    if (EmployeeID > 0) {
+        OperatorID = EmployeeID;
+    }
+
+    Visit.add(MemberID, OperatorID, Remarks, Style, function (err, mem) {
 
         if (err) {
             return res.send({ code: 2, message: "数据库出错" });

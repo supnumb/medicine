@@ -9,13 +9,13 @@ function Visit() {
     var _action = {
 
         //添加
-        _add: "insert into Visits (MemberID,OperatorID,Remarks,CreateTime) values (:MemberID,:OperatorID,:Remarks,curdate());",
+        _add: "insert into Visits (MemberID,OperatorID,Remarks,Style,CreateTime) values (:MemberID,:OperatorID,:Remarks,:Style,now());",
 
         //删除
         _delete: "update Visits set Status=0 where ID=:ID;",
 
         //修改
-        _update: "update Visits set Remarks=:Remarks where ID=:ID;",
+        _update: "update Visits set Remarks=:Remarks,Style=:Style where ID=:ID;",
 
         //总数
         _visitQuantity: "select count(1) as Quantity from Visits where CreateTime>=:StartTime and CreateTime<=:EndTime and Remarks like :KeyWord;",
@@ -45,13 +45,14 @@ function Visit() {
  * @param  {Number} OperatorID 操作员ID
  * @param  {String} Remarks 备注
  */
-Visit.prototype.add = function(MemberID, OperatorID, Remarks, callback) {
+Visit.prototype.add = function (MemberID, OperatorID, Remarks, Style, callback) {
 
     this._add({
         MemberID,
         OperatorID,
-        Remarks
-    }, function(err, rows) {
+        Remarks,
+        Style
+    }, function (err, rows) {
         if (err) {
             return callback(err, null);
         }
@@ -63,11 +64,11 @@ Visit.prototype.add = function(MemberID, OperatorID, Remarks, callback) {
  * 回访记录删除
  * @param  {Number} ID 回访ID
  */
-Visit.prototype.delete = function(ID, callback) {
+Visit.prototype.delete = function (ID, callback) {
 
     this._delete({
         ID
-    }, function(err, rows) {
+    }, function (err, rows) {
         if (err) {
             return callback(err, null);
         }
@@ -80,12 +81,13 @@ Visit.prototype.delete = function(ID, callback) {
  * @param  {Number} ID 回访ID
  * @param  {String} Remarks 备注 
  */
-Visit.prototype.update = function(ID, Remarks, callback) {
+Visit.prototype.update = function (ID, Remarks, Style, callback) {
 
     this._update({
         ID,
-        Remarks
-    }, function(err, rows) {
+        Remarks,
+        Style
+    }, function (err, rows) {
         if (err) {
             return callback(err, null);
         }
@@ -99,13 +101,13 @@ Visit.prototype.update = function(ID, Remarks, callback) {
  * @param  {Number} Page 第几页
  * @param  {Number} Limit 每页显示几条
  */
-Visit.prototype.visitList = function(KeyWord, Page, Limit, StartTime, EndTime, callback) {
+Visit.prototype.visitList = function (KeyWord, Page, Limit, StartTime, EndTime, callback) {
 
     const that = this;
 
     async.parallel([
 
-        function(cb) {
+        function (cb) {
 
             that._visitQuantity({
                 KeyWord: `%${KeyWord}%`,
@@ -113,7 +115,7 @@ Visit.prototype.visitList = function(KeyWord, Page, Limit, StartTime, EndTime, c
                 Limit,
                 StartTime,
                 EndTime,
-            }, function(err, db) {
+            }, function (err, db) {
 
                 if (err) {
                     return cb(err, null);
@@ -125,7 +127,7 @@ Visit.prototype.visitList = function(KeyWord, Page, Limit, StartTime, EndTime, c
 
         },
 
-        function(cb) {
+        function (cb) {
 
             that._visitList({
                 KeyWord: `%${KeyWord}%`,
@@ -133,7 +135,7 @@ Visit.prototype.visitList = function(KeyWord, Page, Limit, StartTime, EndTime, c
                 Limit,
                 StartTime,
                 EndTime,
-            }, function(err, db) {
+            }, function (err, db) {
 
                 if (err) {
                     return cb(err, null);
@@ -145,7 +147,7 @@ Visit.prototype.visitList = function(KeyWord, Page, Limit, StartTime, EndTime, c
 
         }
 
-    ], function(err, result) {
+    ], function (err, result) {
 
         if (err) {
             return callback(err, null);
@@ -155,8 +157,9 @@ Visit.prototype.visitList = function(KeyWord, Page, Limit, StartTime, EndTime, c
 
         const rows = result[1];
 
-        rows.forEach(function(element, index) {
+        rows.forEach(function (element, index) {
 
+            rows[index].StyleLabel = ["电话", "微信", "短信", "其它"][rows[index].Style];
             rows[index].CreateTime = moment(rows[index].CreateTime).format('YYYY-MM-DD');
             rows[index].UpdateTime = moment(rows[index].UpdateTime).format('YYYY-MM-DD HH:mm:ss');
 
@@ -171,17 +174,17 @@ Visit.prototype.visitList = function(KeyWord, Page, Limit, StartTime, EndTime, c
  * 回访记录搜索
  * @param  {Number} MemberID 会员ID
  */
-Visit.prototype.search = function(MemberID, callback) {
+Visit.prototype.search = function (MemberID, callback) {
 
     this._search({
         MemberID
-    }, function(err, rows) {
+    }, function (err, rows) {
         if (err) {
             return callback(err, null);
         }
 
-        rows.forEach(function(element, index) {
-
+        rows.forEach(function (element, index) {
+            rows[index].StyleLabel = ["电话", "微信", "短信", "其它"][rows[index].Style];
             rows[index].CreateTime = moment(rows[index].CreateTime).format('YYYY-MM-DD');
             rows[index].UpdateTime = moment(rows[index].UpdateTime).format('YYYY-MM-DD HH:mm');
 
