@@ -3,8 +3,8 @@ import Store from './Reducer'
 import { Form, Field, createFormControl } from 'form-lib';
 import { SchemaModel, StringType } from 'rsuite-schema';
 
-
 import InviteList from './InviteList';
+import { RadioGroup, Radio } from 'rsuite';
 
 const TextareaField = createFormControl('textarea');
 const model = SchemaModel({ Remarks: StringType().isRequired('请输入回访内容') });
@@ -95,6 +95,24 @@ class InviteEditor extends React.Component {
                     </label>
                     <Field name="Remarks" id="Remarks" accepter={TextareaField} />
                 </div>
+
+                <div className="form-group">
+                    <label >
+                        方式
+                    </label>
+                    <RadioGroup name="StatItem" id="Style" inline={true} onChange={
+                        (value, event) => {
+                            // this.setState({})
+                            // Store.dispatch({ type: "SET_STATITEM", payload: value });
+                        }
+                    }>
+                        <Radio value={1}>电话</Radio>
+                        <Radio value={2}>微信</Radio>
+                        <Radio value={3}>短信</Radio>
+                        <Radio value={4}>其他</Radio>
+                    </RadioGroup>
+                </div>
+
                 <div className="form-group">
                     <button onClick={this.submitInvite} className="btn btn-primary" disabled={isFetching}>
                         保存

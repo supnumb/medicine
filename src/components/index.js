@@ -27,3 +27,5 @@ export { default as EmployeeList } from './EmployeeList';
 export { default as EmployeeEditor } from './EmployeeEditor';
 
 export { default as MemberOrderList } from './MemberOrderList';
+
+export { default as VisitStat } from './VisitStat';

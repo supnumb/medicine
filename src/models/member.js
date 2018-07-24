@@ -42,6 +42,8 @@ function Member() {
         _employeeList: "select * from Members where Flag!=0 and concat(Name,MobilPhone) like :KeyWord order by ID desc",
 
         _toggleStatus: "update Members set Status=:Status where ID=:EmployeeID",
+
+        _visitStat: "SELECT AA.CreateTime , BB. NAME , BB.MobilPhone , AA.Style , AA.Remarks , CC. NAME AS EmployeeName FROM Visits AS AA INNER JOIN Members AS BB ON AA.MemberID = BB.ID INNER JOIN Members AS CC ON AA.OperatorID = CC.ID where AA.CreateTime >=:START and AA.CreateTime <=:END",
     };
 
     var base = new Base();
@@ -50,6 +52,16 @@ function Member() {
     this.prototype = base;
     Base.apply(this, arguments);
 };
+
+/**
+ * 得到指定时间段内，回访记录的列表信息
+ * @param {String} Start 开始时间
+ * @param {String} End 结束时间
+ * @param {Function} callback 回调
+ */
+Member.prototype.visitStat = function (Start, End, callback) {
+    this._visitStat({ START: Start, END: End }, callback)
+}
 
 /**
  * 根据电话号码查找
@@ -179,8 +191,8 @@ Member.prototype.memberList = function (KeyWord, MobilPhone, Page, Limit, OrderB
                 Flag: 0,
                 KeyWord: `%${KeyWord}%`,
                 MobilPhone: `%${MobilPhone}%`,
-                Page:Number.parseInt(Page),
-                Limit:Number.parseInt(Limit),
+                Page: Number.parseInt(Page),
+                Limit: Number.parseInt(Limit),
                 OrderBy: `m.${OrderBy}`,
                 StartTime,
                 EndTime,

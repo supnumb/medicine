@@ -3,8 +3,10 @@ import Store from './Reducer';
 import Moment from 'moment';
 import numeral from 'numeral';
 import { Icon, RadioGroup, Radio, DatePicker, SelectPicker } from 'rsuite';
-import Table from 'rsuite/lib/Table';
+// import Table from 'rsuite/lib/Table';
 import { Form, Field, createFormControl } from 'form-lib';
+
+import {VisitStat} from './index';
 
 
 const FeeStat=(props)=>{
@@ -515,6 +517,7 @@ class StatsList extends React.Component {
         this.loadCategoryStat = this._loadCategoryStat.bind(this);
         this.loadStockStat = this._loadStockStat.bind(this);
         this.downloadCSV=this._downloadCSV.bind(this);
+        this.loadVisitStat=this._loadVisitStat.bind(this);
         this.loadEmployeesFromDB=this._loadEmployeesFromDB.bind(this);
     }
 
@@ -530,8 +533,42 @@ class StatsList extends React.Component {
         this.loadSalerStat(null, start, end);
         this.loadCategoryStat(null, start, end);
         this.loadStockStat("");
+        this.loadVisitStat(null,start,end);
         this.loadEmployeesFromDB();
     }
+
+    _loadVisitStat(event,start,end){
+        let postData = {
+            StartTime: start,
+            EndTime: end,
+            action: "export"
+        }
+
+        Store.dispatch({ type: "FETCH_CASH", payload: postData });
+
+        fetch('/api/stat/visit', {
+            body: JSON.stringify(postData),
+            method: 'POST',
+            mode: 'same-origin',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(res => res.json()).then(json => {
+            console.log(json);
+            if (json.code == 0) {
+                this.downurl=json.url;
+                this.filename=json.filename;
+                Store.dispatch({ type: "FETCH_VISIT_DONE", payload: json.data })
+            } else {
+                this.downurl=null;
+                this.filename=null;
+                alert(json.message);
+            }
+        }).catch(err => {
+            console.error(err);
+        })
+    };
 
     _loadCashStat(event, start, end) {
 
@@ -737,7 +774,7 @@ class StatsList extends React.Component {
 
     render() {
 
-        let { statList: { isCashFetching, cashStat, isSalerFetching, salerStat, isCategoryFetching, categoryStat, isStockFetching, stocksStat, start, end, statItem,employees } } = this.state;
+        let { statList: { isCashFetching, cashStat, isSalerFetching, salerStat, isCategoryFetching, categoryStat, isStockFetching, stocksStat,visitStat, start, end, statItem,employees } } = this.state;
 
         let zone = (<div className="stat_zone">
             <CashStat isFetching={isCashFetching} data={cashStat} />
@@ -859,6 +896,30 @@ class StatsList extends React.Component {
                     </tr>
                 </tbody>);
                 break;
+                case 7:
+                zone = (<div className="stat_zone">
+                <VisitStat isFetching={isSalerFetching} data={visitStat} />
+            </div>);
+            search_bar = (<tbody>
+                <tr>
+                    <td>日期范围</td>
+                    <td><DatePicker name="StartDate" placeholder="起始日期" id="Date" value={Moment(start)} onChange={(date) => {
+                        Store.dispatch({ type: "SET_START_DATE", payload: date });
+                        this._onDateRangeChanged(date);
+                        // this.loadCashStat(null, date, end);
+                    }} /></td>
+                    <td>~</td>
+                    <td><DatePicker name="EndDate" placeholder="终止日期" id="Date" value={Moment(end)} onChange={(date) => {
+                        Store.dispatch({ type: "SET_END_DATE", payload: date });
+                        this._onDateRangeChanged(null, date);
+                        // this.loadCashStat(null, start, date);
+                    }} /></td>
+                    <td style={{width:"400px"}}>
+                        
+                    </td>
+                </tr>
+            </tbody>);
+                break;
               
         }
 
@@ -877,6 +938,7 @@ class StatsList extends React.Component {
                     <Radio value={4}>品类销售统计</Radio>
                     <Radio value={5}>库存统计</Radio>
                     <Radio value={6}>费用统计</Radio>
+                    <Radio value={7}>回访统计</Radio>
                 </RadioGroup>
             </div>
 

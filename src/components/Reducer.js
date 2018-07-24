@@ -102,6 +102,7 @@ const defaultState = {
         salerStat: null,
         categoryStat: null,
         stocksStat: null,
+        visitStat: null,
         start: Moment().add(-1, 'day').format("YYYY-MM-DD"),
         end: Moment().format("YYYY-MM-DD"),
         statItem: 1,
@@ -135,6 +136,8 @@ function StatReducer(state = defaultState.statList, action) {
             return Object.assign({}, state, { statItem: action.payload });
         case "FETCH_EMPLOYEES_DONE":
             return Object.assign({}, state, { employees: action.payload });
+        case "FETCH_VISIT_DONE":
+            return Object.assign({}, state, { visitStat: action.payload });
         default:
             return state;
     }

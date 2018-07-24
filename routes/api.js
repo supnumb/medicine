@@ -126,6 +126,9 @@ router.post('/stat/rate', member.checkUser, stat.rate);
 //品类统计
 router.post('/stat/good', member.checkUser, stat.good);
 
+//回访记录
+router.post('/stat/visit', member.checkUser, stat.visit);
+
 //会员详情(会员信息、意向记录、回访记录、、成单记录)
 router.post('/member/:MemberID', member.checkUser, member.memberInfo);
 

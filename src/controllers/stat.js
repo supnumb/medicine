@@ -14,8 +14,38 @@
 const moment = require('moment');
 var fs = require('fs');
 
-const { Order } = require('../models/index');
+const { Order, Member } = require('../models/index');
 const config = require('../../config');
+
+
+/**
+ * 
+ * @param  {Object}   req  http 请求对象
+ * @param  {Object}   res  http 响应对象
+ * @param  {Date}     req.body.StartTime 开始时间
+ * @param  {Date}     req.body.EndTime 结束时间
+ * @param  {Function} next 管道操作，传递到下一步
+ */
+exports.visit = (req, res, next) => {
+    //SELECT AA.CreateTime , BB. NAME , BB.MobilPhone , AA.Style , AA.Remarks , CC. NAME AS EmployeeName FROM Visits AS AA INNER JOIN Members AS BB ON AA.MemberID = BB.ID INNER JOIN Members AS CC ON AA.OperatorID = CC.ID where AA.CreateTime >: START and AA.CreateTime <=: END
+
+    let { StartTime = '', EndTime = '', Keyword = "" } = req.body;
+
+    if (!StartTime && !EndTime) {
+        StartTime = moment().add(-1, "days").format('YYYY-MM-DD');
+        EndTime = moment().add(1, "days").format('YYYY-MM-DD');
+    }
+
+    // console.log({ StartTime, EndTime });
+
+    Member.visitStat(StartTime, EndTime, function (err, rows) {
+        if (err) {
+            return res.send({ code: -2, message: "数据操作错误，请重试" });
+        }
+
+        return res.send({ code: 0, message: "获取数据成功", data: rows });
+    });
+}
 
 /**
  * 收银统计

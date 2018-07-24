@@ -6,7 +6,7 @@ var Moment = require('moment');
 var should = require('should');
 describe("#数据统计模块测试", function () {
     before(function (done) {
-        agent.post('/api/employee/signin').send({ login_name: "13511111111", password: "super1111" }).expect(200).end(function (err, res) {
+        agent.post('/api/employee/signin').send({ login_name: "13511111111", password: "123456" }).expect(200).end(function (err, res) {
             if (err) {
                 console.log(err);
             }
@@ -47,7 +47,7 @@ describe("#数据统计模块测试", function () {
         });
     })
 
-    it.only("##015 品类统计 应该返回成功，Code=0", function (done) {
+    it("##015 品类统计 应该返回成功，Code=0", function (done) {
         let StartTime = "";
         let EndTime = "";
         let Keyword = "感冒";
@@ -69,6 +69,22 @@ describe("#数据统计模块测试", function () {
         let EndTime = "";
 
         agent.post('/api/stock/search').send({ StartTime, EndTime }).expect(200).end(function (err, res) {
+            if (err) {
+                return done(err);
+            }
+
+            console.log(JSON.parse(res.text));
+            res.text.should.containEql("0");
+            done();
+        });
+    })
+
+    it.only("##015 指定时间内的会员回访记录列表，Code=0", function (done) {
+        let StartTime = "";
+        let EndTime = "";
+        let Keyword = "感冒";
+
+        agent.post('/api/stat/visit').send({ Keyword, StartTime, EndTime }).expect(200).end(function (err, res) {
             if (err) {
                 return done(err);
             }
