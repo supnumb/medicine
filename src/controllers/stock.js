@@ -69,6 +69,8 @@ exports.stocks = (req, res, next) => {
             return res.send({ code: 2, message: "数据库出错" });
         };
 
+        rows.forEach(item => item.TotalAmount = item.ValiableQuantity * item.DefaultCostPrice);
+
         if (action == 'export') {
             let csvStr = `商品id,商品名称,通用名称,规格,单位,生产厂家,总进货,已销售,可用库存,进价平均,库存金额\r\n`;
 

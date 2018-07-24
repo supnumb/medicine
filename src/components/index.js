@@ -29,3 +29,7 @@ export { default as EmployeeEditor } from './EmployeeEditor';
 export { default as MemberOrderList } from './MemberOrderList';
 
 export { default as VisitStat } from './VisitStat';
+
+export { default as StockStat } from './StockStat';
+
+export { default as CategoryStat } from './CategoryStat';
