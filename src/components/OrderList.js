@@ -1,11 +1,9 @@
 import React from 'react';
 import Store from './Reducer';
-
+import { withRouter } from 'react-router-dom';
 import { Form, Field, createFormControl } from 'form-lib';
-import { SchemaModel, StringType } from 'rsuite-schema';
 import { Icon } from 'rsuite';
 import { default as Pager } from './Pager'
-import Moment from 'moment';
 
 /**
  * 销售订单页面
@@ -143,7 +141,7 @@ class OrderList extends React.Component {
                             &nbsp;
                             &nbsp;
                             <button onClick={() => {
-                                this.props.history.push({ pathname: "/order/editor", state: {action:"NEW_ORDER"} })
+                                this.props.history.push({ pathname: "/order/editor", state: { action: "NEW_ORDER" } })
                             }} className="btn btn-default">
                                 添加销售订单
                             </button>
@@ -189,4 +187,4 @@ class OrderList extends React.Component {
     }
 }
 
-export default OrderList;
+export default withRouter(OrderList);

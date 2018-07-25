@@ -33,15 +33,18 @@ class OrderGoodList extends React.Component {
         const id = target.id;
         let val = value;
 
-        if (!/\d+/.test(val)) {
-            val = 0;
-        }
-
-        g[id] = val;
-
-        console.log(id, val);
+        console.log({ id, val });
 
         let { orderGoods } = this.state;
+        g[id] = val;
+
+        if (!/^[\+\-]?\d+$/.test(val)) {
+
+            this.setState({ orderGood: g })
+            return;
+        }
+
+        console.log(true);
 
         orderGoods.forEach(good => {
             if (good.ID == g.ID) {
@@ -73,7 +76,7 @@ class OrderGoodList extends React.Component {
 
         let loading = isFetching ? (<Icon icon='spinner' spin />) : ("");
 
-        // console.log({ orderGood });
+        console.log({ orderGood });
 
         let listJsx = orderGoods.map((og, index) => {
 
@@ -101,6 +104,22 @@ class OrderGoodList extends React.Component {
                     <td>
                         <button onClick={() => {
                             let { orderGoods } = this.state;
+
+                            let flag = false;
+                            let cgood = null;
+                            orderGoods.forEach(g => {
+                                if (!/^\d+(\.\d{1,2})?$/.test(g.FinalPrice) || !/^[\+\-]?\d+$/.test(g.Quantity)) {
+                                    cgood = g;
+                                    flag = true;
+                                    return true;
+                                }
+                            })
+
+                            if (flag) {
+                                alert(`ID为${cgood.ID}的药品价格或数量录入有误[药品数量为正负整数，价格为正数]，请重新检查`);
+                                return;
+                            }
+
                             this.calcGoodSumPrice(orderGoods);
                             this.setState({ orderGood: null });
                         }}>确定</button>
