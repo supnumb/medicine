@@ -1,4 +1,5 @@
 import React from 'react';
+import { withRouter } from 'react-router-dom';
 import Store from './Reducer';
 import { Icon, Radio, RadioGroup } from 'rsuite';
 import { Form, Field, createFormControl } from 'form-lib';
@@ -242,4 +243,4 @@ class ReceiptList extends React.Component {
     }
 }
 
-export default ReceiptList;
+export default withRouter(ReceiptList);

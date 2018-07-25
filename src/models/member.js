@@ -39,7 +39,7 @@ function Member() {
         _memberInfo: "select * from Members where ID=:ID;",
 
         //雇员列表
-        _employeeList: "select * from Members where Flag!=0 and concat(Name,MobilPhone) like :KeyWord order by ID desc",
+        _employeeList: "select * from Members where Flag=1 and Status=1 and concat(Name,MobilPhone) like :KeyWord order by ID desc",
 
         _toggleStatus: "update Members set Status=:Status where ID=:EmployeeID",
 
