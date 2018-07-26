@@ -136,3 +136,16 @@ ALTER TABLE `Medicine`.`Orders` ADD COLUMN `Tax` int NOT NULL DEFAULT 0 AFTER `D
 3、修改字段returnQuantity为ReturnQuantity。
 4、增加保存销售单时销售单ID返回。
 5、入库单是否已售不可修改，Flag=1，商品已售不可修改，Flag=0,商品可以修改
+
+### 2018-06-17
+---------
+今天任务：  
+1、[ * ] 销售订单的商品删除；  
+2、[ * ] 进货单的商品删除；   
+3、[ * ] 退货逻辑增加；  
+4、[  ] 药师提交功能、药师重置密码功能；  
+
+2018-06-20
+今天任务：
+1、打印快递单；
+2、修改bug;
