@@ -149,3 +149,16 @@ ALTER TABLE `Medicine`.`Orders` ADD COLUMN `Tax` int NOT NULL DEFAULT 0 AFTER `D
 今天任务：
 1、打印快递单；
 2、修改bug;
+
+
+
+### 2018-07-25
+目标：
+1. 部署一个Medicine的Demo站点； 
+    1. 做好Nigin反向； **完成**
+    2. 让Docker_1服务器可以自动启动； 
+    3. 整理一个测试药品的列表，导入到Demo库；
+    4. 
+2. git做好和春江网站的分支，以免冲突造成额外的问题； 
+3. 重新写一下产品功能的说明 ； 
+
