@@ -1,19 +1,17 @@
 import React from 'react';
-
+import { withRouter } from 'react-router-dom';
 import { Form, Field, createFormControl } from 'form-lib';
 import { SchemaModel, StringType } from 'rsuite-schema';
 import { DatePicker, SelectPicker, AutoComplete, Icon } from 'rsuite';
 import Moment from 'moment';
 import { asyncContainer, Typeahead } from 'react-bootstrap-typeahead';
-const AsyncTypeahead = asyncContainer(Typeahead);
-
-const model = SchemaModel({ VendorName: StringType().isRequired('请选择供应商') });
-
 import ReceiptGoodList from './ReceiptGoodList';
 import GoodSelector from './GoodSelector';
-const TextareaField = createFormControl('textarea');
-
 import store from './Reducer';
+
+const AsyncTypeahead = asyncContainer(Typeahead);
+const model = SchemaModel({ VendorName: StringType().isRequired('请选择供应商') });
+const TextareaField = createFormControl('textarea');
 
 /**
  * 进货单详情管理
@@ -354,4 +352,4 @@ class ReceiptEditor extends React.Component {
     }
 }
 
-export default ReceiptEditor;
+export default withRouter(ReceiptEditor);
