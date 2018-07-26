@@ -92,12 +92,12 @@ class StockStat extends React.Component {
                     <Cell dataKey="Name" />
                 </Column>
 
-                <Column width={100} >
+                <Column flexGrow={2} >
                     <HeaderCell>通用名称</HeaderCell>
                     <Cell dataKey="OfficalName" />
                 </Column>
 
-                <Column width={70} >
+                <Column width={80} resizable={true} >
                     <HeaderCell>规格</HeaderCell>
                     <Cell dataKey="Dimension" />
                 </Column>
@@ -106,7 +106,7 @@ class StockStat extends React.Component {
                     <HeaderCell>单位</HeaderCell>
                     <Cell dataKey="Unit" />
                 </Column>
-                <Column width={100}>
+                <Column flexGrow={1.5}>
                     <HeaderCell>生产厂家</HeaderCell>
                     <Cell dataKey="Manufacturer" />
                 </Column>
